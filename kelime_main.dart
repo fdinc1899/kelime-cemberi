@@ -3901,7 +3901,7 @@ class GameScreen extends StatefulWidget {
   State<GameScreen> createState() => _GameScreenState();
 }
 
-class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateMixin {
+class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   final math.Random _random = math.Random();
   final AudioPlayer _musicPlayer = AudioPlayer();
   late final AnimationController _cheerController;
@@ -3931,6 +3931,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _cheerController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1450),
@@ -3945,9 +3946,20 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
 
   @override
   void dispose() {
+    _saveProgress();
+    WidgetsBinding.instance.removeObserver(this);
     _cheerController.dispose();
     _musicPlayer.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
+      _saveProgress();
+    }
   }
 
   Future<void> _startMusic() async {
@@ -3991,6 +4003,38 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     _cheerController.forward(from: 0);
     SystemSound.play(SystemSoundType.click);
     HapticFeedback.lightImpact();
+  }
+
+  Future<bool> _confirmExit() async {
+    _saveProgress();
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Oyundan çık?'),
+        content: const Text('İlerlemen kaydedilecek. Oyundan çıkmak istiyor musun?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Hayır'),
+          ),
+          FilledButton.icon(
+            onPressed: () {
+              _saveProgress();
+              Navigator.pop(dialogContext, true);
+            },
+            icon: const Icon(Icons.save_rounded),
+            label: const Text('Evet, çık'),
+          ),
+        ],
+      ),
+    );
+    if (result == true) {
+      if (mounted) {
+        SystemNavigator.pop();
+      }
+      return true;
+    }
+    return false;
   }
 
   Future<void> _restore() async {
@@ -4058,8 +4102,8 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     _prefs?.setInt('unlocked_v3', _unlocked);
   }
 
-  // Harf tekerleği ham dokunma olaylarını işler. Ana oyun sahnesi
-  // kaydırılamadığı için sürükleme parmağın altında kesintisiz çalışır.
+  // Ham dokunma olayları + EagerGestureRecognizer ile kaydırma çakışmasını
+  // önleriz. Üst SingleChildScrollView, tekerlekteki sürüklemeyi alamaz.
   void _wheelTouchDown(PointerDownEvent event, double size) {
     if (_activeWheelPointer != null) return;
     _activeWheelPointer = event.pointer;
@@ -4120,6 +4164,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     final word = _selection;
     final targets = _puzzle.answers.map((e) => e.word).toSet();
     bool newWord = false;
+    bool newBonus = false;
     bool justCompleted = false;
     setState(() {
       _dragged.clear();
@@ -4141,6 +4186,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
         }
       } else if (_puzzle.bonusWords.contains(word)) {
         if (_bonuses.add(word)) {
+          newBonus = true;
           _coins += 5;
           _notice = 'Bonus: $word +5 altın';
         } else {
@@ -4154,6 +4200,8 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     if (newWord) {
       _celebrate(justCompleted ? 'TEBRİKLER!' : 'BRAVO!',
           justCompleted ? 'BÖLÜM TAMAMLANDI! +40 ALTIN' : '$word  +10 ALTIN');
+    } else if (newBonus) {
+      _celebrate('BONUS!', '$word  +5 ALTIN');
     }
   }
 
@@ -4230,6 +4278,194 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     );
   }
 
+  Widget _mapProgressPill(String text, Color bg, Color fg) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(40),
+        ),
+        child: Text(text,
+            style: TextStyle(color: fg, fontSize: 11, fontWeight: FontWeight.w800)),
+      );
+
+  Widget _cityStageDot(bool done, bool active, bool locked) {
+    final Color fill = done ? const Color(0xFF55B36C) : (active ? _gold : (locked ? const Color(0xFFE9DFCF) : const Color(0xFF123255)));
+    final Color border = done ? Colors.white : (active ? Colors.white : _gold.withOpacity(.75));
+    return Container(
+      width: 14,
+      height: 14,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: fill,
+        border: Border.all(color: border, width: 1.4),
+        boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 3)],
+      ),
+      child: done ? const Icon(Icons.check, size: 9, color: Colors.white) : null,
+    );
+  }
+
+  Widget _cityMapCard(BuildContext sheetContext, int i) {
+    final cityStart = i * 3;
+    final cityName = _levels[cityStart].city;
+    final locked = cityStart > _unlocked;
+    final done = List.generate(3, (k) => cityStart + k)
+        .where((j) => _completedLevels.contains(j)).length;
+    final isCurrentCity = _level ~/ 3 == i;
+    final preview = i == 0 ? _istanbulBackground : _cityBackgrounds[cityName]!;
+    final progress = done / 3.0;
+    final int suggested = math.min(_unlocked, cityStart + done.clamp(0, 2).toInt());
+
+    return Opacity(
+      opacity: locked ? .83 : 1,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: locked ? null : () {
+            Navigator.pop(sheetContext);
+            _openLevel(suggested);
+          },
+          borderRadius: BorderRadius.circular(20),
+          child: Ink(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isCurrentCity ? _gold : const Color(0xFFE8DCC8),
+                width: isCurrentCity ? 2 : 1,
+              ),
+              boxShadow: const [BoxShadow(color: Color(0x15000000), blurRadius: 12, offset: Offset(0, 4))],
+            ),
+            child: Column(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: Stack(
+                    children: [
+                      SizedBox(
+                        height: 96,
+                        width: double.infinity,
+                        child: Image.memory(preview, fit: BoxFit.cover),
+                      ),
+                      Positioned.fill(
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [Colors.black.withOpacity(.10), Colors.black.withOpacity(.58)],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 10,
+                        top: 10,
+                        child: CircleAvatar(
+                          radius: 16,
+                          backgroundColor: locked ? const Color(0xFFF1E1CA) : const Color(0xFFBD8B55),
+                          child: locked
+                              ? const Icon(Icons.lock_outline, size: 16, color: Color(0xFF6A533D))
+                              : Text('${i + 1}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
+                        ),
+                      ),
+                      Positioned(
+                        left: 12,
+                        right: 12,
+                        bottom: 10,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(cityName,
+                                      style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, shadows: [Shadow(color: Colors.black54, blurRadius: 5)])),
+                                  Text(
+                                    locked
+                                        ? 'Kilitli şehir'
+                                        : done == 3
+                                            ? 'Şehir tamamlandı ✓'
+                                            : done == 0
+                                                ? 'Maceraya başla'
+                                                : '$done / 3 bölüm tamamlandı',
+                                    style: const TextStyle(color: Color(0xFFFDEFD4), fontSize: 12, fontWeight: FontWeight.w700),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (isCurrentCity)
+                              _mapProgressPill('AKTİF', _gold, _navy)
+                            else if (done == 3)
+                              _mapProgressPill('TAMAM', const Color(0xFF55B36C), Colors.white)
+                            else if (locked)
+                              _mapProgressPill('KİLİTLİ', const Color(0xFFF1E1CA), const Color(0xFF6A533D)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(50),
+                            child: LinearProgressIndicator(
+                              value: progress,
+                              minHeight: 8,
+                              backgroundColor: const Color(0xFFEEE4D7),
+                              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF55B36C)),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: List.generate(3, (stage) {
+                              final real = cityStart + stage;
+                              return Padding(
+                                padding: EdgeInsets.only(right: stage == 2 ? 0 : 7),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    _cityStageDot(_completedLevels.contains(real), _level == real, real > _unlocked),
+                                    const SizedBox(width: 4),
+                                    Text('${stage + 1}', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 11)),
+                                  ],
+                                ),
+                              );
+                            }),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: locked ? const Color(0xFFF3E9DA) : _navy,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: _gold, width: 1.4),
+                      ),
+                      child: Icon(
+                        locked ? Icons.lock_outline : Icons.chevron_right_rounded,
+                        color: locked ? const Color(0xFF6A533D) : _cream,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   void _showMap() {
     showModalBottomSheet<void>(
       context: context,
@@ -4238,43 +4474,23 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
       isScrollControlled: true,
       builder: (sheetContext) => SafeArea(
         child: FractionallySizedBox(
-          heightFactor: .73,
+          heightFactor: .86,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+            padding: const EdgeInsets.fromLTRB(18, 8, 18, 16),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Text('Şehir haritası',
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.w800)),
-              const Text('Her şehirde 3 ayrı bulmaca',
-                style: TextStyle(color: Color(0xFF80674C),fontSize: 13)),
+              const SizedBox(height: 2),
+              Text('6 şehir · 18 bölüm · İlerlemeni kaydediyoruz',
+                style: TextStyle(color: const Color(0xFF80674C), fontSize: 13, fontWeight: FontWeight.w600)),
               const SizedBox(height: 12),
-              Expanded(child: ListView.builder(
-                itemCount: 6,
-                itemBuilder: (context, i) {
-                  final cityStart = i * 3;
-                  final locked = cityStart > _unlocked;
-                  final done = List.generate(3, (k) => cityStart + k)
-                      .where((j) => _completedLevels.contains(j)).length;
-                  return ListTile(
-                    dense: true,
-                    leading: CircleAvatar(
-                      backgroundColor: !locked ? const Color(0xFFBD8B55)
-                        : const Color(0xFFF1E1CA),
-                      child: locked
-                        ? const Icon(Icons.lock_outline, size: 19)
-                        : Text('${i + 1}',style: const TextStyle(color: Colors.white)),
-                    ),
-                    title: Text(_levels[cityStart].city,
-                      style: const TextStyle(fontWeight: FontWeight.w800)),
-                    subtitle: Text(locked ? 'Kilitli · Önceki şehrin 3 bölümünü bitir'
-                      : done == 3 ? '3 / 3 Tamamlandı ✓' : '$done / 3 bölüm tamamlandı'),
-                    trailing: Icon(locked ? Icons.lock_outline : Icons.chevron_right),
-                    onTap: locked ? null : () {
-                      Navigator.pop(sheetContext);
-                      _openLevel(math.min(_unlocked, cityStart + done.clamp(0, 2).toInt()));
-                    },
-                  );
-                },
-              )),
+              Expanded(
+                child: ListView.separated(
+                  itemCount: 6,
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  itemBuilder: (context, i) => _cityMapCard(sheetContext, i),
+                ),
+              ),
             ]),
           ),
         ),
@@ -4310,6 +4526,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                 _prefs?.setString('gift_date', today);
                 _saveProgress();
                 Navigator.pop(sheetContext);
+                _celebrate('ÖDÜL!', 'GÜNLÜK ÖDÜL  +35 ALTIN');
               },
               icon: const Icon(Icons.stars_rounded),
               label: Text(claimed ? 'Bugünkü ödülü aldın' : '35 altını al'),
@@ -4328,7 +4545,9 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     final firstCity = _level ~/ 3 == 0;
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: _confirmExit,
+      child: Scaffold(
       backgroundColor: _navy,
       body: Stack(
         children: [
@@ -4355,52 +4574,41 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
               ),
             ),
           ),
-          // Sabit oyun sahnesi: ana ekran hiçbir yönde kaymaz. Sadece
-          // tuşlara basılır ve harf çemberindeki sürükleme algılanır.
-          // Tasarım 390x800 mantıksal piksel olarak çizilir; FittedBox onu
-          // SafeArea içinde kalan gerçek telefon ekranına ORANTILI sığdırır.
           SafeArea(
             child: LayoutBuilder(builder: (context, viewport) {
-              const designWidth = 390.0;
-              const designHeight = 800.0;
-              const wheelSize = 250.0;
-              // En uzun bulmacalar bile üstteki alanı taşırmasın.
-              final boardMax = math.min(42.0, 208.0 / _puzzle.rows);
-              return ClipRect(
-                child: SizedBox(
-                  width: viewport.maxWidth,
-                  height: viewport.maxHeight,
-                  child: FittedBox(
-                    fit: BoxFit.contain,
-                    alignment: Alignment.center,
-                    child: SizedBox(
-                      width: designWidth,
-                      height: designHeight,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(10, 8, 10, 12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            _premiumTopBar(false),
-                            const SizedBox(height: 8),
-                            _cityPlaque(),
-                            const SizedBox(height: 4),
-                            // Taşan bulmaca değil, kalan boşluk kullanılır.
-                            Expanded(
-                              child: Center(child: _premiumBoard(boardMax)),
-                            ),
-                            _selectionMessage(),
-                            const SizedBox(height: 4),
-                            _wheelAndActions(wheelSize, false),
-                            const SizedBox(height: 10),
-                            _complete ? _nextButton() : _levelDots(),
-                            const SizedBox(height: 10),
-                            _premiumBottomBar(),
-                          ],
-                        ),
+              final narrow = viewport.maxWidth < 370;
+              final compact = viewport.maxHeight < 730;
+              final wheelSize = math.min(
+                viewport.maxWidth - (narrow ? 108 : 132),
+                compact ? 235.0 : 286.0,
+              ).clamp(206.0, 286.0).toDouble();
+              final boardMax = compact ? 38.0 : 47.0;
+              return Padding(
+                padding: EdgeInsets.fromLTRB(narrow ? 10 : 15, 10,
+                    narrow ? 10 : 15, 15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _premiumTopBar(narrow),
+                    SizedBox(height: compact ? 10 : 16),
+                    _cityPlaque(),
+                    SizedBox(height: compact ? 12 : 18),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Flexible(flex: 9, child: Center(child: _premiumBoard(boardMax))),
+                          SizedBox(height: compact ? 8 : 10),
+                          _selectionMessage(),
+                          SizedBox(height: compact ? 4 : 6),
+                          Flexible(flex: 12, child: Center(child: _wheelAndActions(wheelSize, narrow))),
+                          SizedBox(height: compact ? 8 : 10),
+                          _complete ? _nextButton() : _levelDots(),
+                          const SizedBox(height: 10),
+                          _premiumBottomBar(),
+                        ],
                       ),
                     ),
-                  ),
+                  ],
                 ),
               );
             }),
@@ -4452,7 +4660,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
             ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _premiumTopBar(bool narrow) => Row(children: [
