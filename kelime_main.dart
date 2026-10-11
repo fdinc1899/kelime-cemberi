@@ -332,7 +332,8 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     streak = (last == _dayKey(now.subtract(const Duration(days: 1))))
         ? streak + 1
         : 1;
-    final reward = 10 + 5 * min(streak - 1, 6);
+    final int bonusDays = streak - 1 > 6 ? 6 : streak - 1;
+    final int reward = 10 + 5 * bonusDays;
     prefs!.setString('daily', today);
     prefs!.setInt('streak', streak);
     setState(() => coins += reward);
