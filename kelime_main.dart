@@ -6,6 +6,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -3919,6 +3920,8 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   final Set<String> _hintCells = {};
   final Set<int> _completedLevels = {};
   final List<int> _dragged = [];
+  int? _activeWheelPointer;
+  Offset? _lastWheelPoint;
   String _notice = 'Harfleri parmağınla birleştir';
 
   PuzzleLevel get _puzzle => _levels[_level];
@@ -4039,6 +4042,8 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
         ..clear()
         ..addAll(_prefs?.getStringList('hints_v3_$index') ?? []);
       _dragged.clear();
+      _activeWheelPointer = null;
+      _lastWheelPoint = null;
       _notice = 'Harfleri parmağınla birleştir';
     });
     _prefs?.setInt('current_level_v3', index);
@@ -4051,6 +4056,50 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     _prefs?.setStringList('finished_levels_v3', _completedLevels.map((e) => '$e').toList());
     _prefs?.setInt('coins', _coins);
     _prefs?.setInt('unlocked_v3', _unlocked);
+  }
+
+  // Ham dokunma olayları + EagerGestureRecognizer ile kaydırma çakışmasını
+  // önleriz. Üst SingleChildScrollView, tekerlekteki sürüklemeyi alamaz.
+  void _wheelTouchDown(PointerDownEvent event, double size) {
+    if (_activeWheelPointer != null) return;
+    _activeWheelPointer = event.pointer;
+    _lastWheelPoint = null;
+    if (_dragged.isNotEmpty) setState(() => _dragged.clear());
+    _handleWheelMotion(event.localPosition, size);
+  }
+
+  void _wheelTouchMove(PointerMoveEvent event, double size) {
+    if (_activeWheelPointer != event.pointer) return;
+    _handleWheelMotion(event.localPosition, size);
+  }
+
+  void _wheelTouchUp(PointerUpEvent event) {
+    if (_activeWheelPointer != event.pointer) return;
+    _activeWheelPointer = null;
+    _lastWheelPoint = null;
+    _submitWord();
+  }
+
+  void _wheelTouchCancel(PointerCancelEvent event) {
+    if (_activeWheelPointer != event.pointer) return;
+    _activeWheelPointer = null;
+    _lastWheelPoint = null;
+    if (mounted) setState(() => _dragged.clear());
+  }
+
+  void _handleWheelMotion(Offset local, double size) {
+    final from = _lastWheelPoint;
+    _lastWheelPoint = local;
+    if (from == null) {
+      _handleDrag(local, size);
+      return;
+    }
+    // Parmağı hızlı hareket ettirince arada kalan harfleri kaçırma.
+    final steps = math.max(1, ((local - from).distance / (size * .035)).ceil());
+    for (var i = 1; i <= steps; i++) {
+      final part = i / steps;
+      _handleDrag(Offset.lerp(from, local, part)!, size);
+    }
   }
 
   void _handleDrag(Offset local, double size) {
@@ -4560,16 +4609,26 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
         height: size,
         width: size,
         child: Stack(children: [
-          GestureDetector(
+          RawGestureDetector(
             behavior: HitTestBehavior.opaque,
-            onPanDown: (details) => _handleDrag(details.localPosition, size),
-            onPanUpdate: (details) => _handleDrag(details.localPosition, size),
-            onPanEnd: (_) => _submitWord(),
-            onPanCancel: () => setState(() => _dragged.clear()),
-            onTapUp: (_) => _submitWord(),
-            child: CustomPaint(
-              size: Size.square(size),
-              painter: LetterWheelPainter(_wheelLetters, _dragged),
+            gestures: <Type, GestureRecognizerFactory>{
+              // Sayfanın kaydırma hareketinden önce tekerlek dokunmayı kazanır.
+              EagerGestureRecognizer:
+                  GestureRecognizerFactoryWithHandlers<EagerGestureRecognizer>(
+                () => EagerGestureRecognizer(),
+                (EagerGestureRecognizer instance) {},
+              ),
+            },
+            child: Listener(
+              behavior: HitTestBehavior.opaque,
+              onPointerDown: (event) => _wheelTouchDown(event, size),
+              onPointerMove: (event) => _wheelTouchMove(event, size),
+              onPointerUp: _wheelTouchUp,
+              onPointerCancel: _wheelTouchCancel,
+              child: CustomPaint(
+                size: Size.square(size),
+                painter: LetterWheelPainter(_wheelLetters, _dragged),
+              ),
             ),
           ),
           Center(
