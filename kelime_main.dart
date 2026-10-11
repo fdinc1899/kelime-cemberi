@@ -3733,7 +3733,7 @@ const _levels = <PuzzleLevel>[
       WordPosition('KALEM', 0, 2),
       WordPosition('KALE', 0, 2, down: true),
       WordPosition('ELMA', 0, 5, down: true),
-      WordPosition('MAL', 3, 4),
+      WordPosition('MAL', 3, 3, down: true),
       WordPosition('ALEM', 3, 0),
     ],
     bonusWords: ['KEL', 'AL', 'EL'],
