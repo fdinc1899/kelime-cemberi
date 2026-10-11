@@ -4058,8 +4058,8 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     _prefs?.setInt('unlocked_v3', _unlocked);
   }
 
-  // Ham dokunma olayları + EagerGestureRecognizer ile kaydırma çakışmasını
-  // önleriz. Üst SingleChildScrollView, tekerlekteki sürüklemeyi alamaz.
+  // Harf tekerleği ham dokunma olaylarını işler. Ana oyun sahnesi
+  // kaydırılamadığı için sürükleme parmağın altında kesintisiz çalışır.
   void _wheelTouchDown(PointerDownEvent event, double size) {
     if (_activeWheelPointer != null) return;
     _activeWheelPointer = event.pointer;
@@ -4355,39 +4355,50 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
               ),
             ),
           ),
+          // Sabit oyun sahnesi: ana ekran hiçbir yönde kaymaz. Sadece
+          // tuşlara basılır ve harf çemberindeki sürükleme algılanır.
+          // Tasarım 390x800 mantıksal piksel olarak çizilir; FittedBox onu
+          // SafeArea içinde kalan gerçek telefon ekranına ORANTILI sığdırır.
           SafeArea(
             child: LayoutBuilder(builder: (context, viewport) {
-              final narrow = viewport.maxWidth < 370;
-              final compact = viewport.maxHeight < 730;
-              final wheelSize = math.min(
-                viewport.maxWidth - (narrow ? 108 : 132),
-                compact ? 235.0 : 286.0,
-              ).clamp(206.0, 286.0).toDouble();
-              final boardMax = compact ? 38.0 : 47.0;
-              return SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: viewport.maxHeight),
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(narrow ? 10 : 15, 10,
-                        narrow ? 10 : 15, 15),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _premiumTopBar(narrow),
-                        SizedBox(height: compact ? 13 : 21),
-                        _cityPlaque(),
-                        SizedBox(height: compact ? 18 : 25),
-                        _premiumBoard(boardMax),
-                        SizedBox(height: compact ? 13 : 21),
-                        _selectionMessage(),
-                        SizedBox(height: compact ? 9 : 13),
-                        _wheelAndActions(wheelSize, narrow),
-                        SizedBox(height: compact ? 8 : 17),
-                        _complete ? _nextButton() : _levelDots(),
-                        const SizedBox(height: 12),
-                        _premiumBottomBar(),
-                      ],
+              const designWidth = 390.0;
+              const designHeight = 800.0;
+              const wheelSize = 250.0;
+              // En uzun bulmacalar bile üstteki alanı taşırmasın.
+              final boardMax = math.min(42.0, 208.0 / _puzzle.rows);
+              return ClipRect(
+                child: SizedBox(
+                  width: viewport.maxWidth,
+                  height: viewport.maxHeight,
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    alignment: Alignment.center,
+                    child: SizedBox(
+                      width: designWidth,
+                      height: designHeight,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 8, 10, 12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _premiumTopBar(false),
+                            const SizedBox(height: 8),
+                            _cityPlaque(),
+                            const SizedBox(height: 4),
+                            // Taşan bulmaca değil, kalan boşluk kullanılır.
+                            Expanded(
+                              child: Center(child: _premiumBoard(boardMax)),
+                            ),
+                            _selectionMessage(),
+                            const SizedBox(height: 4),
+                            _wheelAndActions(wheelSize, false),
+                            const SizedBox(height: 10),
+                            _complete ? _nextButton() : _levelDots(),
+                            const SizedBox(height: 10),
+                            _premiumBottomBar(),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
