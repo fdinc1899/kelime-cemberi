@@ -224,6 +224,8 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
 
   void _openLevel(int index) {
     if (index > _unlocked || index < 0 || index >= _levels.length) return;
+    bool recovered = false;
+    bool justCompleted = false;
     setState(() {
       _level = index;
       _wheelLetters = _levels[index].letters.split('');
@@ -239,9 +241,64 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
       _dragged.clear();
       _activeWheelPointer = null;
       _lastWheelPoint = null;
-      _notice = 'Harfleri parmağınla birleştir';
+      // Eski APK'da bütün kutular doluyken sayaç ilerlemeyebiliyordu.
+      // Hali hazırda görünür olan tam kelimeleri kayıt üzerinden onar.
+      recovered = _completeFullyRevealedWords() > 0;
+      justCompleted = _finishLevelIfSolved();
+      _notice = justCompleted
+          ? 'Bölüm tamamlandı! Sonraki bölüm açıldı.'
+          : recovered ? 'Açılmış kelimeler tamamlandı' : 'Harfleri parmağınla birleştir';
     });
     _prefs?.setInt('current_level_v3', index);
+    if (recovered || justCompleted) _saveProgress();
+    if (justCompleted) _announceLevelCompleted(index);
+  }
+
+  // Bulmaca hücrelerinin görünmesi ile kelimenin çözüldü olarak sayılması
+  // önceki sürümde iki ayrı durumdu. Tamamı görünür hale gelen bir kelime
+  // artık otomatik tanınır. İpucuyla tamamlanan kelimeler +10 altın kazandırmaz.
+  bool _wordFullyRevealed(WordPosition word) {
+    for (var i = 0; i < word.word.length; i++) {
+      final row = word.row + (word.down ? i : 0);
+      final col = word.col + (word.down ? 0 : i);
+      if (!_hintCells.contains('$row:$col') && !_isSolvedCell(row, col)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  int _completeFullyRevealedWords() {
+    var addedCount = 0;
+    // Bir kelimenin tamamlanması kesişen başka bir kelimeyi de tamamlayabilir.
+    bool changed;
+    do {
+      changed = false;
+      for (final word in _puzzle.answers) {
+        if (_solved.contains(word.word) || !_wordFullyRevealed(word)) continue;
+        if (_solved.add(word.word)) {
+          addedCount++;
+          changed = true;
+        }
+      }
+    } while (changed);
+    return addedCount;
+  }
+
+  bool _finishLevelIfSolved() {
+    if (!_complete || !_completedLevels.add(_level)) return false;
+    _coins += 40;
+    if (_level + 1 < _levels.length) {
+      _unlocked = math.max(_unlocked, _level + 1);
+    }
+    return true;
+  }
+
+  void _announceLevelCompleted(int finishedIndex) {
+    _celebrate('TEBRİKLER!', 'BÖLÜM TAMAMLANDI! +40 ALTIN');
+    Future.delayed(const Duration(milliseconds: 1650), () {
+      if (mounted && _level == finishedIndex) _showLevelResult();
+    });
   }
 
   Future<void> _saveProgress() async {
@@ -333,14 +390,10 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
           newWord = true;
           _coins += 10;
           _notice = '$word bulundu! +10 altın';
-          if (_complete && _completedLevels.add(_level)) {
-            justCompleted = true;
-            _coins += 40;
-            _notice = 'Bölüm tamamlandı! +40 altın';
-            if (_level + 1 < _levels.length) {
-              _unlocked = math.max(_unlocked, _level + 1);
-            }
-          }
+          final autoCount = _completeFullyRevealedWords();
+          if (autoCount > 0) _notice = '$word bulundu! $autoCount kelime de tamamlandı';
+          justCompleted = _finishLevelIfSolved();
+          if (justCompleted) _notice = 'Bölüm tamamlandı! +40 altın';
         } else {
           _notice = '$word zaten bulundu';
         }
@@ -358,13 +411,10 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     });
     _saveProgress();
     if (newWord) {
-      _celebrate(justCompleted ? 'TEBRİKLER!' : 'BRAVO!',
-          justCompleted ? 'BÖLÜM TAMAMLANDI! +40 ALTIN' : '$word  +10 ALTIN');
       if (justCompleted) {
-        final finishedIndex = _level;
-        Future.delayed(const Duration(milliseconds: 1650), () {
-          if (mounted && _level == finishedIndex) _showLevelResult();
-        });
+        _announceLevelCompleted(_level);
+      } else {
+        _celebrate('BRAVO!', '$word  +10 ALTIN');
       }
     } else if (newBonus) {
       _celebrate('BONUS!', '$word  +5 ALTIN');
@@ -388,10 +438,6 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
 
   void _hint() {
     if (_complete) return;
-    if (_coins < 25) {
-      setState(() => _notice = 'İpucu için 25 altın gerekiyor');
-      return;
-    }
     final cells = _puzzle.cells;
     for (final word in _puzzle.answers.where((w) => !_solved.contains(w.word))) {
       for (int i = 0; i < word.word.length; i++) {
@@ -399,17 +445,41 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
         final col = word.col + (word.down ? 0 : i);
         final id = '$row:$col';
         if (!_hintCells.contains(id) && !_isSolvedCell(row, col)) {
+          if (_coins < 25) {
+            setState(() => _notice = 'İpucu için 25 altın gerekiyor');
+            return;
+          }
+          var autoCount = 0;
+          var justCompleted = false;
           setState(() {
             _hintCells.add(id);
             _coins -= 25;
-            _notice = 'İpucu açıldı: ${cells[id]}  −25 altın';
+            autoCount = _completeFullyRevealedWords();
+            justCompleted = _finishLevelIfSolved();
+            _notice = justCompleted
+                ? 'Bölüm tamamlandı! +40 altın'
+                : autoCount > 0
+                    ? '$autoCount kelime otomatik tamamlandı'
+                    : 'İpucu açıldı: ${cells[id]}  −25 altın';
           });
           _saveProgress();
+          if (justCompleted) _announceLevelCompleted(_level);
           return;
         }
       }
     }
-    setState(() => _notice = 'Açılabilecek başka harf kalmadı');
+    // Bu duruma yalnızca önceki sürümden bozuk kayıtla gelinebilir.
+    var recovered = 0;
+    var justCompleted = false;
+    setState(() {
+      recovered = _completeFullyRevealedWords();
+      justCompleted = _finishLevelIfSolved();
+      _notice = justCompleted
+          ? 'Bölüm tamamlandı! +40 altın'
+          : recovered > 0 ? '$recovered kelime tamamlandı' : 'Harfleri birleştirerek devam et';
+    });
+    if (recovered > 0 || justCompleted) _saveProgress();
+    if (justCompleted) _announceLevelCompleted(_level);
   }
 
   bool _isSolvedCell(int row, int col) {
@@ -1251,7 +1321,8 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
 
   Widget _premiumCell(int row, int col, double size, String? letter) {
     if (letter == null) return SizedBox(width: size, height: size);
-    final revealed = _hintCells.contains('$row:$col') || _isSolvedCell(row, col);
+    final solvedCell = _isSolvedCell(row, col);
+    final revealed = _hintCells.contains('$row:$col') || solvedCell;
     return Container(
       width: size - 3,
       height: size - 3,
@@ -1260,9 +1331,11 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: revealed
+          colors: solvedCell
               ? const [Color(0xFF7BE791), Color(0xFF159650)]
-              : const [Color(0xFFFFFEF5), Color(0xFFFFEDD1)],
+              : revealed
+                  ? const [Color(0xFFFFE19C), Color(0xFFE9A744)]
+                  : const [Color(0xFFFFFEF5), Color(0xFFFFEDD1)],
         ),
         borderRadius: BorderRadius.circular(7),
         border: Border.all(color: const Color(0xFFCBA26E), width: 1.1),
