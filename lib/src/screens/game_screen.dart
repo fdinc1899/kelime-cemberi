@@ -35,6 +35,9 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   Offset? _lastWheelPoint;
   String _notice = 'Harfleri parmağınla birleştir';
   bool _exitDialogOpen = false;
+  bool _readyToPlay = false;
+  bool _showWelcome = true;
+  bool _showCityChoice = false;
 
   PuzzleLevel get _puzzle => _levels[_level];
   bool get _complete => _puzzle.answers.every((w) => _solved.contains(w.word));
@@ -211,6 +214,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
       );
     }
     _openLevel(_level);
+    if (mounted) setState(() => _readyToPlay = true);
     _startMusic();
   }
 
@@ -699,6 +703,11 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                 icon: const Icon(Icons.close, color: _cream)),
             ]),
             const SizedBox(height: 8),
+            _premiumMenuItem(Icons.home_rounded, 'Ana menü / Şehir seç', () {
+              Navigator.pop(menuContext);
+              _saveProgress();
+              _showWelcomeChoice();
+            }),
             _premiumMenuItem(Icons.map_rounded, 'Şehir haritası', () {
               Navigator.pop(menuContext);
               WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) _showMap(); });
@@ -1119,6 +1128,32 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     );
   }
 
+  void _continueFromSave() {
+    setState(() {
+      _showWelcome = false;
+      _showCityChoice = false;
+    });
+  }
+
+  void _openFromWelcome(int index) {
+    if (index < 0 || index > _unlocked || index >= _levels.length) return;
+    _openLevel(index); // persists the selected chapter using the V3 keys
+    setState(() {
+      _showWelcome = false;
+      _showCityChoice = false;
+    });
+  }
+
+  void _showWelcomeChoice() => setState(() {
+    _showWelcome = true;
+    _showCityChoice = false;
+  });
+
+  void _chooseCityOnWelcome() => setState(() {
+    _showWelcome = true;
+    _showCityChoice = true;
+  });
+
   // Premium arayüz — oyun mekaniği ve kayıt sistemi aynı kalır.
   static const _navy = Color(0xFF0C2440);
   static const _gold = Color(0xFFFFD36E);
@@ -1126,6 +1161,42 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+    if (!_readyToPlay) {
+      return const Scaffold(
+        backgroundColor: Color(0xFF071628),
+        body: Center(child: CircularProgressIndicator(color: Color(0xFFFFCC68))),
+      );
+    }
+    if (_showWelcome) {
+      return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
+          if (_showCityChoice) {
+            _showWelcomeChoice();
+          } else {
+            _confirmExit();
+          }
+        },
+        child: _showCityChoice
+            ? PremiumCityChooser(
+                unlocked: _unlocked,
+                completed: _completedLevels,
+                onBack: _showWelcomeChoice,
+                onOpenLevel: _openFromWelcome,
+              )
+            : PremiumOpeningScreen(
+                currentCity: _puzzle.city,
+                currentStage: (_level % 3) + 1,
+                finishedCount: _completedLevels.length,
+                onContinue: _continueFromSave,
+                onChooseCity: _chooseCityOnWelcome,
+                onChooseChapter: _chooseCityOnWelcome,
+                onSettings: _showSettings,
+                onExit: _confirmExit,
+              ),
+      );
+    }
     final firstCity = _level ~/ 3 == 0;
     return PopScope(
       canPop: false,

@@ -15,6 +15,7 @@ part 'src/data/puzzles.dart';
 part 'src/screens/game_screen.dart';
 part 'src/screens/premium_page.dart';
 part 'src/screens/journey_map.dart';
+part 'src/screens/intro_screens.dart';
 part 'src/widgets/painters.dart';
 part 'src/widgets/v10_ornaments.dart';
 part 'src/widgets/v12_sparkles.dart';

@@ -1,44 +1,28 @@
-# Kelime Şehirleri — V12 Yeniden Tasarım
+# Kelime Şehirleri V13 — açılış ve şehir seçimi
 
-Bu paket, V11'in çalışan oyun mantığını koruyarak ekranları referans kolajdaki
-lacivert–altın görsel diline göre yeniden düzenler.
+Bu paket, mevcut V12 üzerinde çalışan **yeni bir açılış akışı** içerir.
 
-## Yapılanlar
+## Yeni özellikler
+- Açılışta animasyonlu başlık ve dört seçim: OYUNA BAŞLA, ŞEHİR SEÇ, BÖLÜM SEÇ, KALDIĞIM YERDEN DEVAM ET.
+- 6 şehirlik fotoğraflı seçici; her şehir için ayrı 3 bölümlük seçici.
+- Yalnızca açılmış bölümler seçilebilir. Tamamlanan bölümler yeniden oynanabilir.
+- Ana oyun ekranı kaymaz; açılış/şehir seçimi listeleri gerektiğinde kaydırılabilir.
+- Mevcut ilerleme, çözülen kelimeler, altın ve ayarlar için önceki SharedPreferences anahtarları korunmuştur.
+- Oyun menüsüne **Ana menü / Şehir seç** seçeneği eklendi.
+- Yeni, bağımsız ve ayrıntılı **Kapadokya** ve **Antalya** sahneleri kondu (1080×1920 WebP); kart önizlemeleri de yenilendi.
+- İstanbul'un mevcut yüksek çözünürlüklü sahnesi korundu.
 
-- Oyun ekranı: daha dengeli ve sabit bulmaca/harf çemberi oranları.
-- Harita: büyük sütun kartları yerine fotoğraflı yatay şehir kartları; altın
-  kıvrımlı yol, kilitler, bölüm işaretleri, ilerleme ve tıklanabilir şehirler.
-- Harita zemini: ayrı, daha renkli yüksek çözünürlüklü arka plan.
-- Ödül: mevcut altın sandığı + yeni ışık/parıltı katmanı.
-- Bonus: kırmızı kurdele, ayrılmış harf kutuları ve altın ödülü.
-- Profil: kompakt profil kartı, sayılar ve şehir rozetleri.
-- İstatistikler: kupa ve bölüm ilerlemesi.
-- Çıkış onayı: parlak mavi Hayır / kırmızı Evet-Çık düğmeleri.
-- Ayarlar: müzik, ses efekti, titreşim, yerel kayıt.
-- Bölüm sonu: yıldızlar, bölüm resmi, ödül ve Sonraki Bölüm.
+## Henüz tamamlanmayan görseller
+Mardin, İzmir ve Ankara sahneleri önceki sürümden korunmuştur. Bu üç görselin kaynak keskinliği yetersizdir; yalnızca daha büyük piksel boyutuna sahip olmaları onları gerçek HD yapmaz. Sıfırdan yeni sahnelerle değiştirilmeleri gereklidir.
 
-## Veri koruma
+## GitHub / Termux yükleme
+1. ZIP dosyasını Android telefonun Downloads klasörüne indir.
+2. Termux'ta çalıştır:
 
-Kayıt anahtarları (`solved_v3_*`, `bonuses_v3_*`, `hints_v3_*`,
-`finished_levels_v3`, `coins`, `unlocked_v3`) değiştirilmedi.
-18 bulmaca, bölüm kilitleri, müzik ve harf sürükleme korunmuştur.
+cd ~/kelime-cemberi && cp kelime_main.dart kelime_main_v12_yedek.dart && unzip -o ~/storage/downloads/kelime-sehirleri-v13-secimli-acilis.zip -d . && git add kelime_main.dart lib pubspec.yaml assets README.md && git commit -m "V13 animasyonlu baslangic ve sehir secimi" && git push origin main
 
-## Kurulum (Termux)
+3. GitHub Actions sayfasından son çalışmayı incele.
+4. Derleme başarılıysa artifact ZIP'inden APK'yı çıkar, mevcut uygulamanın üstüne kur.
 
-1. ZIP dosyasını telefonunun Downloads klasörüne indir.
-2. Terminale şunu tek seferde yapıştır:
-
-```sh
-cd ~/kelime-cemberi && cp kelime_main.dart kelime_main_v11_yedek.dart && unzip -o ~/storage/downloads/kelime-sehirleri-v12-tasarim.zip -d . && git add kelime_main.dart lib pubspec.yaml assets README.md && git commit -m "V12 referans arayuz tasarimi" && git push origin main
-```
-
-3. GitHub Actions'dan derleme sonucunu kontrol et.
-
-`.github/workflows/build.yml` değiştirilmedi; önceki yetki sorunu tekrarlanmaz.
-
-## Sınırlar
-
-Tasarım ekranları gerçek Flutter widget'larıdır, dokunulabilir. Görseldeki AI
-mockup ile piksel piksel birebir olduğu garanti edilmez. Antalya, Mardin, İzmir
-ve Ankara manzaralarında eski görsel kaynağın ayrıntı sınırı hâlâ vardır.
-Flutter SDK burada olmadığı için APK derlenerek cihaz testi yapılamadı.
+NOT: Bu ortamda Flutter SDK bulunmadığından gerçek APK derlemesi ve cihaz testi yapılmadı. Üç sahne hâlâ düşük kaliteli.
+GitHub Actions workflow dosyasına dokunulmadı.
