@@ -563,7 +563,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
           _openLevel(nextLevel);
         },
         child: Container(
-          height: 112,
+          height: 123,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
             color: const Color(0xFF082038),
@@ -582,10 +582,10 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                   gradient: LinearGradient(begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                     colors: [const Color(0x4205152C),
-                      const Color(0xEE071C33), const Color(0xFF07182D)],
+                      const Color(0xC7071C33), const Color(0xEF07182D)],
                     stops: const [0, .45, 1])))),
               if (locked)
-                Positioned.fill(child: Container(color: const Color(0x55091C2D))),
+                Positioned.fill(child: Container(color: const Color(0x66091C2D))),
               Positioned(left: 12, top: 10,
                 child: Container(width: 29, height: 29,
                   decoration: BoxDecoration(shape: BoxShape.circle,
@@ -605,7 +605,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                           style: const TextStyle(color: _cream,
                             fontSize: 17, fontFamily: 'serif', fontWeight: FontWeight.w900))),
                       const SizedBox(height: 3),
-                      Text(locked ? '🔒 KİLİTLİ' : '$done / 3 BÖLÜM',
+                      Text(locked ? 'KİLİTLİ' : '$done / 3 BÖLÜM',
                         style: const TextStyle(color: _gold, fontSize: 10,
                             fontWeight: FontWeight.bold, letterSpacing: 1)),
                       const SizedBox(height: 5),
@@ -613,7 +613,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                           padding: const EdgeInsets.only(right: 2),
                           child: Icon(_completedLevels.contains(start + k)
                                   ? Icons.star_rounded : Icons.star_outline_rounded,
-                            size: 19, color: _gold)))),
+                            size: 21, color: _gold)))),
                       const SizedBox(height: 4),
                       ClipRRect(borderRadius: BorderRadius.circular(6),
                         child: LinearProgressIndicator(value: done / 3,

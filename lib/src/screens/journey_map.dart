@@ -67,7 +67,7 @@ class _JourneyRoadPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final width = size.width;
     final route = Path();
-    Offset point(int i) => Offset(width * (i.isEven ? .25 : .75), 100 + i * 174.0);
+    Offset point(int i) => Offset(width * (i.isEven ? .23 : .77), 100 + i * 174.0);
     route.moveTo(point(0).dx, point(0).dy);
     for (var i = 0; i < 5; i++) {
       final a = point(i);
@@ -87,7 +87,7 @@ class _JourneyRoadPainter extends CustomPainter {
         if (tangent != null) {
           final step = (d / metric.length * 5).floor();
           final unlocked = step <= reachedCities;
-          canvas.drawCircle(tangent.position, unlocked ? 4.6 : 3.4,
+          canvas.drawCircle(tangent.position, unlocked ? 5.5 : 3.7,
             Paint()..color = unlocked ? const Color(0xFFFFD36E)
               : const Color(0xFFEEE3C0));
           if (unlocked && d % 7 < 4) {
@@ -95,7 +95,7 @@ class _JourneyRoadPainter extends CustomPainter {
               Paint()..color = const Color(0x33FFD36E));
           }
         }
-        d += 16;
+        d += 13;
       }
     }
   }

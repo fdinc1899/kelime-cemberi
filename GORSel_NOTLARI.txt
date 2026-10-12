@@ -1,0 +1,10 @@
+Kelime Şehirleri V11 — Görsel Notları
+
+Kapadokya: bağımsız yeni dikey 940×1672 yapay zekâ görselinden 1080×1920 varlık.
+İstanbul: mevcut sevilen görselin düzenlenmiş hali.
+Antalya, Mardin, İzmir, Ankara: önceki 504×896 kaynakların 1080×1920
+boyuta yükseltilip renk/kontrast/keskinliklerinin dikkatle iyileştirilmiş hali.
+Bu işlem kaybolmuş özgün fotoğraf detaylarını geri getirmez.
+Harita zemini: 1080×1920 bağımsız vektörel/işlemsel çizim.
+Harita kartları 960×520, tüm tıklanabilir butonlar Flutter widget'ı.
+Her şey internet olmadan çalışır.
