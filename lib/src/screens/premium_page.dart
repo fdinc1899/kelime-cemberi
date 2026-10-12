@@ -20,15 +20,15 @@ class PremiumPageShell extends StatelessWidget {
         height: MediaQuery.sizeOf(context).height,
         child: Stack(children: [
         Positioned.fill(child: map
-          ? Image.asset('assets/images/ui/map_backdrop_v12.webp',
-              fit: BoxFit.cover, color: const Color(0x2405172A),
+          ? Image.asset('assets/images/cities/antalya.webp',
+              fit: BoxFit.cover, color: const Color(0x2805172A),
               colorBlendMode: BlendMode.multiply)
           : Image.memory(background, fit: BoxFit.cover,
               color: const Color(0xE005172A), colorBlendMode: BlendMode.multiply)),
         Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(
           gradient: LinearGradient(begin: Alignment.topCenter,
             end: Alignment.bottomCenter, colors: map
-              ? [const Color(0xAF032038), const Color(0x32061920), const Color(0x97041B30)]
+              ? [const Color(0x90031A30), const Color(0x0C051A2C), const Color(0x51031A2D)]
               : [const Color(0xE905172A), const Color(0xE7071B32),
                   const Color(0xF105172A)])))),
         SafeArea(child: Column(children: [
@@ -41,13 +41,23 @@ class PremiumPageShell extends StatelessWidget {
                   icon: const Icon(Icons.arrow_back_rounded,
                     color: PremiumPalette.cream))),
               const SizedBox(width: 8),
-              Expanded(child: FittedBox(fit: BoxFit.scaleDown,
-                child: Text(map ? '✦  ŞEHİR HARİTASI  ✦' : title,
-                  style: TextStyle(color: map ? PremiumPalette.gold
-                      : PremiumPalette.cream,
-                    fontSize: 25, fontFamily: map ? 'serif' : null,
-                    fontWeight: FontWeight.w900,
-                    shadows: const [Shadow(color: Colors.black87, blurRadius: 9)])))),
+              Expanded(child: Container(
+                constraints: const BoxConstraints(minHeight: 45),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+                decoration: map ? BoxDecoration(
+                  gradient: const LinearGradient(colors: [Color(0xFF163D5D),
+                    Color(0xFF061628), Color(0xFF153958)]),
+                  border: Border.all(color: PremiumPalette.gold, width: 1.8),
+                  borderRadius: BorderRadius.circular(9),
+                  boxShadow: const [BoxShadow(color: Colors.black87, blurRadius: 8)],
+                ) : null,
+                child: Center(child: FittedBox(fit: BoxFit.scaleDown,
+                  child: Text(map ? '✦ ŞEHİR HARİTASI ✦' : title,
+                    style: TextStyle(color: map ? PremiumPalette.gold
+                        : PremiumPalette.cream,
+                      fontSize: 23, fontFamily: 'serif',
+                      fontWeight: FontWeight.w900,
+                      shadows: const [Shadow(color: Colors.black87, blurRadius: 9)])))))),
               const SizedBox(width: 55),
             ])),
           if (map) Container(height: 2, margin: const EdgeInsets.symmetric(horizontal: 15),

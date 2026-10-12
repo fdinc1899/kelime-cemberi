@@ -546,72 +546,82 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     final done = List.generate(3, (j) => start + j)
         .where((j) => _completedLevels.contains(j)).length;
     final active = _level ~/ 3 == i;
-    final image = _premiumCityThumbs[city] ??
-        (i == 0 ? _istanbulBackground : _cityBackgrounds[city]!);
+    // Full-size city source, not the low-resolution card thumbnail.
+    final image = i == 0 ? _istanbulBackground : _cityBackgrounds[city]!;
     final nextLevel = math.min(_unlocked, start + done.clamp(0, 2).toInt());
-    return Material(color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(17),
-        onTap: locked ? null : () {
-          Navigator.pop(sheetContext);
-          _openLevel(nextLevel);
-        },
-        child: Container(
-          height: 98,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(17),
-            border: Border.all(color: _gold, width: active ? 2.2 : 1.5),
-            boxShadow: const [BoxShadow(color: Color(0xB9000000),
-              blurRadius: 12, offset: Offset(0, 5))]),
-          child: ClipRRect(borderRadius: BorderRadius.circular(15),
-            child: Stack(children: [
-              Positioned.fill(child: Container(color: const Color(0xFF061C34))),
-              Positioned(left: 0, top: 0, bottom: 0, width: 143,
-                child: Image.memory(image, fit: BoxFit.cover,
-                  alignment: Alignment.center)),
-              Positioned(left: 94, top: 0, bottom: 0, width: 68,
-                child: DecoratedBox(decoration: BoxDecoration(gradient:
-                  LinearGradient(colors: [const Color(0x00071A32),
-                    const Color(0xFF071A32)])))),
-              if (locked) Positioned.fill(child: Container(
-                color: const Color(0x32030D1C))),
-              Positioned(left: 4, top: 7,
-                child: Container(height: 29, width: 29,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(shape: BoxShape.circle,
-                    gradient: const LinearGradient(colors: [Color(0xFFFFF2BB),
-                      Color(0xFFEAB650), Color(0xFFAC7021)]),
-                    border: Border.all(color: Colors.white, width: 1.5),
-                    boxShadow: const [BoxShadow(color: Colors.black54,blurRadius: 5)]),
-                  child: Text('${i + 1}', style: const TextStyle(
-                    color: _navy, fontWeight: FontWeight.w900, fontSize: 15)))),
-              Positioned(left: 140, top: 0, right: 7, bottom: 0,
-                child: Row(children: [
-                  Expanded(child: Column(mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      FittedBox(fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text(city, style: const TextStyle(color: _cream,
-                          fontSize: 15, fontWeight: FontWeight.w900))),
-                      const SizedBox(height: 5),
-                      Text(locked ? 'KİLİTLİ' : '$done / 3 BÖLÜM',
-                        style: const TextStyle(color: _gold,
-                          fontSize: 10, fontWeight: FontWeight.w800)),
-                      const SizedBox(height: 4),
-                      Row(children: List.generate(3, (j) => Padding(
-                        padding: const EdgeInsets.only(right: 2),
-                        child: Icon(_completedLevels.contains(start+j)
-                            ? Icons.star_rounded : Icons.circle_outlined,
-                          color: _gold, size: 13)))),
-                    ])),
-                  Icon(locked ? Icons.lock_rounded :
-                    (done == 3 ? Icons.check_circle_rounded : Icons.chevron_right_rounded),
-                    size: 23, color: locked ? Colors.white : _gold),
+    return Material(color: Colors.transparent, child: InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: locked ? null : () {
+        Navigator.pop(sheetContext);
+        _openLevel(nextLevel);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFFFD877),
+            width: active ? 2.5 : 1.8),
+          boxShadow: const [
+            BoxShadow(color: Color(0xA9000000), blurRadius: 15, offset: Offset(0, 5)),
+            BoxShadow(color: Color(0x55FFD06B), blurRadius: 7),
+          ]),
+        child: ClipRRect(borderRadius: BorderRadius.circular(14),
+          child: Stack(children: [
+            Positioned.fill(child: Container(color: const Color(0xFF061A31))),
+            Positioned(left: 0, top: 0, bottom: 0, width: 167,
+              child: Image.memory(image, fit: BoxFit.cover,
+                alignment: Alignment.center)),
+            Positioned(left: 136, top: 0, bottom: 0, width: 51,
+              child: DecoratedBox(decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [const Color(0x00051A31),
+                  const Color(0xFF061A31)])))),
+            Positioned.fill(child: IgnorePointer(child: DecoratedBox(
+              decoration: BoxDecoration(gradient: LinearGradient(
+                begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                colors: [Colors.white.withOpacity(.07), Colors.transparent,
+                  const Color(0x55000000)]))))),
+            Positioned(left: 5, top: 5, child: Container(
+              width: 32, height: 32, alignment: Alignment.center,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(colors: [Color(0xFFFFF5BD),
+                  Color(0xFFFFC449), Color(0xFFB66D0F)]),
+                boxShadow: [BoxShadow(color: Color(0xB8000000), blurRadius: 5)]),
+              child: Text('${i + 1}', style: const TextStyle(color: _navy,
+                fontSize: 16, fontWeight: FontWeight.w900)))),
+            Positioned(left: 173, right: 6, top: 0, bottom: 0,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center, children: [
+                  FittedBox(fit: BoxFit.scaleDown,
+                    child: Text(city, style: const TextStyle(color: Colors.white,
+                      fontSize: 16, fontWeight: FontWeight.w900,
+                      shadows: [Shadow(color: Colors.black87, blurRadius: 6)]))),
+                  const SizedBox(height: 2),
+                  Text(locked ? 'KİLİTLİ' : '$done/3 BÖLÜM',
+                    style: const TextStyle(color: _gold,
+                      fontSize: 11, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 5),
+                  Row(mainAxisSize: MainAxisSize.min, children: [
+                    ...List.generate(3, (j) => Padding(
+                      padding: const EdgeInsets.only(right: 1),
+                      child: Icon(_completedLevels.contains(start + j)
+                        ? Icons.star_rounded : Icons.star_border_rounded,
+                        color: _gold, size: 16))),
+                    const Spacer(),
+                    Icon(locked ? Icons.lock_rounded :
+                      done == 3 ? Icons.check_circle_rounded : Icons.arrow_forward_ios_rounded,
+                      color: locked ? Colors.white : _gold, size: 18),
+                  ]),
+                  const SizedBox(height: 3),
+                  ClipRRect(borderRadius: BorderRadius.circular(6),
+                    child: LinearProgressIndicator(value: done / 3,
+                      minHeight: 4, backgroundColor: const Color(0xFF31485A),
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        Color(0xFF22C665)))),
                 ])),
-            ])),
-        ),
+          ])),
       ),
-    );
+    ));
   }
 
   // Ekranlar resim değil; gerçek dokunulabilir Flutter kontrolleridir.
@@ -632,9 +642,9 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   Widget _premiumMenuItem(IconData icon, String label, VoidCallback onTap,
       {String? detail, Color? accent}) => Container(
     margin: const EdgeInsets.symmetric(vertical: 5),
-    decoration: BoxDecoration(color: const Color(0xEA0A2745),
+    decoration: BoxDecoration(color: const Color(0xF208233B),
       borderRadius: BorderRadius.circular(14),
-      border: Border.all(color: _gold.withOpacity(.76), width: 1)),
+      border: Border.all(color: const Color(0xFF537798), width: 1)),
     child: ListTile(
       onTap: onTap,
       leading: Icon(icon, color: accent ?? _gold, size: 26),
@@ -1015,15 +1025,11 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
               const Text('✓  İLERLEME KAYDEDİLDİ', style: TextStyle(
                 color: Color(0xFF8CE6A9), fontSize: 11, fontWeight: FontWeight.bold)),
               const SizedBox(height: 18),
-              SizedBox(width: double.infinity, child: FilledButton.icon(
-                style: FilledButton.styleFrom(backgroundColor: const Color(0xFF119D53),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 13)),
-                onPressed: () { Navigator.pop(ctx); _next(); },
-                icon: const Icon(Icons.arrow_forward_rounded),
-                label: Text(level == _levels.length - 1
+              SizedBox(width: double.infinity, child: PremiumActionButton(
+                title: level == _levels.length - 1
                   ? 'OYUNU BİTİR' : 'SONRAKİ BÖLÜM',
-                  style: const TextStyle(fontWeight: FontWeight.w900)))),
+                icon: Icons.arrow_forward_rounded,
+                onPressed: () { Navigator.pop(ctx); _next(); })),
               TextButton.icon(onPressed: () {
                 Navigator.pop(ctx); _showMap();
               }, icon: const Icon(Icons.map_outlined, color: _cream),
@@ -1062,7 +1068,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
             decoration: BoxDecoration(
               gradient: const LinearGradient(begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Color(0xFF17395D), Color(0xFF041426), Color(0xFF102B4C)]),
+                colors: [Color(0xFF09233C), Color(0xFF030A17), Color(0xFF0B2B45)]),
               borderRadius: BorderRadius.circular(25),
               border: Border.all(color: _gold, width: 2),
               boxShadow: const [BoxShadow(color: Color(0xBB000000), blurRadius: 22)],
@@ -1072,6 +1078,13 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
               Align(alignment: Alignment.centerRight,
                 child: IconButton(onPressed: () => Navigator.pop(dialogContext),
                   icon: const Icon(Icons.close_rounded, color: _cream, size: 26))),
+              const V10Ribbon(title: 'GÜNLÜK ÖDÜL'),
+              const SizedBox(height: 5),
+              const Text('Her gün giriş yap, 35 altın kazan!',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: _cream, fontSize: 14,
+                  fontWeight: FontWeight.w700)),
+              const SizedBox(height: 4),
               TweenAnimationBuilder<double>(
                 tween: Tween(begin: .80, end: 1),
                 duration: const Duration(milliseconds: 750),
@@ -1083,7 +1096,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                       _gold.withOpacity(.64), const Color(0x00FFD36E)]))),
                   SizedBox(height: 212, width: double.infinity,
                     child: CustomPaint(painter: V12SparklePainter())),
-                  Image.asset('assets/images/ui/reward_hero_v10.png',
+                  Image.asset('assets/images/ui/reward_chest.png',
                     height: 215, fit: BoxFit.contain),
                   const Positioned(top: 4, left: 30, child: Icon(Icons.auto_awesome_rounded,
                     color: _gold, size: 27)),
@@ -1093,11 +1106,10 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                     color: _cream, size: 20)),
                 ]),
               ),
-              Transform.translate(offset: const Offset(0, -9),
-                child: V10Ribbon(title: 'GÜNLÜK ÖDÜL')),
-              const Text('Her gün 35 altın kazan. Yeni şehirleri keşfet!',
+              const Text('GÜNLÜK HEDİYEN',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: _cream, fontSize: 13, height: 1.4)),
+                style: TextStyle(color: _cream, fontSize: 13,
+                  letterSpacing: 2, fontWeight: FontWeight.w800)),
               const SizedBox(height: 16),
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 const Icon(Icons.monetization_on_rounded, color: _gold, size: 33),

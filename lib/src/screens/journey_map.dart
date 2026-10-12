@@ -40,9 +40,9 @@ class JourneyMapView extends StatelessWidget {
     const SizedBox(height: 4),
     Expanded(child: LayoutBuilder(builder: (context, constraints) {
       final width = constraints.maxWidth;
-      const stride = 126.0;
-      const cardHeight = 98.0;
-      final totalHeight = 6 * stride + 6;
+      const stride = 116.0;
+      const cardHeight = 92.0;
+      final totalHeight = 6 * stride + 8;
       return ListView(children: [
         SizedBox(height: totalHeight, child: Stack(children: [
           Positioned.fill(child: CustomPaint(
@@ -51,9 +51,9 @@ class JourneyMapView extends StatelessWidget {
           for (var i = 0; i < 6; i++)
             Positioned(
               top: 12 + i * stride,
-              left: i.isEven ? 9 : null,
-              right: i.isOdd ? 9 : null,
-              width: width * .84,
+              left: i.isEven ? 7 : null,
+              right: i.isOdd ? 7 : null,
+              width: width * .91,
               height: cardHeight,
               child: cardBuilder(context, i),
             ),
@@ -82,9 +82,9 @@ class _JourneyRoadPainter extends CustomPainter {
     }
     canvas.drawPath(route, Paint()..color = const Color(0xB5031022)
       ..style = PaintingStyle.stroke..strokeWidth = 14);
-    canvas.drawPath(route, Paint()..color = const Color(0xFFA9670D)
+    canvas.drawPath(route, Paint()..color = const Color(0xFFB46F12)
       ..style = PaintingStyle.stroke..strokeWidth = 8);
-    canvas.drawPath(route, Paint()..color = const Color(0xFFFFDD79)
+    canvas.drawPath(route, Paint()..color = const Color(0xFFFFE9A5)
       ..style = PaintingStyle.stroke..strokeWidth = 3
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3));
     for (final metric in route.computeMetrics()) {
