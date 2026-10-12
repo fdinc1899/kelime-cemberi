@@ -9111,6 +9111,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   int? _activeWheelPointer;
   Offset? _lastWheelPoint;
   String _notice = 'Harfleri parmağınla birleştir';
+  bool _exitDialogOpen = false;
 
   PuzzleLevel get _puzzle => _levels[_level];
   bool get _complete => _puzzle.answers.every((w) => _solved.contains(w.word));
@@ -9209,43 +9210,56 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     if (_vibrationOn) HapticFeedback.lightImpact();
   }
 
-  Future<bool> _confirmExit() async {
+  Future<void> _confirmExit() async {
+    if (_exitDialogOpen || !mounted) return;
+    _exitDialogOpen = true;
     await _saveProgress();
-    final result = await showDialog<bool>(
+    if (!mounted) { _exitDialogOpen = false; return; }
+    final shouldExit = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: _navy,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18),
-          side: const BorderSide(color: _gold, width: 1.5)),
-        title: const Text('Oyundan çık?', style: TextStyle(color: _gold, fontWeight: FontWeight.w900)),
-        content: const Text('Tüm ilerlemen otomatik kaydedilecek. Oyundan çıkmak istiyor musun?',
-          style: TextStyle(color: _cream)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Hayır', style: TextStyle(color: _cream)),
-          ),
-          FilledButton.icon(
-            onPressed: () {
-              _saveProgress();
-              Navigator.pop(dialogContext, true);
-            },
-            style: FilledButton.styleFrom(backgroundColor: const Color(0xFFC83832), foregroundColor: Colors.white),
-            icon: const Icon(Icons.save_rounded),
-            label: const Text('Evet, çık'),
-          ),
-        ],
+      barrierDismissible: false,
+      builder: (dialogContext) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 25),
+        child: _goldFrame(child: Column(mainAxisSize: MainAxisSize.min, children: [
+          const Icon(Icons.exit_to_app_rounded, color: _gold, size: 54),
+          const SizedBox(height: 9),
+          const Text('OYUNDAN ÇIKMAK', style: TextStyle(color: _gold,
+              fontFamily: 'serif', fontWeight: FontWeight.w900, fontSize: 21)),
+          const Text('İSTİYOR MUSUN?', style: TextStyle(color: _cream,
+              fontFamily: 'serif', fontWeight: FontWeight.w900, fontSize: 20)),
+          const SizedBox(height: 13),
+          const Text('Bulduğun kelimeler, altınların ve bölümün kaydedilecek.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: _cream, fontSize: 13)),
+          const SizedBox(height: 22),
+          Row(children: [
+            Expanded(child: OutlinedButton(
+              style: OutlinedButton.styleFrom(foregroundColor: _cream,
+                  side: const BorderSide(color: _gold),
+                  padding: const EdgeInsets.symmetric(vertical: 13)),
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('HAYIR', style: TextStyle(fontWeight: FontWeight.w900)))),
+            const SizedBox(width: 12),
+            Expanded(child: FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: const Color(0xFFB82E2E),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 13)),
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('EVET, ÇIK', style: TextStyle(fontWeight: FontWeight.w900)))),
+          ]),
+        ])),
       ),
     );
-    if (result == true) {
+    if (!mounted) { _exitDialogOpen = false; return; }
+    if (shouldExit == true) {
       await _saveProgress();
-      if (mounted) {
-        SystemNavigator.pop();
-      }
-      return false;
+      await _musicPlayer.stop();
+      await SystemNavigator.pop();
     }
-    return false;
+    _exitDialogOpen = false;
   }
+
 
   Future<void> _restore() async {
     final prefs = await SharedPreferences.getInstance();
@@ -9623,104 +9637,181 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     );
   }
 
-  void _showMap() {
-    showModalBottomSheet<void>(
+  // Ekranlar resim değil; gerçek dokunulabilir Flutter kontrolleridir.
+  void _premiumPage(String title, Widget body, {Uint8List? background}) {
+    showDialog<void>(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: const Color(0xFF0B2542),
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (sheetContext) => SafeArea(
+      useSafeArea: false,
+      barrierColor: Colors.black87,
+      builder: (pageContext) => Dialog(
+        backgroundColor: _navy,
+        insetPadding: EdgeInsets.zero,
         child: SizedBox(
-          height: MediaQuery.sizeOf(sheetContext).height * .91,
+          width: MediaQuery.sizeOf(pageContext).width,
+          height: MediaQuery.sizeOf(pageContext).height,
           child: Stack(children: [
-            Positioned.fill(child: Image.memory(_istanbulBackground,
-                fit: BoxFit.cover, color: const Color(0xCC092C33),
-                colorBlendMode: BlendMode.multiply)),
+            Positioned.fill(child: Image.memory(
+              background ?? _istanbulBackground,
+              fit: BoxFit.cover,
+              color: const Color(0xDE05172A),
+              colorBlendMode: BlendMode.multiply,
+            )),
             Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(
-                gradient: LinearGradient(begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [const Color(0xFF07182A),
-                    const Color(0xD9092437), const Color(0xEE0A2B37)])))),
-            Column(children: [
-              Padding(padding: const EdgeInsets.fromLTRB(17, 18, 17, 12),
+              gradient: LinearGradient(begin: Alignment.topCenter,
+                end: Alignment.bottomCenter, colors: [
+                  _navy.withOpacity(.92), _navy.withOpacity(.48), _navy.withOpacity(.95),
+                ]),
+            ))),
+            SafeArea(child: Column(children: [
+              Padding(padding: const EdgeInsets.fromLTRB(12, 9, 12, 10),
                 child: Row(children: [
-                  _goldRoundButton(Icons.close_rounded,
-                      () => Navigator.pop(sheetContext), radius: 19),
-                  const SizedBox(width: 10),
-                  Expanded(child: Column(children: [
-                    const Text('✦  ŞEHİR HARİTASI  ✦',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: _gold, fontSize: 20,
-                        fontFamily: 'serif', fontWeight: FontWeight.w900)),
-                    const SizedBox(height: 4),
-                    Text('${_completedLevels.length} / 18 BÖLÜM TAMAMLANDI',
-                      style: const TextStyle(color: _cream,
-                        fontWeight: FontWeight.w700, letterSpacing: 1, fontSize: 10)),
-                  ])),
-                  const SizedBox(width: 48),
+                  _goldRoundButton(Icons.arrow_back_rounded,
+                    () => Navigator.pop(pageContext), radius: 20),
+                  Expanded(child: Text('✦  $title  ✦', textAlign: TextAlign.center,
+                    style: const TextStyle(color: _gold, fontSize: 22,
+                        fontFamily: 'serif', fontWeight: FontWeight.w900))),
+                  const SizedBox(width: 41),
                 ])),
-              Padding(padding: const EdgeInsets.symmetric(horizontal: 26),
-                child: ClipRRect(borderRadius: BorderRadius.circular(12),
-                  child: LinearProgressIndicator(
-                    value: _completedLevels.length / _levels.length,
-                    minHeight: 8, backgroundColor: const Color(0xFF40556C),
-                    valueColor: const AlwaysStoppedAnimation<Color>(_gold)))),
-              const SizedBox(height: 14),
-              Expanded(child: ListView.separated(
-                padding: const EdgeInsets.fromLTRB(12, 5, 12, 28),
-                itemCount: 6,
-                separatorBuilder: (_, i) => SizedBox(height: 43,
-                  child: Center(child: CustomPaint(size: const Size(68, 39),
-                    painter: _TrailPainter(reached: (i + 1) * 3 <= _unlocked)))),
-                itemBuilder: (ctx, i) => Align(
-                  alignment: i.isEven ? Alignment.centerLeft : Alignment.centerRight,
-                  child: SizedBox(
-                    width: MediaQuery.sizeOf(ctx).width * .81,
-                    child: _cityMapCard(sheetContext, i))),
-              )),
-            ]),
+              Container(height: 2, margin: const EdgeInsets.symmetric(horizontal: 18),
+                color: _gold.withOpacity(.65)),
+              Expanded(child: body),
+            ])),
           ]),
         ),
       ),
     );
   }
 
-  void _showGameMenu() {
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: const Color(0xFF0C2440),
-      showDragHandle: true,
-      builder: (sheetContext) => Theme(
-        data: ThemeData.dark().copyWith(colorScheme: const ColorScheme.dark(primary: _gold)),
-        child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(17, 8, 17, 22),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Text('OYUN MENÜSÜ',
-                style: TextStyle(color: _gold, fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 1)),
-            const SizedBox(height: 9),
-            ListTile(leading: const Icon(Icons.map_rounded), title: const Text('Şehir haritası'),
-              onTap: () { Navigator.pop(sheetContext); Future.microtask(() { if (mounted) _showMap(); }); }),
-            ListTile(leading: const Icon(Icons.person_rounded), title: const Text('Profil ve istatistikler'),
-              onTap: () { Navigator.pop(sheetContext); Future.microtask(() { if (mounted) _showProfile(); }); }),
-            ListTile(leading: const Icon(Icons.settings_rounded), title: const Text('Ayarlar'),
-              onTap: () { Navigator.pop(sheetContext); Future.microtask(() { if (mounted) _showSettings(); }); }),
-            ListTile(leading: const Icon(Icons.save_rounded), title: const Text('İlerlemeyi kaydet'),
-              onTap: () async {
-                await _saveProgress();
-                if (!mounted) return;
-                Navigator.pop(sheetContext);
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text('Oyun ilerlemen kaydedildi ✓'), duration: Duration(seconds: 2)));
-              }),
-            ListTile(leading: const Icon(Icons.logout_rounded), title: const Text('Oyundan çık'),
-              onTap: () { Navigator.pop(sheetContext); Future.microtask(() { if (mounted) _confirmExit(); }); }),
-          ]),
-        ),
+  Widget _premiumMenuItem(IconData icon, String label, VoidCallback onTap,
+      {String? detail, Color? accent}) => Container(
+    margin: const EdgeInsets.symmetric(vertical: 5),
+    decoration: BoxDecoration(color: const Color(0xEA0A2745),
+      borderRadius: BorderRadius.circular(14),
+      border: Border.all(color: _gold.withOpacity(.76), width: 1)),
+    child: ListTile(
+      onTap: onTap,
+      leading: Icon(icon, color: accent ?? _gold, size: 26),
+      title: Text(label, style: const TextStyle(color: _cream,
+          fontSize: 16, fontWeight: FontWeight.w800)),
+      subtitle: detail == null ? null : Text(detail,
+        style: const TextStyle(color: Color(0xFFDBCCA9), fontSize: 11)),
+      trailing: const Icon(Icons.chevron_right_rounded, color: _gold),
+    ),
+  );
+
+  Widget _settingToggle(String label, IconData icon, bool enabled,
+      ValueChanged<bool> onChange) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 10),
+    margin: const EdgeInsets.symmetric(vertical: 4),
+    decoration: BoxDecoration(color: const Color(0xD60C2947),
+      borderRadius: BorderRadius.circular(13),
+      border: Border.all(color: const Color(0x7759A0C6))),
+    child: SwitchListTile(
+      contentPadding: EdgeInsets.zero,
+      secondary: Icon(icon, color: _cream, size: 26),
+      title: Text(label, style: const TextStyle(color: _cream, fontWeight: FontWeight.w800)),
+      value: enabled, activeColor: _navy,
+      activeTrackColor: _gold, inactiveTrackColor: const Color(0xFF3A5269),
+      onChanged: onChange,
+    ),
+  );
+
+  Widget _statsLine(String title, String data, IconData icon) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+    margin: const EdgeInsets.symmetric(vertical: 3),
+    decoration: BoxDecoration(
+      color: const Color(0xD60B2A48), borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: const Color(0x7BFFD36E))),
+    child: Row(children: [
+      Icon(icon, color: _gold, size: 22), const SizedBox(width: 10),
+      Expanded(child: Text(title, style: const TextStyle(color: _cream, fontWeight: FontWeight.w600))),
+      Text(data, style: const TextStyle(color: _gold, fontSize: 16, fontWeight: FontWeight.w900)),
+    ]),
+  );
+
+  void _showMap() {
+    _premiumPage('ŞEHİR HARİTASI', Column(children: [
+      const SizedBox(height: 12),
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(color: _navy,
+          border: Border.all(color: _gold), borderRadius: BorderRadius.circular(20)),
+        child: Text('★  ${_completedLevels.length} / 18 BÖLÜM TAMAMLANDI  ★',
+          style: const TextStyle(color: _gold, fontWeight: FontWeight.bold, fontSize: 12)),
+      ),
+      Padding(padding: const EdgeInsets.fromLTRB(26, 14, 26, 3),
+        child: ClipRRect(borderRadius: BorderRadius.circular(20),
+          child: LinearProgressIndicator(value: _completedLevels.length / 18,
+            minHeight: 8, backgroundColor: const Color(0xFF52657B),
+            valueColor: const AlwaysStoppedAnimation<Color>(_gold)))),
+      Expanded(child: ListView.builder(
+        padding: const EdgeInsets.fromLTRB(10, 15, 10, 40),
+        itemCount: 11,
+        itemBuilder: (ctx, index) {
+          if (index.isOdd) {
+            final pathIndex = index ~/ 2;
+            return SizedBox(height: 47, child: Center(child: CustomPaint(
+              size: const Size(115, 45),
+              painter: _TrailPainter(reached: (pathIndex + 1) * 3 <= _unlocked))));
+          }
+          final i = index ~/ 2;
+          return Align(
+            alignment: i.isEven ? Alignment.centerLeft : Alignment.centerRight,
+            child: SizedBox(width: MediaQuery.sizeOf(ctx).width * .81,
+                child: _cityMapCard(ctx, i)));
+        },
       )),
-    );
+    ]), background: _premiumCityScenes['Antalya'] ?? _istanbulBackground);
   }
+
+
+  void _showGameMenu() {
+    showDialog<void>(context: context,
+      builder: (menuContext) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20),
+        child: _goldFrame(child: SingleChildScrollView(child: Column(
+          mainAxisSize: MainAxisSize.min, children: [
+            Row(children: [
+              const Expanded(child: Text('OYUN MENÜSÜ', textAlign: TextAlign.center,
+                style: TextStyle(color: _gold, fontSize: 22, fontFamily: 'serif',
+                    fontWeight: FontWeight.w900))),
+              IconButton(onPressed: () => Navigator.pop(menuContext),
+                icon: const Icon(Icons.close, color: _cream)),
+            ]),
+            const SizedBox(height: 8),
+            _premiumMenuItem(Icons.map_rounded, 'Şehir haritası', () {
+              Navigator.pop(menuContext);
+              WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) _showMap(); });
+            }),
+            _premiumMenuItem(Icons.person_rounded, 'Profilim', () {
+              Navigator.pop(menuContext);
+              WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) _showProfile(); });
+            }),
+            _premiumMenuItem(Icons.bar_chart_rounded, 'İstatistikler', () {
+              Navigator.pop(menuContext);
+              WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) _showStatistics(); });
+            }),
+            _premiumMenuItem(Icons.settings_rounded, 'Ayarlar', () {
+              Navigator.pop(menuContext);
+              WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) _showSettings(); });
+            }),
+            _premiumMenuItem(Icons.save_rounded, 'Oyunu kaydet', () async {
+              await _saveProgress();
+              if (!mounted) return;
+              Navigator.pop(menuContext);
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:
+                Text('Oyun ilerlemen telefona kaydedildi ✓')));
+            }),
+            _premiumMenuItem(Icons.logout_rounded, 'Oyundan çık', () {
+              Navigator.pop(menuContext);
+              WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) _confirmExit(); });
+            }, accent: const Color(0xFFFF7777)),
+          ],
+        ))),
+      ));
+  }
+
 
   Widget _goldFrame({required Widget child, EdgeInsetsGeometry? padding}) {
     return Container(
@@ -9746,72 +9837,58 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   ]);
 
   void _showSettings() {
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: const Color(0xFF0C2440),
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (ctx) => Theme(
-        data: ThemeData.dark().copyWith(colorScheme: const ColorScheme.dark(primary: _gold)),
-        child: StatefulBuilder(builder: (context, modalSetState) {
-        void refresh(VoidCallback change) {
-          setState(change);
-          modalSetState(() {});
-        }
-        return SafeArea(child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(22, 6, 22, 30),
-          child: Column(mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Center(child: Text('✦  AYARLAR  ✦', style: TextStyle(color: _gold, fontFamily: 'serif', fontSize: 26, fontWeight: FontWeight.w900))),
-            const SizedBox(height: 18),
-            SwitchListTile.adaptive(
-              contentPadding: EdgeInsets.zero,
-              secondary: const Icon(Icons.music_note_rounded),
-              title: const Text('Müzik'), value: _musicOn,
-              onChanged: (value) { _toggleMusic(); modalSetState(() {}); }),
-            _settingsHeading('Müzik sesi', Icons.volume_up_rounded),
-            Slider(value: _musicVolume, min: 0, max: 1, divisions: 20,
-              label: '${(_musicVolume * 100).round()}%', onChanged: (value) {
-                refresh(() => _musicVolume = value);
-                _musicPlayer.setVolume(value);
-                _prefs?.setDouble('music_volume_v5', value);
-              }),
-            const Divider(),
-            SwitchListTile.adaptive(
-              contentPadding: EdgeInsets.zero,
-              secondary: const Icon(Icons.campaign_rounded),
-              title: const Text('Ses efektleri'), value: _effectsOn,
-              onChanged: (value) {
-                refresh(() => _effectsOn = value);
-                _prefs?.setBool('effects_enabled_v5', value);
-                if (value) _playEffect();
-              }),
-            _settingsHeading('Efekt sesi', Icons.graphic_eq_rounded),
-            Slider(value: _effectsVolume, min: 0, max: 1, divisions: 20,
-              label: '${(_effectsVolume * 100).round()}%', onChanged: (value) {
-                refresh(() => _effectsVolume = value);
-                _prefs?.setDouble('effects_volume_v5', value);
-              }, onChangeEnd: (_) => _playEffect()),
-            const Divider(),
-            SwitchListTile.adaptive(
-              contentPadding: EdgeInsets.zero,
-              secondary: const Icon(Icons.vibration_rounded),
-              title: const Text('Titreşim'),
-              subtitle: const Text('Kelime bulunca hafif titreşim'),
-              value: _vibrationOn,
-              onChanged: (value) {
-                refresh(() => _vibrationOn = value);
-                _prefs?.setBool('vibration_enabled_v5', value);
-                if (value) HapticFeedback.selectionClick();
-              }),
-            const SizedBox(height: 12),
-            const Text('İlerlemen ve ayarların bu telefonda otomatik kaydedilir.',
-                style: TextStyle(color: Color(0xFFE3D2BA), fontSize: 12)),
-          ]),
-        ));
-      })),
-    );
+    _premiumPage('AYARLAR', StatefulBuilder(builder: (ctx, refresh) {
+      void change(VoidCallback callback) {
+        setState(callback);
+        refresh(() {});
+      }
+      return ListView(padding: const EdgeInsets.fromLTRB(18, 18, 18, 30), children: [
+        _settingToggle('Müzik', Icons.music_note_rounded, _musicOn, (value) {
+          _toggleMusic(); refresh(() {});
+        }),
+        _statsLine('Müzik sesi', '%${(_musicVolume * 100).round()}', Icons.volume_up_rounded),
+        Slider(value: _musicVolume, min: 0, max: 1, divisions: 20,
+          activeColor: _gold, inactiveColor: const Color(0xFF4D6071),
+          onChanged: (v) { change(() => _musicVolume = v);
+            _musicPlayer.setVolume(v); _prefs?.setDouble('music_volume_v5', v); }),
+        _settingToggle('Ses efektleri', Icons.graphic_eq_rounded, _effectsOn, (v) {
+          change(() => _effectsOn = v);
+          _prefs?.setBool('effects_enabled_v5', v); if (v) _playEffect();
+        }),
+        _statsLine('Efekt sesi', '%${(_effectsVolume * 100).round()}', Icons.surround_sound_rounded),
+        Slider(value: _effectsVolume, min: 0, max: 1, divisions: 20,
+          activeColor: _gold, inactiveColor: const Color(0xFF4D6071),
+          onChanged: (v) { change(() => _effectsVolume = v);
+            _prefs?.setDouble('effects_volume_v5', v); },
+          onChangeEnd: (_) => _playEffect()),
+        _settingToggle('Titreşim', Icons.vibration_rounded, _vibrationOn, (v) {
+          change(() => _vibrationOn = v);
+          _prefs?.setBool('vibration_enabled_v5', v);
+          if (v) HapticFeedback.selectionClick();
+        }),
+        const SizedBox(height: 12),
+        _premiumMenuItem(Icons.person_rounded, 'Hesabım / İlerleme', () {
+          Navigator.pop(ctx);
+          WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) _showProfile(); });
+        }),
+        _premiumMenuItem(Icons.save_rounded, 'Telefonuma kaydet', () async {
+          await _saveProgress();
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('İlerlemen bu telefona kaydedildi ✓')));
+        }, detail: 'Bu özellik buluta yedekleme değildir'),
+        _premiumMenuItem(Icons.info_outline_rounded, 'Oyun hakkında', () {
+          showDialog<void>(context: ctx, builder: (d) => AlertDialog(
+            title: const Text('Kelime Şehirleri'),
+            content: const Text('18 bulmaca, 6 şehir, müzik, bonuslar ve yerel kayıt.
+'
+                'İlerleme bu cihazda saklanır; uygulama verilerini silmeyin.'),
+            actions: [TextButton(onPressed: () => Navigator.pop(d), child: const Text('Tamam'))]));
+        }),
+      ]);
+    }));
   }
+
 
   Widget _profileStat(IconData icon, String value, String title) => Expanded(child: Container(
     padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 4),
@@ -9827,65 +9904,126 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     ]),
   ));
 
-  void _showProfile() {
-    final allSolved = List.generate(_levels.length,
-        (i) => _prefs?.getStringList('solved_v3_$i')?.length ?? 0)
-        .fold<int>(0, (sum, count) => sum + count);
-    final allBonuses = List.generate(_levels.length,
-        (i) => _prefs?.getStringList('bonuses_v3_$i')?.length ?? 0)
-        .fold<int>(0, (sum, count) => sum + count);
-    final citiesDone = List.generate(6, (i) =>
-        List.generate(3, (j) => i * 3 + j)
+  int get _totalSolvedCount => List.generate(_levels.length,
+      (i) => _prefs?.getStringList('solved_v3_$i')?.length ?? 0)
+      .fold<int>(0, (a, b) => a + b);
+
+  int get _totalBonusCount => List.generate(_levels.length,
+      (i) => _prefs?.getStringList('bonuses_v3_$i')?.length ?? 0)
+      .fold<int>(0, (a, b) => a + b);
+
+  int get _citiesComplete => List.generate(6, (i) =>
+      List.generate(3, (j) => i * 3 + j)
           .every((index) => _completedLevels.contains(index)))
-        .where((done) => done).length;
-    showModalBottomSheet<void>(
-      context: context, backgroundColor: const Color(0xFF0C2440),
-      isScrollControlled: true, showDragHandle: true,
-      builder: (ctx) => Theme(
-        data: ThemeData.dark().copyWith(colorScheme: const ColorScheme.dark(primary: _gold)),
-        child: SafeArea(child: FractionallySizedBox(
-        heightFactor: .77,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(18, 4, 18, 18),
-          child: ListView(children: [
-            Container(height: 116, decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), border: Border.all(color: _gold, width: 1.5), image: DecorationImage(image: MemoryImage(_istanbulBackground), fit: BoxFit.cover)), alignment: Alignment.center, child: Container(padding: const EdgeInsets.all(13), decoration: BoxDecoration(color: const Color(0xD40A213A), shape: BoxShape.circle, border: Border.all(color: _gold, width: 2)), child: const Icon(Icons.person_rounded, size: 45, color: _cream))),
-            const SizedBox(height: 10),
-            const Text('GEZGİN PROFİLİ', style: TextStyle(color: _gold, fontSize: 25, fontWeight: FontWeight.w900)),
-            Text('${_puzzle.city} • Bölüm ${_level % 3 + 1}/3',
-              style: const TextStyle(color: Color(0xFFDFCBA9))),
-            const SizedBox(height: 17),
-            Row(children: [
-              _profileStat(Icons.stars_rounded, '$_coins', 'Altın'),
-              const SizedBox(width: 8),
-              _profileStat(Icons.emoji_events_rounded, '${_completedLevels.length}/18', 'Bölüm'),
-              const SizedBox(width: 8),
-              _profileStat(Icons.public_rounded, '$citiesDone/6', 'Şehir'),
+      .where((v) => v).length;
+
+  void _showProfile() {
+    _premiumPage('PROFİLİM', ListView(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 35), children: [
+      Container(height: 150, decoration: BoxDecoration(
+        border: Border.all(color: _gold, width: 2),
+        borderRadius: BorderRadius.circular(18),
+        image: DecorationImage(image: MemoryImage(_istanbulBackground), fit: BoxFit.cover)),
+        child: Center(child: Container(
+          width: 88, height: 88,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xDC0A2441),
+            border: Border.all(color: _gold, width: 3)),
+          child: const Icon(Icons.person_rounded, color: _gold, size: 55)))),
+      const SizedBox(height: 10),
+      const Text('KELİME GEZGİNİ', textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 24, color: _gold, fontWeight: FontWeight.w900)),
+      Text('${_puzzle.city} · Bölüm ${_level % 3 + 1}/3', textAlign: TextAlign.center,
+          style: const TextStyle(color: _cream)),
+      const SizedBox(height: 16),
+      Row(children: [
+        _profileStat(Icons.monetization_on, '$_coins', 'Altın'),
+        const SizedBox(width: 6),
+        _profileStat(Icons.emoji_events_rounded, '${_completedLevels.length}/18', 'Bölüm'),
+        const SizedBox(width: 6),
+        _profileStat(Icons.stars_rounded, '$_totalBonusCount', 'Bonus'),
+      ]),
+      const SizedBox(height: 17),
+      _statsLine('Tamamlanan şehirler', '$_citiesComplete / 6', Icons.public_rounded),
+      _statsLine('Bulunan kelimeler', '$_totalSolvedCount', Icons.abc_rounded),
+      const SizedBox(height: 15),
+      const Text('ŞEHİR ROZETLERİ', style: TextStyle(color: _gold,
+          fontWeight: FontWeight.w900, fontSize: 17)),
+      const SizedBox(height: 8),
+      SizedBox(height: 104, child: ListView.builder(scrollDirection: Axis.horizontal,
+        itemCount: 6, itemBuilder: (ctx, i) {
+          final name = _levels[i * 3].city;
+          final done = List.generate(3, (k) => i * 3 + k)
+              .every((idx) => _completedLevels.contains(idx));
+          return Container(width: 92, margin: const EdgeInsets.only(right: 9),
+            decoration: BoxDecoration(color: const Color(0xD50C2947),
+                borderRadius: BorderRadius.circular(13), border: Border.all(color: _gold)),
+            child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Icon(done ? Icons.workspace_premium_rounded : Icons.lock_outline,
+                  color: done ? _gold : const Color(0xFF8798A8), size: 33),
+              const SizedBox(height: 7),
+              Text(name, textAlign: TextAlign.center, maxLines: 1,
+                overflow: TextOverflow.ellipsis, style: const TextStyle(color: _cream, fontSize: 11)),
+              Text(done ? 'TAMAM' : 'KİLİTLİ', style: TextStyle(
+                color: done ? _gold : const Color(0xFF9CACBB), fontSize: 9)),
             ]),
-            const SizedBox(height: 16),
-            ListTile(leading: const Icon(Icons.abc_rounded),
-              title: const Text('Bulunan kelimeler'), trailing: Text('$allSolved')),
-            ListTile(leading: const Icon(Icons.auto_awesome_rounded),
-              title: const Text('Bonus kelimeler'), trailing: Text('$allBonuses')),
-            const SizedBox(height: 8),
-            ClipRRect(borderRadius: BorderRadius.circular(14),
-              child: LinearProgressIndicator(
-                value: _completedLevels.length / _levels.length,
-                minHeight: 14,
-                backgroundColor: const Color(0xFFE5D8C5),
-                valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF45A86B)),
-              )),
-            const SizedBox(height: 6),
-            Text('Genel ilerleme: %${(_completedLevels.length * 100 / _levels.length).round()}',
-              style: const TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
-            FilledButton.icon(onPressed: () {
-              Navigator.pop(ctx); Future.microtask(() { if (mounted) _showMap(); });
-            }, icon: const Icon(Icons.map_rounded), label: const Text('Şehir yolculuğum')),
-          ]),
-        ),
-      ))),
-    );
+          );
+        })),
+      const SizedBox(height: 15),
+      ClipRRect(borderRadius: BorderRadius.circular(20),
+        child: LinearProgressIndicator(
+          value: _completedLevels.length / 18,
+          minHeight: 11,
+          backgroundColor: const Color(0xFF42536C),
+          valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF58C26E)))),
+      const SizedBox(height: 12),
+      _premiumMenuItem(Icons.bar_chart_rounded, 'Tüm istatistikler', () {
+        Navigator.pop(context);
+        WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) _showStatistics(); });
+      }),
+      _premiumMenuItem(Icons.map_rounded, 'Şehir haritası', () {
+        Navigator.pop(context);
+        WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) _showMap(); });
+      }),
+    ]), background: _istanbulBackground);
   }
+
+  void _showStatistics() {
+    _premiumPage('İSTATİSTİKLER', ListView(
+      padding: const EdgeInsets.fromLTRB(18, 25, 18, 30), children: [
+      const Icon(Icons.emoji_events_rounded, color: _gold, size: 80),
+      const SizedBox(height: 18),
+      _statsLine('Tamamlanan bölümler', '${_completedLevels.length} / 18', Icons.emoji_events),
+      _statsLine('Bulunan kelimeler', '$_totalSolvedCount', Icons.abc_rounded),
+      _statsLine('Bonus kelimeler', '$_totalBonusCount', Icons.stars_rounded),
+      _statsLine('Mevcut altın', '$_coins', Icons.monetization_on_rounded),
+      _statsLine('Tamamlanan şehirler', '$_citiesComplete / 6', Icons.public),
+      const SizedBox(height: 18),
+      const Text('ŞEHİR İLERLEMESİ', style: TextStyle(color: _gold,
+          fontWeight: FontWeight.w900, fontSize: 18)),
+      const SizedBox(height: 10),
+      ...List.generate(6, (i) {
+        final done = List.generate(3, (j) => i * 3 + j)
+            .where((idx) => _completedLevels.contains(idx)).length;
+        return Container(padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Row(children: [
+            CircleAvatar(radius: 18, backgroundColor: _navy,
+              child: Text('${i+1}', style: const TextStyle(color: _gold))),
+            const SizedBox(width: 10),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(_levels[i * 3].city, style: const TextStyle(color: _cream,
+                  fontWeight: FontWeight.bold)),
+              const SizedBox(height: 4),
+              LinearProgressIndicator(value: done / 3, minHeight: 6,
+                  backgroundColor: const Color(0xFF354E67),
+                  valueColor: const AlwaysStoppedAnimation<Color>(_gold)),
+            ])),
+            const SizedBox(width: 12),
+            Text('$done/3', style: const TextStyle(color: _gold, fontWeight: FontWeight.bold)),
+          ]));
+      }),
+    ]));
+  }
+
 
   void _showLevelResult() {
     final level = _level;
@@ -10042,8 +10180,11 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     final firstCity = _level ~/ 3 == 0;
-    return WillPopScope(
-      onWillPop: _confirmExit,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) _confirmExit();
+      },
       child: Scaffold(
       backgroundColor: _navy,
       body: Stack(
@@ -10417,32 +10558,31 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
       );
 
   void _showBonuses() {
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: const Color(0xFF0C2440),
-      showDragHandle: true,
-      builder: (ctx) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(23),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Icon(Icons.stars_rounded, color: _gold, size: 40),
-            const SizedBox(height: 8),
-            const Text('BONUS KELİMELER', style: TextStyle(color: _gold, fontSize: 23,
-                fontWeight: FontWeight.w900)),
-            const SizedBox(height: 8),
-            Text('${_bonuses.length} bonus kelime buldun.',
-                style: const TextStyle(color: _cream, fontSize: 15)),
-            const SizedBox(height: 6),
-            Text(_bonuses.isEmpty
-                ? 'Harflerle farklı kelimeler oluşturarak altın kazan.'
-                : (_bonuses.toList()..sort()).join('  ·  '),
-                textAlign: TextAlign.center, style: const TextStyle(color: _cream)),
-            const SizedBox(height: 15),
-          ]),
-        ),
-      ),
-    );
+    showDialog<void>(context: context,
+      builder: (ctx) => Dialog(backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 25),
+        child: _goldFrame(child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Align(alignment: Alignment.topRight,
+            child: IconButton(onPressed: () => Navigator.pop(ctx),
+                icon: const Icon(Icons.close_rounded, color: _cream))),
+          const Icon(Icons.stars_rounded, color: _gold, size: 72),
+          const SizedBox(height: 7),
+          const Text('BONUS KELİMELER', style: TextStyle(color: _gold,
+              fontFamily: 'serif', fontSize: 22, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 15),
+          _statsLine('Bulduğun bonuslar', '${_bonuses.length}', Icons.auto_awesome_rounded),
+          const SizedBox(height: 9),
+          Text(_bonuses.isEmpty
+              ? 'Farklı kelimeler oluştur, sürpriz altınlar kazan.'
+              : (_bonuses.toList()..sort()).join('   ·   '),
+            textAlign: TextAlign.center, style: const TextStyle(color: _cream, fontSize: 15)),
+          const SizedBox(height: 18),
+          const Text('Her yeni bonus kelime +5 altın kazandırır.',
+              style: TextStyle(color: _gold, fontSize: 12)),
+        ])),
+      ));
   }
+
 
   Widget _levelDots() => Row(
         mainAxisAlignment: MainAxisAlignment.center,
