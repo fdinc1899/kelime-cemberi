@@ -20,13 +20,15 @@ class PremiumPageShell extends StatelessWidget {
       child: Stack(children: [
         Positioned.fill(child: Image.memory(background,
           fit: BoxFit.cover,
-          color: const Color(0xD905172A), colorBlendMode: BlendMode.multiply)),
+          color: title == 'ŞEHİR HARİTASI'
+            ? const Color(0x7705172A) : const Color(0xD905172A),
+          colorBlendMode: BlendMode.multiply)),
         Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(
           gradient: LinearGradient(begin: Alignment.topCenter,
             end: Alignment.bottomCenter, colors: [
-              PremiumPalette.navy.withOpacity(.93),
-              PremiumPalette.navy.withOpacity(.46),
-              PremiumPalette.navy.withOpacity(.98),
+              PremiumPalette.navy.withOpacity(title == 'ŞEHİR HARİTASI' ? .80 : .93),
+              PremiumPalette.navy.withOpacity(title == 'ŞEHİR HARİTASI' ? .28 : .46),
+              PremiumPalette.navy.withOpacity(title == 'ŞEHİR HARİTASI' ? .81 : .98),
             ])))),
         SafeArea(child: Column(children: [
           Padding(padding: const EdgeInsets.fromLTRB(12, 9, 12, 10),

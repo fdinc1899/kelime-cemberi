@@ -532,7 +532,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                           style: const TextStyle(color: _cream,
                             fontSize: 17, fontFamily: 'serif', fontWeight: FontWeight.w900))),
                       const SizedBox(height: 3),
-                      Text(locked ? 'KİLİTLİ' : '$done / 3 BÖLÜM',
+                      Text(locked ? '🔒 KİLİTLİ' : '$done / 3 BÖLÜM',
                         style: const TextStyle(color: _gold, fontSize: 10,
                             fontWeight: FontWeight.bold, letterSpacing: 1)),
                       const SizedBox(height: 5),
@@ -962,70 +962,87 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     ]),
   );
 
+  // Reward chest is a transparent game asset, never a static screenshot.
   void _showRewards() {
     final today = DateTime.now().toIso8601String().substring(0, 10);
     final claimed = _lastGiftDay == today;
     showDialog<void>(
       context: context,
+      barrierColor: const Color(0xD800091A),
       builder: (dialogContext) => Dialog(
         backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 26),
-        child: _goldFrame(child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Align(alignment: Alignment.topRight,
-            child: IconButton(onPressed: () => Navigator.pop(dialogContext),
-              icon: const Icon(Icons.close_rounded, color: _cream))),
-          Stack(alignment: Alignment.center, children: [
-            const Icon(Icons.auto_awesome, color: _gold, size: 170),
-            Container(width: 150, height: 126,
-              decoration: BoxDecoration(shape: BoxShape.circle,
-                boxShadow: [BoxShadow(color: _gold.withOpacity(.32),
-                  blurRadius: 42, spreadRadius: 18)])),
-            const Icon(Icons.inventory_2_rounded,
-              color: Color(0xFFCA7726), size: 99),
-            const Positioned(top: 7, right: 30,
-              child: Icon(Icons.monetization_on_rounded, color: _gold, size: 34)),
-            const Positioned(bottom: 12, left: 24,
-              child: Icon(Icons.monetization_on_rounded, color: _gold, size: 29)),
-          ]),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 9),
-            decoration: BoxDecoration(color: const Color(0xFF9F1F1F),
-                borderRadius: BorderRadius.circular(9),
-                border: Border.all(color: _gold, width: 1.3)),
-            child: const Text('GÜNLÜK ÖDÜL',
-              style: TextStyle(color: _cream,
-                fontSize: 23, fontWeight: FontWeight.w900, letterSpacing: 1))),
-          const SizedBox(height: 14),
-          const Text('Her gün oyuna girerek altın kazan!',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: _cream, fontSize: 13)),
-          const SizedBox(height: 16),
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const Icon(Icons.monetization_on_rounded, color: _gold, size: 38),
-            Text(claimed ? ' BUGÜN ALINDI' : ' +35 ALTIN',
-              style: const TextStyle(color: _gold, fontSize: 23,
-                fontWeight: FontWeight.w900)),
-          ]),
-          const SizedBox(height: 18),
-          SizedBox(width: double.infinity,
-            child: FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFF149F52),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14)),
-              onPressed: claimed ? null : () {
-                setState(() {
-                  _coins += 35;
-                  _lastGiftDay = today;
-                  _notice = 'Günlük ödül! +35 altın';
-                });
-                _prefs?.setString('gift_date', today);
-                _saveProgress();
-                Navigator.pop(dialogContext);
-                _celebrate('ÖDÜL!', 'GÜNLÜK +35 ALTIN');
-              },
-              child: Text(claimed ? 'YARIN TEKRAR GEL' : 'ÖDÜLÜ AL',
-                style: const TextStyle(fontWeight: FontWeight.w900)))),
-        ])),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 22),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * .83),
+          child: SingleChildScrollView(child: Container(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF17395D), Color(0xFF041426), Color(0xFF102B4C)]),
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(color: _gold, width: 2),
+              boxShadow: const [BoxShadow(color: Color(0xBB000000), blurRadius: 22)],
+            ),
+            padding: const EdgeInsets.fromLTRB(18, 6, 18, 23),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Align(alignment: Alignment.centerRight,
+                child: IconButton(onPressed: () => Navigator.pop(dialogContext),
+                  icon: const Icon(Icons.close_rounded, color: _cream, size: 26))),
+              TweenAnimationBuilder<double>(
+                tween: Tween(begin: .80, end: 1),
+                duration: const Duration(milliseconds: 750),
+                curve: Curves.elasticOut,
+                builder: (ctx, value, child) => Transform.scale(scale: value, child: child),
+                child: Stack(alignment: Alignment.center, children: [
+                  Container(height: 210, decoration: BoxDecoration(shape: BoxShape.circle,
+                    gradient: RadialGradient(colors: [
+                      _gold.withOpacity(.44), _gold.withOpacity(0)]))),
+                  Image.asset('assets/images/ui/reward_chest.png',
+                    height: 218, fit: BoxFit.contain),
+                ]),
+              ),
+              Transform.translate(offset: const Offset(0, -9), child: Container(
+                width: double.infinity, alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: [Color(0xFF870F26),
+                    Color(0xFFE63D2D), Color(0xFF8E1229)]),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: _gold, width: 2),
+                  boxShadow: const [BoxShadow(color: Color(0xBB000000), blurRadius: 7)]),
+                padding: const EdgeInsets.symmetric(vertical: 11),
+                child: const Text('GÜNLÜK ÖDÜL', textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 23, fontWeight: FontWeight.w900,
+                    letterSpacing: 1, color: _cream)),
+              )),
+              const Text('Her gün oyuna gir, yeni macerana altınla devam et!',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: _cream, fontSize: 13, height: 1.4)),
+              const SizedBox(height: 16),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                const Icon(Icons.monetization_on_rounded, color: _gold, size: 33),
+                Text(claimed ? ' BUGÜN ALINDI' : ' +35 ALTIN',
+                  style: const TextStyle(color: _gold, fontSize: 23,
+                    fontWeight: FontWeight.w900)),
+              ]),
+              const SizedBox(height: 19),
+              SizedBox(width: double.infinity, child: PremiumActionButton(
+                title: claimed ? 'YARIN TEKRAR GEL' : 'ÖDÜLÜ AL',
+                icon: claimed ? Icons.check_circle_rounded : Icons.card_giftcard_rounded,
+                onPressed: claimed ? null : () {
+                  setState(() {
+                    _coins += 35;
+                    _lastGiftDay = today;
+                    _notice = 'Günlük ödül! +35 altın';
+                  });
+                  _prefs?.setString('gift_date', today);
+                  _saveProgress();
+                  Navigator.pop(dialogContext);
+                  _celebrate('ÖDÜL!', 'GÜNLÜK +35 ALTIN');
+                },
+              )),
+            ]),
+          )),
+        ),
       ),
     );
   }
@@ -1076,10 +1093,10 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
               final narrow = viewport.maxWidth < 370;
               final compact = viewport.maxHeight < 730;
               final wheelSize = math.min(
-                viewport.maxWidth - (narrow ? 108 : 132),
-                compact ? 235.0 : 286.0,
-              ).clamp(206.0, 286.0).toDouble();
-              final boardMax = compact ? 38.0 : 47.0;
+                viewport.maxWidth - (narrow ? 130 : 136),
+                compact ? 216.0 : 247.0,
+              ).clamp(175.0, 247.0).toDouble();
+              final boardMax = compact ? 39.0 : 45.0;
               return Padding(
                 padding: EdgeInsets.fromLTRB(narrow ? 10 : 15, 10,
                     narrow ? 10 : 15, 15),
@@ -1087,17 +1104,17 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _premiumTopBar(narrow),
-                    SizedBox(height: compact ? 10 : 16),
+                    SizedBox(height: compact ? 7 : 11),
                     _cityPlaque(),
-                    SizedBox(height: compact ? 12 : 18),
+                    SizedBox(height: compact ? 7 : 12),
                     Expanded(
                       child: Column(
                         children: [
-                          Flexible(flex: 9, child: Center(child: _premiumBoard(boardMax))),
+                          Flexible(flex: 10, child: Center(child: _premiumBoard(boardMax))),
                           SizedBox(height: compact ? 8 : 10),
                           _selectionMessage(),
                           SizedBox(height: compact ? 4 : 6),
-                          Flexible(flex: 12, child: Center(child: _wheelAndActions(wheelSize, narrow))),
+                          Flexible(flex: 11, child: Center(child: _wheelAndActions(wheelSize, narrow))),
                           SizedBox(height: compact ? 8 : 10),
                           _complete ? _nextButton() : _levelDots(),
                           const SizedBox(height: 10),
@@ -1313,13 +1330,13 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
         children: [
           Column(mainAxisSize: MainAxisSize.min, children: [
             _smallAction(Icons.shuffle_rounded, 'KARIŞTIR', _shuffle),
-            const SizedBox(height: 22),
+            const SizedBox(height: 12),
             _smallAction(Icons.stars_rounded, 'BONUS', _showBonuses),
           ]),
           _premiumWheel(wheelSize),
           Column(mainAxisSize: MainAxisSize.min, children: [
             _smallAction(Icons.lightbulb_rounded, '25 ALTIN', _hint),
-            const SizedBox(height: 22),
+            const SizedBox(height: 12),
             _smallAction(Icons.card_giftcard_rounded, 'ÖDÜL', _showRewards),
           ]),
         ],
@@ -1379,15 +1396,15 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
           borderRadius: BorderRadius.circular(22),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             Container(
-              height: 51,
-              width: 51,
+              height: 46,
+              width: 46,
               decoration: BoxDecoration(
                 color: _navy.withOpacity(.92),
                 shape: BoxShape.circle,
                 border: Border.all(color: _gold, width: 2),
                 boxShadow: const [BoxShadow(color: Color(0x85000000), blurRadius: 8)],
               ),
-              child: Icon(icon, color: _cream, size: 28),
+              child: Icon(icon, color: _cream, size: 24),
             ),
             const SizedBox(height: 4),
             Container(
