@@ -9880,8 +9880,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
         _premiumMenuItem(Icons.info_outline_rounded, 'Oyun hakkında', () {
           showDialog<void>(context: ctx, builder: (d) => AlertDialog(
             title: const Text('Kelime Şehirleri'),
-            content: const Text('18 bulmaca, 6 şehir, müzik, bonuslar ve yerel kayıt.
-'
+            content: const Text('18 bulmaca, 6 şehir, müzik, bonuslar ve yerel kayıt.\n'
                 'İlerleme bu cihazda saklanır; uygulama verilerini silmeyin.'),
             actions: [TextButton(onPressed: () => Navigator.pop(d), child: const Text('Tamam'))]));
         }),
