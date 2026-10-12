@@ -157,19 +157,11 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
               style: TextStyle(color: _cream, fontSize: 13)),
           const SizedBox(height: 22),
           Row(children: [
-            Expanded(child: OutlinedButton(
-              style: OutlinedButton.styleFrom(foregroundColor: _cream,
-                  side: const BorderSide(color: _gold),
-                  padding: const EdgeInsets.symmetric(vertical: 13)),
-              onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('HAYIR', style: TextStyle(fontWeight: FontWeight.w900)))),
+            Expanded(child: V12PillButton(label: 'HAYIR',
+              onPressed: () => Navigator.of(dialogContext).pop(false))),
             const SizedBox(width: 12),
-            Expanded(child: FilledButton(
-              style: FilledButton.styleFrom(backgroundColor: const Color(0xFFB82E2E),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 13)),
-              onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('EVET, ÇIK', style: TextStyle(fontWeight: FontWeight.w900)))),
+            Expanded(child: V12PillButton(label: 'EVET, ÇIK', danger: true,
+              onPressed: () => Navigator.of(dialogContext).pop(true))),
           ]),
         ])),
       ),
@@ -553,81 +545,66 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     final image = _premiumCityThumbs[city] ??
         (i == 0 ? _istanbulBackground : _cityBackgrounds[city]!);
     final nextLevel = math.min(_unlocked, start + done.clamp(0, 2).toInt());
-
-    return Material(
-      color: Colors.transparent,
+    return Material(color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(17),
         onTap: locked ? null : () {
           Navigator.pop(sheetContext);
           _openLevel(nextLevel);
         },
         child: Container(
-          height: 123,
+          height: 98,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            color: const Color(0xFF082038),
-            border: Border.all(
-                color: active ? _gold : _gold.withOpacity(.78),
-                width: active ? 2.4 : 1.5),
-            boxShadow: const [BoxShadow(color: Color(0x99000000),
-                blurRadius: 12, offset: Offset(0, 5))],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(17),
+            border: Border.all(color: _gold, width: active ? 2.2 : 1.5),
+            boxShadow: const [BoxShadow(color: Color(0xB9000000),
+              blurRadius: 12, offset: Offset(0, 5))]),
+          child: ClipRRect(borderRadius: BorderRadius.circular(15),
             child: Stack(children: [
-              Positioned.fill(child: Image.memory(image,
-                  fit: BoxFit.cover, alignment: Alignment.center)),
-              Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(
-                  gradient: LinearGradient(begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [const Color(0x4205152C),
-                      const Color(0xC7071C33), const Color(0xEF07182D)],
-                    stops: const [0, .45, 1])))),
-              if (locked)
-                Positioned.fill(child: Container(color: const Color(0x66091C2D))),
-              Positioned(left: 12, top: 10,
-                child: Container(width: 29, height: 29,
-                  decoration: BoxDecoration(shape: BoxShape.circle,
-                    gradient: const LinearGradient(colors: [Color(0xFFFFE69C), Color(0xFFC38B30)]),
-                    border: Border.all(color: Colors.white, width: 1.4)),
+              Positioned.fill(child: Container(color: const Color(0xFF061C34))),
+              Positioned(left: 0, top: 0, bottom: 0, width: 143,
+                child: Image.memory(image, fit: BoxFit.cover,
+                  alignment: Alignment.center)),
+              Positioned(left: 94, top: 0, bottom: 0, width: 68,
+                child: DecoratedBox(decoration: BoxDecoration(gradient:
+                  LinearGradient(colors: [const Color(0x00071A32),
+                    const Color(0xFF071A32)])))),
+              if (locked) Positioned.fill(child: Container(
+                color: const Color(0x32030D1C))),
+              Positioned(left: 4, top: 7,
+                child: Container(height: 29, width: 29,
                   alignment: Alignment.center,
+                  decoration: BoxDecoration(shape: BoxShape.circle,
+                    gradient: const LinearGradient(colors: [Color(0xFFFFF2BB),
+                      Color(0xFFEAB650), Color(0xFFAC7021)]),
+                    border: Border.all(color: Colors.white, width: 1.5),
+                    boxShadow: const [BoxShadow(color: Colors.black54,blurRadius: 5)]),
                   child: Text('${i + 1}', style: const TextStyle(
-                    fontWeight: FontWeight.w900, color: _navy, fontSize: 14)))),
-              Positioned(left: 0, right: 8, bottom: 9, top: 7,
+                    color: _navy, fontWeight: FontWeight.w900, fontSize: 15)))),
+              Positioned(left: 140, top: 0, right: 7, bottom: 0,
                 child: Row(children: [
-                  const Expanded(flex: 4, child: SizedBox()),
-                  Expanded(flex: 6, child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Expanded(child: Column(mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft,
-                        child: Text(city.toUpperCase(),
-                          style: const TextStyle(color: _cream,
-                            fontSize: 17, fontFamily: 'serif', fontWeight: FontWeight.w900))),
-                      const SizedBox(height: 3),
-                      Text(locked ? 'KİLİTLİ' : '$done / 3 BÖLÜM',
-                        style: const TextStyle(color: _gold, fontSize: 10,
-                            fontWeight: FontWeight.bold, letterSpacing: 1)),
+                      FittedBox(fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(city, style: const TextStyle(color: _cream,
+                          fontSize: 15, fontWeight: FontWeight.w900))),
                       const SizedBox(height: 5),
-                      Row(children: List.generate(3, (k) => Padding(
-                          padding: const EdgeInsets.only(right: 2),
-                          child: Icon(_completedLevels.contains(start + k)
-                                  ? Icons.star_rounded : Icons.star_outline_rounded,
-                            size: 21, color: _gold)))),
+                      Text(locked ? 'KİLİTLİ' : '$done / 3 BÖLÜM',
+                        style: const TextStyle(color: _gold,
+                          fontSize: 10, fontWeight: FontWeight.w800)),
                       const SizedBox(height: 4),
-                      ClipRRect(borderRadius: BorderRadius.circular(6),
-                        child: LinearProgressIndicator(value: done / 3,
-                          minHeight: 4, backgroundColor: const Color(0xFF526174),
-                          valueColor: const AlwaysStoppedAnimation<Color>(_gold))),
+                      Row(children: List.generate(3, (j) => Padding(
+                        padding: const EdgeInsets.only(right: 2),
+                        child: Icon(_completedLevels.contains(start+j)
+                            ? Icons.star_rounded : Icons.circle_outlined,
+                          color: _gold, size: 13)))),
                     ])),
-                  SizedBox(width: 25, child: Icon(locked ? Icons.lock_rounded
-                    : Icons.chevron_right_rounded, color: _cream, size: 22)),
+                  Icon(locked ? Icons.lock_rounded :
+                    (done == 3 ? Icons.check_circle_rounded : Icons.chevron_right_rounded),
+                    size: 23, color: locked ? Colors.white : _gold),
                 ])),
-              if (active)
-                const Positioned(right: 4, top: 4,
-                  child: Icon(Icons.auto_awesome, color: _gold, size: 16)),
-            ]),
-          ),
+            ])),
         ),
       ),
     );
@@ -854,20 +831,28 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   void _showProfile() {
     _premiumPage('PROFİLİM', ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 35), children: [
-      Container(height: 150, decoration: BoxDecoration(
-        border: Border.all(color: _gold, width: 2),
-        borderRadius: BorderRadius.circular(18),
-        image: DecorationImage(image: MemoryImage(_istanbulBackground), fit: BoxFit.cover)),
-        child: Center(child: Container(
-          width: 88, height: 88,
-          decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xDC0A2441),
-            border: Border.all(color: _gold, width: 3)),
-          child: const Icon(Icons.person_rounded, color: _gold, size: 55)))),
-      const SizedBox(height: 10),
-      const Text('KELİME GEZGİNİ', textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 24, color: _gold, fontWeight: FontWeight.w900)),
-      Text('${_puzzle.city} · Bölüm ${_level % 3 + 1}/3', textAlign: TextAlign.center,
-          style: const TextStyle(color: _cream)),
+      Container(padding: const EdgeInsets.all(13),
+        decoration: BoxDecoration(color: const Color(0xDD051B33),
+          border: Border.all(color: _gold, width: 1),
+          borderRadius: BorderRadius.circular(14)),
+        child: Row(children: [
+          Container(width: 68, height: 68,
+            decoration: BoxDecoration(shape: BoxShape.circle,
+              border: Border.all(color: _gold, width: 3),
+              image: DecorationImage(image: MemoryImage(_istanbulBackground),
+                fit: BoxFit.cover)),
+            child: const Icon(Icons.person_rounded, color: _cream, size: 35)),
+          const SizedBox(width: 14),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Kelime Ustası', style: TextStyle(color: _cream,
+                fontWeight: FontWeight.w900, fontSize: 19)),
+              const Text('Şehirleri keşfet!', style: TextStyle(color: _gold,
+                fontSize: 12)),
+              Text('${_puzzle.city} · Bölüm ${_level % 3 + 1}/3',
+                style: const TextStyle(color: _cream, fontSize: 11)),
+            ])),
+        ])),
       const SizedBox(height: 16),
       Row(children: [
         _profileStat(Icons.monetization_on, '$_coins', 'Altın'),
@@ -933,8 +918,13 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   void _showStatistics() {
     _premiumPage('İSTATİSTİKLER', ListView(
       padding: const EdgeInsets.fromLTRB(18, 25, 18, 30), children: [
-      const Icon(Icons.emoji_events_rounded, color: _gold, size: 80),
-      const SizedBox(height: 18),
+      const Center(child: SizedBox(height: 103, width: 145,
+        child: Stack(alignment: Alignment.center, children: [
+          Icon(Icons.emoji_events_rounded, color: _gold, size: 74),
+          Positioned(top: 0, right: 11, child: Icon(Icons.auto_awesome,
+            color: _gold, size: 23)),
+        ]))),
+      const SizedBox(height: 11),
       _statsLine('Tamamlanan bölümler', '${_completedLevels.length} / 18', Icons.emoji_events),
       _statsLine('Bulunan kelimeler', '$_totalSolvedCount', Icons.abc_rounded),
       _statsLine('Bonus kelimeler', '$_totalBonusCount', Icons.stars_rounded),
@@ -1081,7 +1071,9 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                 child: Stack(alignment: Alignment.center, children: [
                   Container(height: 210, decoration: BoxDecoration(shape: BoxShape.circle,
                     gradient: RadialGradient(colors: [
-                      _gold.withOpacity(.44), _gold.withOpacity(0)]))),
+                      _gold.withOpacity(.64), const Color(0x00FFD36E)]))),
+                  SizedBox(height: 212, width: double.infinity,
+                    child: CustomPaint(painter: V12SparklePainter())),
                   Image.asset('assets/images/ui/reward_hero_v10.png',
                     height: 215, fit: BoxFit.contain),
                   const Positioned(top: 4, left: 30, child: Icon(Icons.auto_awesome_rounded,
@@ -1173,10 +1165,10 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
               final narrow = viewport.maxWidth < 370;
               final compact = viewport.maxHeight < 730;
               final wheelSize = math.min(
-                viewport.maxWidth - (narrow ? 130 : 136),
-                compact ? 210.0 : 239.0,
-              ).clamp(175.0, 239.0).toDouble();
-              final boardMax = compact ? 39.0 : 45.0;
+                viewport.maxWidth * (narrow ? .56 : .58),
+                compact ? 195.0 : 230.0,
+              ).clamp(170.0, 230.0).toDouble();
+              final boardMax = compact ? 40.0 : 47.0;
               return Padding(
                 padding: EdgeInsets.fromLTRB(narrow ? 10 : 15, 10,
                     narrow ? 10 : 15, 15),
@@ -1190,11 +1182,11 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                     Expanded(
                       child: Column(
                         children: [
-                          Flexible(flex: 10, child: Center(child: _premiumBoard(boardMax))),
+                          Flexible(flex: 11, child: Center(child: _premiumBoard(boardMax))),
                           SizedBox(height: compact ? 8 : 10),
                           _selectionMessage(),
                           SizedBox(height: compact ? 4 : 6),
-                          Flexible(flex: 11, child: Center(child: _wheelAndActions(wheelSize, narrow))),
+                          Flexible(flex: 10, child: Center(child: _wheelAndActions(wheelSize, narrow))),
                           SizedBox(height: compact ? 8 : 10),
                           _complete ? _nextButton() : _levelDots(),
                           const SizedBox(height: 10),
@@ -1484,40 +1476,40 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   void _showBonusAward(String word) {
     showDialog<void>(context: context, builder: (ctx) => Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 25),
-      child: _goldFrame(child: Column(mainAxisSize: MainAxisSize.min, children: [
-        const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Icon(Icons.star_rounded, color: _gold, size: 45),
-          Icon(Icons.star_rounded, color: _gold, size: 66),
-          Icon(Icons.star_rounded, color: _gold, size: 45),
-        ]),
-        const V10Ribbon(title: 'BONUS KELİME!', compact: true),
-        const SizedBox(height: 15),
-        FittedBox(fit: BoxFit.scaleDown, child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: word.split('').map((letter) => Container(
-            width: 40, height: 47,
-            margin: const EdgeInsets.symmetric(horizontal: 3),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [Color(0xFFFFFAE7),Color(0xFFFFDEA2)]),
-              border: Border.all(color: _gold, width: 2),
-              borderRadius: BorderRadius.circular(7),
-              boxShadow: const [BoxShadow(color: Color(0x77FFA600), blurRadius: 8)]),
-            child: Text(letter, style: const TextStyle(color: _navy,
-              fontSize: 26, fontWeight: FontWeight.w900)))).toList(),
-        )),
-        const SizedBox(height: 20),
-        const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Icon(Icons.monetization_on_rounded, color: _gold, size: 31),
-          Text('  +5 ALTIN', style: TextStyle(color: _gold,
-            fontSize: 25, fontWeight: FontWeight.w900)),
-        ]),
-        const SizedBox(height: 15),
-        SizedBox(width: double.infinity, child: PremiumActionButton(
-          title: 'SÜPER!', icon: Icons.check_rounded,
-          onPressed: () => Navigator.pop(ctx))),
-      ])),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 28),
+      child: Stack(children: [
+        PremiumPanel(child: Column(mainAxisSize: MainAxisSize.min, children: [
+          const SizedBox(height: 14),
+          const SizedBox(height: 110, width: double.infinity,
+            child: CustomPaint(painter: V12SparklePainter())),
+          const V10Ribbon(title: 'BONUS KELİME!'),
+          const SizedBox(height: 14),
+          Row(mainAxisAlignment: MainAxisAlignment.center,
+            children: word.split('').map((letter) => Container(
+              height: 43, width: 38,
+              margin: const EdgeInsets.symmetric(horizontal: 2),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(color: const Color(0xFFFFF5DF),
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(color: _gold, width: 1.4),
+                boxShadow: const [BoxShadow(color: Colors.black54, blurRadius: 5)]),
+              child: Text(letter, style: const TextStyle(color: _navy,
+                fontWeight: FontWeight.w900, fontSize: 22)))).toList()),
+          const SizedBox(height: 16),
+          const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Icon(Icons.monetization_on_rounded, color: _gold, size: 32),
+            Text('  +5 ALTIN', style: TextStyle(color: _gold,
+              fontSize: 23, fontWeight: FontWeight.w900)),
+          ]),
+          const SizedBox(height: 19),
+          SizedBox(width: double.infinity,
+            child: PremiumActionButton(title: 'DEVAM ET',
+              onPressed: () => Navigator.pop(ctx))),
+        ])),
+        Positioned(top: 4, right: 5,
+          child: IconButton(onPressed: () => Navigator.pop(ctx),
+            icon: const Icon(Icons.close, color: _cream))),
+      ]),
     ));
   }
 

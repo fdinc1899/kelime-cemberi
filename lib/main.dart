@@ -17,6 +17,7 @@ part 'src/screens/premium_page.dart';
 part 'src/screens/journey_map.dart';
 part 'src/widgets/painters.dart';
 part 'src/widgets/v10_ornaments.dart';
+part 'src/widgets/v12_sparkles.dart';
 
 // Art and music are stored as genuine project assets, not inline Base64 source.
 late Uint8List _istanbulBackground;

@@ -1,9 +1,9 @@
 part of kelime_sehirleri;
 
-/// Scenic six-city route. Only the map scrolls; the game screen stays fixed.
+/// V12: a real, tappable scenic route; no flattened screenshot as an interface.
 class JourneyMapView extends StatelessWidget {
-  const JourneyMapView({super.key, required this.completed, required this.unlocked,
-    required this.cardBuilder});
+  const JourneyMapView({super.key, required this.completed,
+    required this.unlocked, required this.cardBuilder});
 
   final int completed;
   final int unlocked;
@@ -11,45 +11,50 @@ class JourneyMapView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(children: [
-    const SizedBox(height: 9),
+    const SizedBox(height: 7),
     Container(
-      padding: const EdgeInsets.symmetric(horizontal: 19, vertical: 10),
+      margin: const EdgeInsets.symmetric(horizontal: 28),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFF07172C), Color(0xFF183D62)]),
-        border: Border.all(color: PremiumPalette.gold, width: 1.6),
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: const [BoxShadow(color: Color(0x88000000), blurRadius: 12)],
+        color: const Color(0xED071A31),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: PremiumPalette.gold, width: 1.4),
+        boxShadow: const [BoxShadow(color: Color(0x99000000), blurRadius: 14)],
       ),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        const Icon(Icons.stars_rounded, color: PremiumPalette.gold, size: 20),
+      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        const Icon(Icons.stars_rounded, color: PremiumPalette.gold, size: 19),
         const SizedBox(width: 9),
-        Text('$completed / 18 BÖLÜM TAMAMLANDI',
-          style: const TextStyle(color: PremiumPalette.gold,
-            fontWeight: FontWeight.w900, fontSize: 12, letterSpacing: .7)),
+        Text('$completed / 18 TAMAMLANAN BÖLÜM',
+          style: const TextStyle(color: PremiumPalette.cream,
+            fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: .35)),
         const SizedBox(width: 9),
-        const Icon(Icons.stars_rounded, color: PremiumPalette.gold, size: 20),
+        const Icon(Icons.stars_rounded, color: PremiumPalette.gold, size: 19),
       ]),
     ),
-    Padding(padding: const EdgeInsets.fromLTRB(23, 12, 23, 12),
+    const SizedBox(height: 8),
+    Padding(padding: const EdgeInsets.symmetric(horizontal: 25),
       child: ClipRRect(borderRadius: BorderRadius.circular(20),
         child: LinearProgressIndicator(value: completed / 18,
-          minHeight: 9, backgroundColor: const Color(0xFF52657B),
-          valueColor: const AlwaysStoppedAnimation<Color>(PremiumPalette.gold)))),
+          backgroundColor: const Color(0x99051D34), minHeight: 6,
+          valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFFC95F))))),
+    const SizedBox(height: 4),
     Expanded(child: LayoutBuilder(builder: (context, constraints) {
-      final viewWidth = constraints.maxWidth;
-      const cardSpacing = 174.0;
-      const topGap = 22.0;
-      final trailHeight = 6 * cardSpacing + 24;
+      final width = constraints.maxWidth;
+      const stride = 126.0;
+      const cardHeight = 98.0;
+      final totalHeight = 6 * stride + 6;
       return ListView(children: [
-        SizedBox(height: trailHeight, child: Stack(children: [
+        SizedBox(height: totalHeight, child: Stack(children: [
           Positioned.fill(child: CustomPaint(
-            painter: _JourneyRoadPainter(reachedCities: unlocked ~/ 3))),
+            painter: _JourneyRoadPainter(reachedCities: unlocked ~/ 3,
+              stepHeight: stride))),
           for (var i = 0; i < 6; i++)
             Positioned(
-              top: topGap + i * cardSpacing,
-              left: i.isEven ? 6 : null,
-              right: i.isOdd ? 6 : null,
-              width: viewWidth * .84,
+              top: 12 + i * stride,
+              left: i.isEven ? 9 : null,
+              right: i.isOdd ? 9 : null,
+              width: width * .84,
+              height: cardHeight,
               child: cardBuilder(context, i),
             ),
         ])),
@@ -58,49 +63,47 @@ class JourneyMapView extends StatelessWidget {
   ]);
 }
 
-/// Winding dotted golden trail between destination cards.
 class _JourneyRoadPainter extends CustomPainter {
-  const _JourneyRoadPainter({required this.reachedCities});
+  const _JourneyRoadPainter({required this.reachedCities, required this.stepHeight});
   final int reachedCities;
+  final double stepHeight;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final width = size.width;
     final route = Path();
-    Offset point(int i) => Offset(width * (i.isEven ? .23 : .77), 100 + i * 174.0);
-    route.moveTo(point(0).dx, point(0).dy);
+    Offset pin(int i) => Offset(size.width * (i.isEven ? .32 : .68),
+        57 + i * stepHeight);
+    route.moveTo(pin(0).dx, pin(0).dy);
     for (var i = 0; i < 5; i++) {
-      final a = point(i);
-      final b = point(i + 1);
-      route.cubicTo(width * (i.isEven ? 1.0 : 0.0), a.dy + 55,
-        width * (i.isEven ? .0 : 1.0), b.dy - 55, b.dx, b.dy);
+      final a = pin(i);
+      final b = pin(i + 1);
+      route.cubicTo(size.width * (i.isEven ? .98 : .02), a.dy + 58,
+          size.width * (i.isEven ? .02 : .98), b.dy - 58, b.dx, b.dy);
     }
-    canvas.drawPath(route, Paint()..color = const Color(0x77000000)
-      ..strokeWidth = 12..style = PaintingStyle.stroke..strokeCap = StrokeCap.round);
-    canvas.drawPath(route, Paint()..color = const Color(0x77F8C76D)
-      ..strokeWidth = 5..style = PaintingStyle.stroke..strokeCap = StrokeCap.round
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7));
+    canvas.drawPath(route, Paint()..color = const Color(0xB5031022)
+      ..style = PaintingStyle.stroke..strokeWidth = 14);
+    canvas.drawPath(route, Paint()..color = const Color(0xFFA9670D)
+      ..style = PaintingStyle.stroke..strokeWidth = 8);
+    canvas.drawPath(route, Paint()..color = const Color(0xFFFFDD79)
+      ..style = PaintingStyle.stroke..strokeWidth = 3
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3));
     for (final metric in route.computeMetrics()) {
-      double d = 0;
+      double d = 5;
       while (d < metric.length) {
         final tangent = metric.getTangentForOffset(d);
         if (tangent != null) {
-          final step = (d / metric.length * 5).floor();
-          final unlocked = step <= reachedCities;
-          canvas.drawCircle(tangent.position, unlocked ? 5.5 : 3.7,
-            Paint()..color = unlocked ? const Color(0xFFFFD36E)
-              : const Color(0xFFEEE3C0));
-          if (unlocked && d % 7 < 4) {
-            canvas.drawCircle(tangent.position, 7,
-              Paint()..color = const Color(0x33FFD36E));
-          }
+          final progress = d / metric.length;
+          final active = progress <= reachedCities / 5.0;
+          canvas.drawCircle(tangent.position, active ? 4 : 3,
+            Paint()..color = active ? const Color(0xFFFFE997)
+              : const Color(0xFFD2BD93));
         }
-        d += 13;
+        d += 18;
       }
     }
   }
 
   @override
   bool shouldRepaint(covariant _JourneyRoadPainter old) =>
-      old.reachedCities != reachedCities;
+    old.reachedCities != reachedCities || old.stepHeight != stepHeight;
 }
