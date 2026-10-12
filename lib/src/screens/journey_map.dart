@@ -75,8 +75,11 @@ class _JourneyRoadPainter extends CustomPainter {
       route.cubicTo(width * (i.isEven ? 1.0 : 0.0), a.dy + 55,
         width * (i.isEven ? .0 : 1.0), b.dy - 55, b.dx, b.dy);
     }
-    canvas.drawPath(route, Paint()..color = const Color(0x9A061426)
-      ..strokeWidth = 10..style = PaintingStyle.stroke..strokeCap = StrokeCap.round);
+    canvas.drawPath(route, Paint()..color = const Color(0x77000000)
+      ..strokeWidth = 12..style = PaintingStyle.stroke..strokeCap = StrokeCap.round);
+    canvas.drawPath(route, Paint()..color = const Color(0x77F8C76D)
+      ..strokeWidth = 5..style = PaintingStyle.stroke..strokeCap = StrokeCap.round
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7));
     for (final metric in route.computeMetrics()) {
       double d = 0;
       while (d < metric.length) {
@@ -84,9 +87,9 @@ class _JourneyRoadPainter extends CustomPainter {
         if (tangent != null) {
           final step = (d / metric.length * 5).floor();
           final unlocked = step <= reachedCities;
-          canvas.drawCircle(tangent.position, unlocked ? 4 : 3,
+          canvas.drawCircle(tangent.position, unlocked ? 4.6 : 3.4,
             Paint()..color = unlocked ? const Color(0xFFFFD36E)
-              : const Color(0xFFA6A5A0));
+              : const Color(0xFFEEE3C0));
           if (unlocked && d % 7 < 4) {
             canvas.drawCircle(tangent.position, 7,
               Paint()..color = const Color(0x33FFD36E));

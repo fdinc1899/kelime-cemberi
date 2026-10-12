@@ -145,9 +145,9 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
         backgroundColor: Colors.transparent,
         insetPadding: const EdgeInsets.symmetric(horizontal: 25),
         child: _goldFrame(child: Column(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.exit_to_app_rounded, color: _gold, size: 54),
+          const Icon(Icons.door_back_door_rounded, color: _gold, size: 58),
           const SizedBox(height: 9),
-          const Text('OYUNDAN ÇIKMAK', style: TextStyle(color: _gold,
+          const Text('OYUNDAN ÇIKMAK', style: TextStyle(color: _cream,
               fontFamily: 'serif', fontWeight: FontWeight.w900, fontSize: 21)),
           const Text('İSTİYOR MUSUN?', style: TextStyle(color: _cream,
               fontFamily: 'serif', fontWeight: FontWeight.w900, fontSize: 20)),
@@ -368,6 +368,9 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
       }
     } else if (newBonus) {
       _celebrate('BONUS!', '$word  +5 ALTIN');
+      Future.delayed(const Duration(milliseconds: 1400), () {
+        if (mounted) _showBonusAward(word);
+      });
     }
   }
 
@@ -701,42 +704,46 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
         setState(callback);
         refresh(() {});
       }
-      return ListView(padding: const EdgeInsets.fromLTRB(18, 18, 18, 30), children: [
-        _settingToggle('Müzik', Icons.music_note_rounded, _musicOn, (value) {
-          _toggleMusic(); refresh(() {});
-        }),
-        _statsLine('Müzik sesi', '%${(_musicVolume * 100).round()}', Icons.volume_up_rounded),
-        Slider(value: _musicVolume, min: 0, max: 1, divisions: 20,
-          activeColor: _gold, inactiveColor: const Color(0xFF4D6071),
-          onChanged: (v) { change(() => _musicVolume = v);
-            _musicPlayer.setVolume(v); _prefs?.setDouble('music_volume_v5', v); }),
-        _settingToggle('Ses efektleri', Icons.graphic_eq_rounded, _effectsOn, (v) {
-          change(() => _effectsOn = v);
-          _prefs?.setBool('effects_enabled_v5', v); if (v) _playEffect();
-        }),
-        _statsLine('Efekt sesi', '%${(_effectsVolume * 100).round()}', Icons.surround_sound_rounded),
-        Slider(value: _effectsVolume, min: 0, max: 1, divisions: 20,
-          activeColor: _gold, inactiveColor: const Color(0xFF4D6071),
-          onChanged: (v) { change(() => _effectsVolume = v);
+      return ListView(padding: const EdgeInsets.fromLTRB(15, 18, 15, 28), children: [
+        const SizedBox(height: 2),
+        V10SettingsSection(
+          icon: Icons.music_note_rounded, label: 'Müzik', value: _musicOn,
+          level: _musicVolume,
+          onToggle: (v) { _toggleMusic(); refresh(() {}); },
+          onSlide: (v) { change(() => _musicVolume = v);
+            _musicPlayer.setVolume(v); _prefs?.setDouble('music_volume_v5', v); },
+        ),
+        V10SettingsSection(
+          icon: Icons.volume_up_rounded, label: 'Ses Efektleri', value: _effectsOn,
+          level: _effectsVolume,
+          onToggle: (v) { change(() => _effectsOn = v);
+            _prefs?.setBool('effects_enabled_v5', v); if (v) _playEffect(); },
+          onSlide: (v) { change(() => _effectsVolume = v);
             _prefs?.setDouble('effects_volume_v5', v); },
-          onChangeEnd: (_) => _playEffect()),
+        ),
         _settingToggle('Titreşim', Icons.vibration_rounded, _vibrationOn, (v) {
-          change(() => _vibrationOn = v);
-          _prefs?.setBool('vibration_enabled_v5', v);
+          change(() => _vibrationOn = v); _prefs?.setBool('vibration_enabled_v5', v);
           if (v) HapticFeedback.selectionClick();
         }),
-        const SizedBox(height: 12),
+        _premiumMenuItem(Icons.palette_outlined, 'Tema', () {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:
+            Text('Premium gece teması etkin')));
+        }, detail: 'Premium gece'),
+        _premiumMenuItem(Icons.language_rounded, 'Dil', () {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:
+            Text('Türkçe kelime paketi etkin')));
+        }, detail: 'Türkçe'),
         _premiumMenuItem(Icons.person_rounded, 'Hesabım / İlerleme', () {
           Navigator.pop(ctx);
           WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) _showProfile(); });
         }),
-        _premiumMenuItem(Icons.save_rounded, 'Telefonuma kaydet', () async {
+        _premiumMenuItem(Icons.save_rounded, 'Oyun Kaydı', () async {
           await _saveProgress();
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('İlerlemen bu telefona kaydedildi ✓')));
-        }, detail: 'Bu özellik buluta yedekleme değildir'),
-        _premiumMenuItem(Icons.info_outline_rounded, 'Oyun hakkında', () {
+        }, detail: 'Bu telefonda otomatik kayıt'),
+        _premiumMenuItem(Icons.info_outline_rounded, 'Hakkında', () {
           showDialog<void>(context: ctx, builder: (d) => AlertDialog(
             title: const Text('Kelime Şehirleri'),
             content: const Text('18 bulmaca, 6 şehir, müzik, bonuslar ve yerel kayıt.\n'
@@ -746,7 +753,6 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
       ]);
     }));
   }
-
 
   Widget _profileStat(IconData icon, String value, String title) => Expanded(child: Container(
     padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 4),
@@ -816,9 +822,18 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
             decoration: BoxDecoration(color: const Color(0xD50C2947),
                 borderRadius: BorderRadius.circular(13), border: Border.all(color: _gold)),
             child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Icon(done ? Icons.workspace_premium_rounded : Icons.lock_outline,
-                  color: done ? _gold : const Color(0xFF8798A8), size: 33),
-              const SizedBox(height: 7),
+              Container(width: 54, height: 54,
+                decoration: BoxDecoration(shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: MemoryImage(_premiumCityThumbs[name]!),
+                    fit: BoxFit.cover),
+                  border: Border.all(color: _gold, width: 2.5),
+                  boxShadow: const [BoxShadow(color: Color(0x77FFD36E), blurRadius: 7)]),
+                child: !done ? Container(decoration: const BoxDecoration(
+                    shape: BoxShape.circle, color: Color(0x8805172A)),
+                  child: const Icon(Icons.lock_outline_rounded,
+                    color: _cream, size: 22)) : null),
+              const SizedBox(height: 5),
               Text(name, textAlign: TextAlign.center, maxLines: 1,
                 overflow: TextOverflow.ellipsis, style: const TextStyle(color: _cream, fontSize: 11)),
               Text(done ? 'TAMAM' : 'KİLİTLİ', style: TextStyle(
@@ -900,10 +915,10 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
           padding: const EdgeInsets.all(17),
           child: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.auto_awesome_rounded, color: _gold, size: 27),
+              const V10Ribbon(title: 'TEBRİKLER!', compact: true),
               const Text('BÖLÜM TAMAMLANDI!', textAlign: TextAlign.center,
                 style: TextStyle(color: _cream, fontFamily: 'serif',
-                  fontSize: 24, fontWeight: FontWeight.w900)),
+                  fontSize: 21, fontWeight: FontWeight.w900)),
               const SizedBox(height: 8),
               Row(mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(3, (i) => _goldStar(i, stars,
@@ -997,24 +1012,19 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                   Container(height: 210, decoration: BoxDecoration(shape: BoxShape.circle,
                     gradient: RadialGradient(colors: [
                       _gold.withOpacity(.44), _gold.withOpacity(0)]))),
-                  Image.asset('assets/images/ui/reward_chest.png',
-                    height: 218, fit: BoxFit.contain),
+                  Image.asset('assets/images/ui/reward_hero_v10.png',
+                    height: 215, fit: BoxFit.contain),
+                  const Positioned(top: 4, left: 30, child: Icon(Icons.auto_awesome_rounded,
+                    color: _gold, size: 27)),
+                  const Positioned(bottom: 18, right: 24, child: Icon(Icons.stars_rounded,
+                    color: _gold, size: 32)),
+                  const Positioned(top: 30, right: 17, child: Icon(Icons.star_rounded,
+                    color: _cream, size: 20)),
                 ]),
               ),
-              Transform.translate(offset: const Offset(0, -9), child: Container(
-                width: double.infinity, alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [Color(0xFF870F26),
-                    Color(0xFFE63D2D), Color(0xFF8E1229)]),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: _gold, width: 2),
-                  boxShadow: const [BoxShadow(color: Color(0xBB000000), blurRadius: 7)]),
-                padding: const EdgeInsets.symmetric(vertical: 11),
-                child: const Text('GÜNLÜK ÖDÜL', textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 23, fontWeight: FontWeight.w900,
-                    letterSpacing: 1, color: _cream)),
-              )),
-              const Text('Her gün oyuna gir, yeni macerana altınla devam et!',
+              Transform.translate(offset: const Offset(0, -9),
+                child: V10Ribbon(title: 'GÜNLÜK ÖDÜL')),
+              const Text('Her gün 35 altın kazan. Yeni şehirleri keşfet!',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: _cream, fontSize: 13, height: 1.4)),
               const SizedBox(height: 16),
@@ -1026,7 +1036,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
               ]),
               const SizedBox(height: 19),
               SizedBox(width: double.infinity, child: PremiumActionButton(
-                title: claimed ? 'YARIN TEKRAR GEL' : 'ÖDÜLÜ AL',
+                title: claimed ? 'YARIN TEKRAR GEL' : 'AL',
                 icon: claimed ? Icons.check_circle_rounded : Icons.card_giftcard_rounded,
                 onPressed: claimed ? null : () {
                   setState(() {
@@ -1094,8 +1104,8 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
               final compact = viewport.maxHeight < 730;
               final wheelSize = math.min(
                 viewport.maxWidth - (narrow ? 130 : 136),
-                compact ? 216.0 : 247.0,
-              ).clamp(175.0, 247.0).toDouble();
+                compact ? 210.0 : 239.0,
+              ).clamp(175.0, 239.0).toDouble();
               final boardMax = compact ? 39.0 : 45.0;
               return Padding(
                 padding: EdgeInsets.fromLTRB(narrow ? 10 : 15, 10,
@@ -1142,28 +1152,34 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                         painter: CelebrationPainter(p),
                       ),
                       Align(
-                        alignment: const Alignment(0, -.17),
+                        alignment: const Alignment(0, -.21),
                         child: Opacity(
                           opacity: opacity.clamp(0, 1).toDouble(),
                           child: Transform.scale(
-                            scale: .65 + .4 * Curves.elasticOut.transform(p.clamp(0.0, .9).toDouble()),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 21, vertical: 13),
-                              decoration: BoxDecoration(
-                                color: _navy.withOpacity(.92),
-                                border: Border.all(color: _gold,width:2.4),
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: const [BoxShadow(color: Color(0xBB000000),blurRadius: 19)],
-                              ),
-                              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                                const Text('✦  ★  ✦',style: TextStyle(color: _gold,fontSize: 21)),
-                                Text(_cheerHeadline,style: const TextStyle(
-                                  fontSize: 32,color: _gold,fontFamily: 'serif',fontWeight: FontWeight.w900,
-                                  shadows: [Shadow(color: Colors.black,blurRadius: 7)])),
-                                Text(_cheerSubline,textAlign: TextAlign.center,
-                                  style: const TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 12)),
-                              ]),
-                            ),
+                            scale: .55 + .45 * Curves.elasticOut.transform(p.clamp(0.0, .92).toDouble()),
+                            child: Column(mainAxisSize: MainAxisSize.min, children: [
+                              Row(mainAxisSize: MainAxisSize.min,
+                                children: List.generate(3, (i) => Icon(Icons.star_rounded,
+                                  size: i == 1 ? 56 : 38, color: _gold))),
+                              Text(_cheerHeadline, textAlign: TextAlign.center,
+                                style: const TextStyle(fontSize: 48,
+                                  color: Color(0xFFFFE37B), fontWeight: FontWeight.w900,
+                                  fontFamily: 'serif', fontStyle: FontStyle.italic,
+                                  shadows: [
+                                    Shadow(color: Color(0xFFE77713), blurRadius: 1, offset: Offset(2, 3)),
+                                    Shadow(color: Color(0xFFFFAA11), blurRadius: 19),
+                                    Shadow(color: Colors.black, blurRadius: 12, offset: Offset(1, 5)),
+                                  ])),
+                              DecoratedBox(decoration: BoxDecoration(
+                                color: const Color(0xD8071B35),
+                                borderRadius: BorderRadius.circular(28),
+                                border: Border.all(color: _gold, width: 1.6)),
+                                child: Padding(padding: const EdgeInsets.symmetric(
+                                  horizontal: 22, vertical: 9),
+                                  child: Text(_cheerSubline, textAlign: TextAlign.center,
+                                    style: const TextStyle(color: Colors.white,
+                                      fontWeight: FontWeight.w900, fontSize: 16)))),
+                            ]),
                           ),
                         ),
                       ),
@@ -1184,7 +1200,10 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
         _goldRoundButton(Icons.menu_rounded, _showGameMenu,
             radius: narrow ? 21 : 24),
         const Spacer(),
-        Container(
+        InkWell(
+          onTap: _showRewards,
+          borderRadius: BorderRadius.circular(25),
+          child: Container(
           padding: const EdgeInsets.fromLTRB(12, 8, 14, 8),
           decoration: BoxDecoration(
             color: _navy.withOpacity(.91),
@@ -1201,62 +1220,19 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
             const SizedBox(width: 7),
             const Icon(Icons.add_circle, color: Color(0xFF65D578), size: 24),
           ]),
-        ),
+        )),
         const SizedBox(width: 8),
         _goldRoundButton(Icons.lightbulb_rounded, _hint,
             radius: narrow ? 21 : 24),
       ]);
 
   Widget _cityPlaque() => Center(
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(23, 10, 23, 10),
-          constraints: const BoxConstraints(maxWidth: 330),
-          decoration: BoxDecoration(
-            color: _navy.withOpacity(.90),
-            borderRadius: BorderRadius.circular(11),
-            border: Border.all(color: _gold.withOpacity(.75), width: 1.1),
-            boxShadow: const [BoxShadow(color: Color(0x80000000),
-                blurRadius: 16, offset: Offset(0, 5))],
-          ),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(Icons.auto_awesome_rounded, size: 14, color: _gold),
-              SizedBox(width: 8),
-              Text('Ş E H İ R   H İ K Â Y E L E R İ',
-                  style: TextStyle(color: _gold, fontSize: 9,
-                      fontWeight: FontWeight.w700, letterSpacing: 1)),
-              SizedBox(width: 8),
-              Icon(Icons.auto_awesome_rounded, size: 14, color: _gold),
-            ]),
-            const SizedBox(height: 3),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(_puzzle.city.toUpperCase(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: _cream,
-                    fontFamily: 'serif',
-                    fontSize: 29,
-                    fontWeight: FontWeight.w900,
-                    shadows: [Shadow(color: Colors.black54,
-                        blurRadius: 6, offset: Offset(0, 2))],
-                    letterSpacing: 2.0,
-                  )),
-            ),
-            Row(mainAxisSize: MainAxisSize.min, children: [
-              const Icon(Icons.diamond_outlined, color: _gold, size: 13),
-              Container(width: 110, height: 1,
-                margin: const EdgeInsets.symmetric(vertical: 4),
-                color: _gold.withOpacity(.8)),
-              const Icon(Icons.diamond_outlined, color: _gold, size: 13),
-            ]),
-            Text('B Ö L Ü M   ${_level % 3 + 1} / 3',
-                style: const TextStyle(color: Colors.white,
-                    letterSpacing: 1.5, fontSize: 12,
-                    fontWeight: FontWeight.w800)),
-          ]),
-        ),
-      );
+    child: OrnateTitlePlaque(
+      eyebrow: '✦  Ş E H İ R   H İ K Â Y E L E R İ  ✦',
+      heading: _puzzle.city.toUpperCase(),
+      footer: 'B Ö L Ü M  ${_level % 3 + 1} / 3',
+    ),
+  );
 
   Widget _premiumBoard(double maxCellSize) {
     final cells = _puzzle.cells;
@@ -1285,7 +1261,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: revealed
-              ? const [Color(0xFFFFE19C), Color(0xFFE9A744)]
+              ? const [Color(0xFF7BE791), Color(0xFF159650)]
               : const [Color(0xFFFFFEF5), Color(0xFFFFEDD1)],
         ),
         borderRadius: BorderRadius.circular(7),
@@ -1432,6 +1408,46 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
         ),
       );
 
+  void _showBonusAward(String word) {
+    showDialog<void>(context: context, builder: (ctx) => Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 25),
+      child: _goldFrame(child: Column(mainAxisSize: MainAxisSize.min, children: [
+        const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Icon(Icons.star_rounded, color: _gold, size: 45),
+          Icon(Icons.star_rounded, color: _gold, size: 66),
+          Icon(Icons.star_rounded, color: _gold, size: 45),
+        ]),
+        const V10Ribbon(title: 'BONUS KELİME!', compact: true),
+        const SizedBox(height: 15),
+        FittedBox(fit: BoxFit.scaleDown, child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: word.split('').map((letter) => Container(
+            width: 40, height: 47,
+            margin: const EdgeInsets.symmetric(horizontal: 3),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(colors: [Color(0xFFFFFAE7),Color(0xFFFFDEA2)]),
+              border: Border.all(color: _gold, width: 2),
+              borderRadius: BorderRadius.circular(7),
+              boxShadow: const [BoxShadow(color: Color(0x77FFA600), blurRadius: 8)]),
+            child: Text(letter, style: const TextStyle(color: _navy,
+              fontSize: 26, fontWeight: FontWeight.w900)))).toList(),
+        )),
+        const SizedBox(height: 20),
+        const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Icon(Icons.monetization_on_rounded, color: _gold, size: 31),
+          Text('  +5 ALTIN', style: TextStyle(color: _gold,
+            fontSize: 25, fontWeight: FontWeight.w900)),
+        ]),
+        const SizedBox(height: 15),
+        SizedBox(width: double.infinity, child: PremiumActionButton(
+          title: 'SÜPER!', icon: Icons.check_rounded,
+          onPressed: () => Navigator.pop(ctx))),
+      ])),
+    ));
+  }
+
   void _showBonuses() {
     showDialog<void>(context: context,
       builder: (ctx) => Dialog(backgroundColor: Colors.transparent,
@@ -1442,8 +1458,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                 icon: const Icon(Icons.close_rounded, color: _cream))),
           const Icon(Icons.stars_rounded, color: _gold, size: 72),
           const SizedBox(height: 7),
-          const Text('BONUS KELİMELER', style: TextStyle(color: _gold,
-              fontFamily: 'serif', fontSize: 22, fontWeight: FontWeight.w900)),
+          const V10Ribbon(title: 'BONUS KELİMELER', compact: true),
           const SizedBox(height: 15),
           _statsLine('Bulduğun bonuslar', '${_bonuses.length}', Icons.auto_awesome_rounded),
           const SizedBox(height: 9),

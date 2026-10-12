@@ -18,17 +18,18 @@ class PremiumPageShell extends StatelessWidget {
       width: MediaQuery.sizeOf(context).width,
       height: MediaQuery.sizeOf(context).height,
       child: Stack(children: [
-        Positioned.fill(child: Image.memory(background,
-          fit: BoxFit.cover,
-          color: title == 'ŞEHİR HARİTASI'
-            ? const Color(0x7705172A) : const Color(0xD905172A),
-          colorBlendMode: BlendMode.multiply)),
+        Positioned.fill(child: title == 'ŞEHİR HARİTASI'
+          ? Image.asset('assets/images/ui/map_backdrop_v10.webp',
+              fit: BoxFit.cover, color: const Color(0x5505172A),
+              colorBlendMode: BlendMode.multiply)
+          : Image.memory(background, fit: BoxFit.cover,
+              color: const Color(0xD905172A), colorBlendMode: BlendMode.multiply)),
         Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(
           gradient: LinearGradient(begin: Alignment.topCenter,
             end: Alignment.bottomCenter, colors: [
-              PremiumPalette.navy.withOpacity(title == 'ŞEHİR HARİTASI' ? .80 : .93),
-              PremiumPalette.navy.withOpacity(title == 'ŞEHİR HARİTASI' ? .28 : .46),
-              PremiumPalette.navy.withOpacity(title == 'ŞEHİR HARİTASI' ? .81 : .98),
+              PremiumPalette.navy.withOpacity(title == 'ŞEHİR HARİTASI' ? .39 : .93),
+              PremiumPalette.navy.withOpacity(title == 'ŞEHİR HARİTASI' ? .07 : .46),
+              PremiumPalette.navy.withOpacity(title == 'ŞEHİR HARİTASI' ? .46 : .98),
             ])))),
         SafeArea(child: Column(children: [
           Padding(padding: const EdgeInsets.fromLTRB(12, 9, 12, 10),
