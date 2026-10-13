@@ -1,3 +1,7 @@
+## V21 — 81 il ve tekrarsız şehir kartları
+
+Güncelleme ayrıntıları: `V21_81_IL.md`.
+
 # V20 görseller
 
 19 il için yeni HD kart ve tam ekran sahneleri eklendi. Ayrıntılar: `V20_GORSELLER.md`.

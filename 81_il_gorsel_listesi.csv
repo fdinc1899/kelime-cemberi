@@ -1,0 +1,82 @@
+﻿Oyun sırası,İl,Oyundaki bölüm adı,Bölge,İl kodu (slug),Bölüm IDleri,Kart dosyası,Oyun arka planı
+1,İstanbul,İstanbul,Marmara,istanbul,"0,1,2",assets/images/city_cards_hd/istanbul.webp,assets/images/cities/istanbul.webp
+2,Nevşehir,Kapadokya,İç Anadolu,nevsehir,"3,4,5",assets/images/city_cards_hd/nevsehir.webp,assets/images/cities/kapadokya.webp
+3,Antalya,Antalya,Akdeniz,antalya,"6,7,8",assets/images/city_cards_hd/antalya.webp,assets/images/cities/antalya.webp
+4,Mardin,Mardin,Güneydoğu Anadolu,mardin,"9,10,11",assets/images/city_cards_hd/mardin.webp,assets/images/cities/mardin.webp
+5,İzmir,İzmir,Ege,izmir,"12,13,14",assets/images/city_cards_hd/izmir.webp,assets/images/cities/izmir.webp
+6,Ankara,Ankara,İç Anadolu,ankara,"15,16,17",assets/images/city_cards_hd/ankara.webp,assets/images/cities/ankara.webp
+7,Edirne,Edirne,Marmara,edirne,"30,31,32",assets/images/hd_provinces/cards/edirne.webp,assets/images/hd_provinces/scenes/edirne.webp
+8,Kırklareli,Kırklareli,Marmara,kirklareli,"33,34,35",assets/images/hd_provinces/cards/kirklareli.webp,assets/images/hd_provinces/scenes/kirklareli.webp
+9,Tekirdağ,Tekirdağ,Marmara,tekirdag,"36,37,38",assets/images/hd_provinces/cards/tekirdag.webp,assets/images/hd_provinces/scenes/tekirdag.webp
+10,Çanakkale,Çanakkale,Marmara,canakkale,"39,40,41",assets/images/hd_provinces/cards/canakkale.webp,assets/images/hd_provinces/scenes/canakkale.webp
+11,Balıkesir,Balıkesir,Marmara,balikesir,"42,43,44",assets/images/hd_provinces/cards/balikesir.webp,assets/images/hd_provinces/scenes/balikesir.webp
+12,Bursa,Bursa,Marmara,bursa,"45,46,47",assets/images/hd_provinces/cards/bursa.webp,assets/images/hd_provinces/scenes/bursa.webp
+13,Yalova,Yalova,Marmara,yalova,"48,49,50",assets/images/hd_provinces/cards/yalova.webp,assets/images/hd_provinces/scenes/yalova.webp
+14,Kocaeli,Kocaeli,Marmara,kocaeli,"51,52,53",assets/images/hd_provinces/cards/kocaeli.webp,assets/images/hd_provinces/scenes/kocaeli.webp
+15,Sakarya,Sakarya,Marmara,sakarya,"54,55,56",assets/images/hd_provinces/cards/sakarya.webp,assets/images/hd_provinces/scenes/sakarya.webp
+16,Bilecik,Bilecik,Marmara,bilecik,"57,58,59",assets/images/hd_provinces/cards/bilecik.webp,assets/images/hd_provinces/scenes/bilecik.webp
+17,Aydın,Aydın,Ege,aydin,"60,61,62",assets/images/provinces/aydin.webp,assets/images/provinces/aydin.webp
+18,Muğla,Muğla,Ege,mugla,"63,64,65",assets/images/provinces/mugla.webp,assets/images/provinces/mugla.webp
+19,Denizli,Denizli,Ege,denizli,"66,67,68",assets/images/hd_provinces/cards/denizli.webp,assets/images/hd_provinces/scenes/denizli.webp
+20,Manisa,Manisa,Ege,manisa,"69,70,71",assets/images/provinces/manisa.webp,assets/images/provinces/manisa.webp
+21,Uşak,Uşak,Ege,usak,"72,73,74",assets/images/provinces/usak.webp,assets/images/provinces/usak.webp
+22,Kütahya,Kütahya,Ege,kutahya,"75,76,77",assets/images/hd_provinces/cards/kutahya.webp,assets/images/hd_provinces/scenes/kutahya.webp
+23,Afyonkarahisar,Afyonkarahisar,Ege,afyonkarahisar,"78,79,80",assets/images/hd_provinces/cards/afyonkarahisar.webp,assets/images/hd_provinces/scenes/afyonkarahisar.webp
+24,Isparta,Isparta,Akdeniz,isparta,"81,82,83",assets/images/hd_provinces/cards/isparta.webp,assets/images/hd_provinces/scenes/isparta.webp
+25,Burdur,Burdur,Akdeniz,burdur,"84,85,86",assets/images/provinces/burdur.webp,assets/images/provinces/burdur.webp
+26,Mersin,Mersin,Akdeniz,mersin,"87,88,89",assets/images/provinces/mersin.webp,assets/images/provinces/mersin.webp
+27,Adana,Adana,Akdeniz,adana,"90,91,92",assets/images/provinces/adana.webp,assets/images/provinces/adana.webp
+28,Osmaniye,Osmaniye,Akdeniz,osmaniye,"93,94,95",assets/images/provinces/osmaniye.webp,assets/images/provinces/osmaniye.webp
+29,Hatay,Hatay,Akdeniz,hatay,"96,97,98",assets/images/provinces/hatay.webp,assets/images/provinces/hatay.webp
+30,Kahramanmaraş,Kahramanmaraş,Akdeniz,kahramanmaras,"99,100,101",assets/images/provinces/kahramanmaras.webp,assets/images/provinces/kahramanmaras.webp
+31,Konya,Konya,İç Anadolu,konya,"102,103,104",assets/images/provinces/konya.webp,assets/images/provinces/konya.webp
+32,Karaman,Karaman,İç Anadolu,karaman,"105,106,107",assets/images/provinces/karaman.webp,assets/images/provinces/karaman.webp
+33,Aksaray,Aksaray,İç Anadolu,aksaray,"108,109,110",assets/images/hd_provinces/cards/aksaray.webp,assets/images/hd_provinces/scenes/aksaray.webp
+34,Niğde,Niğde,İç Anadolu,nigde,"111,112,113",assets/images/provinces/nigde.webp,assets/images/provinces/nigde.webp
+35,Kırşehir,Kırşehir,İç Anadolu,kirsehir,"114,115,116",assets/images/provinces/kirsehir.webp,assets/images/provinces/kirsehir.webp
+36,Kırıkkale,Kırıkkale,İç Anadolu,kirikkale,"117,118,119",assets/images/provinces/kirikkale.webp,assets/images/provinces/kirikkale.webp
+37,Çankırı,Çankırı,İç Anadolu,cankiri,"120,121,122",assets/images/provinces/cankiri.webp,assets/images/provinces/cankiri.webp
+38,Yozgat,Yozgat,İç Anadolu,yozgat,"123,124,125",assets/images/provinces/yozgat.webp,assets/images/provinces/yozgat.webp
+39,Kayseri,Kayseri,İç Anadolu,kayseri,"126,127,128",assets/images/provinces/kayseri.webp,assets/images/provinces/kayseri.webp
+40,Sivas,Sivas,İç Anadolu,sivas,"129,130,131",assets/images/hd_provinces/cards/sivas.webp,assets/images/hd_provinces/scenes/sivas.webp
+41,Eskişehir,Eskişehir,İç Anadolu,eskisehir,"132,133,134",assets/images/hd_provinces/cards/eskisehir.webp,assets/images/hd_provinces/scenes/eskisehir.webp
+42,Bolu,Bolu,Karadeniz,bolu,"135,136,137",assets/images/hd_provinces/cards/bolu.webp,assets/images/hd_provinces/scenes/bolu.webp
+43,Düzce,Düzce,Karadeniz,duzce,"138,139,140",assets/images/provinces/duzce.webp,assets/images/provinces/duzce.webp
+44,Zonguldak,Zonguldak,Karadeniz,zonguldak,"141,142,143",assets/images/provinces/zonguldak.webp,assets/images/provinces/zonguldak.webp
+45,Bartın,Bartın,Karadeniz,bartin,"144,145,146",assets/images/provinces/bartin.webp,assets/images/provinces/bartin.webp
+46,Karabük,Karabük,Karadeniz,karabuk,"147,148,149",assets/images/hd_provinces/cards/karabuk.webp,assets/images/hd_provinces/scenes/karabuk.webp
+47,Kastamonu,Kastamonu,Karadeniz,kastamonu,"150,151,152",assets/images/provinces/kastamonu.webp,assets/images/provinces/kastamonu.webp
+48,Sinop,Sinop,Karadeniz,sinop,"153,154,155",assets/images/provinces/sinop.webp,assets/images/provinces/sinop.webp
+49,Samsun,Samsun,Karadeniz,samsun,"156,157,158",assets/images/provinces/samsun.webp,assets/images/provinces/samsun.webp
+50,Ordu,Ordu,Karadeniz,ordu,"159,160,161",assets/images/provinces/ordu.webp,assets/images/provinces/ordu.webp
+51,Giresun,Giresun,Karadeniz,giresun,"162,163,164",assets/images/provinces/giresun.webp,assets/images/provinces/giresun.webp
+52,Trabzon,Trabzon,Karadeniz,trabzon,"165,166,167",assets/images/city_cards_hd/trabzon.webp,assets/images/provinces/trabzon.webp
+53,Rize,Rize,Karadeniz,rize,"168,169,170",assets/images/provinces/rize.webp,assets/images/provinces/rize.webp
+54,Artvin,Artvin,Karadeniz,artvin,"171,172,173",assets/images/provinces/artvin.webp,assets/images/provinces/artvin.webp
+55,Gümüşhane,Gümüşhane,Karadeniz,gumushane,"174,175,176",assets/images/provinces/gumushane.webp,assets/images/provinces/gumushane.webp
+56,Bayburt,Bayburt,Karadeniz,bayburt,"177,178,179",assets/images/provinces/bayburt.webp,assets/images/provinces/bayburt.webp
+57,Tokat,Tokat,Karadeniz,tokat,"180,181,182",assets/images/provinces/tokat.webp,assets/images/provinces/tokat.webp
+58,Amasya,Amasya,Karadeniz,amasya,"183,184,185",assets/images/provinces/amasya.webp,assets/images/provinces/amasya.webp
+59,Çorum,Çorum,Karadeniz,corum,"186,187,188",assets/images/provinces/corum.webp,assets/images/provinces/corum.webp
+60,Erzincan,Erzincan,Doğu Anadolu,erzincan,"189,190,191",assets/images/provinces/erzincan.webp,assets/images/provinces/erzincan.webp
+61,Erzurum,Erzurum,Doğu Anadolu,erzurum,"192,193,194",assets/images/provinces/erzurum.webp,assets/images/provinces/erzurum.webp
+62,Ağrı,Ağrı,Doğu Anadolu,agri,"195,196,197",assets/images/provinces/agri.webp,assets/images/provinces/agri.webp
+63,Iğdır,Iğdır,Doğu Anadolu,igdir,"198,199,200",assets/images/provinces/igdir.webp,assets/images/provinces/igdir.webp
+64,Kars,Kars,Doğu Anadolu,kars,"201,202,203",assets/images/provinces/kars.webp,assets/images/provinces/kars.webp
+65,Ardahan,Ardahan,Doğu Anadolu,ardahan,"204,205,206",assets/images/provinces/ardahan.webp,assets/images/provinces/ardahan.webp
+66,Malatya,Malatya,Doğu Anadolu,malatya,"207,208,209",assets/images/provinces/malatya.webp,assets/images/provinces/malatya.webp
+67,Elazığ,Elazığ,Doğu Anadolu,elazig,"210,211,212",assets/images/provinces/elazig.webp,assets/images/provinces/elazig.webp
+68,Tunceli,Tunceli,Doğu Anadolu,tunceli,"213,214,215",assets/images/provinces/tunceli.webp,assets/images/provinces/tunceli.webp
+69,Bingöl,Bingöl,Doğu Anadolu,bingol,"216,217,218",assets/images/provinces/bingol.webp,assets/images/provinces/bingol.webp
+70,Muş,Muş,Doğu Anadolu,mus,"219,220,221",assets/images/provinces/mus.webp,assets/images/provinces/mus.webp
+71,Bitlis,Bitlis,Doğu Anadolu,bitlis,"222,223,224",assets/images/provinces/bitlis.webp,assets/images/provinces/bitlis.webp
+72,Van,Van,Doğu Anadolu,van,"225,226,227",assets/images/provinces/van.webp,assets/images/provinces/van.webp
+73,Hakkâri,Hakkâri,Doğu Anadolu,hakkri,"228,229,230",assets/images/provinces/hakkri.webp,assets/images/provinces/hakkri.webp
+74,Diyarbakır,Diyarbakır,Güneydoğu Anadolu,diyarbakir,"231,232,233",assets/images/provinces/diyarbakir.webp,assets/images/provinces/diyarbakir.webp
+75,Şanlıurfa,Şanlıurfa,Güneydoğu Anadolu,sanliurfa,"234,235,236",assets/images/provinces/sanliurfa.webp,assets/images/provinces/sanliurfa.webp
+76,Gaziantep,Gaziantep,Güneydoğu Anadolu,gaziantep,"237,238,239",assets/images/city_cards_hd/gaziantep.webp,assets/images/provinces/gaziantep.webp
+77,Kilis,Kilis,Güneydoğu Anadolu,kilis,"240,241,242",assets/images/provinces/kilis.webp,assets/images/provinces/kilis.webp
+78,Adıyaman,Adıyaman,Güneydoğu Anadolu,adiyaman,"243,244,245",assets/images/provinces/adiyaman.webp,assets/images/provinces/adiyaman.webp
+79,Batman,Batman,Güneydoğu Anadolu,batman,"246,247,248",assets/images/provinces/batman.webp,assets/images/provinces/batman.webp
+80,Siirt,Siirt,Güneydoğu Anadolu,siirt,"249,250,251",assets/images/provinces/siirt.webp,assets/images/provinces/siirt.webp
+81,Şırnak,Şırnak,Güneydoğu Anadolu,sirnak,"252,253,254",assets/images/provinces/sirnak.webp,assets/images/provinces/sirnak.webp

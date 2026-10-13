@@ -14,6 +14,7 @@ part 'src/theme/premium_theme.dart';
 part 'src/data/puzzles.dart';
 part 'src/data/extra_puzzles.dart';
 part 'src/data/provinces.dart';
+part 'src/data/city_catalog.dart';
 part 'src/data/province_puzzles.dart';
 part 'src/features/adventure_features.dart';
 part 'src/screens/game_screen.dart';
