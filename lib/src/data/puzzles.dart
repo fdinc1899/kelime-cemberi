@@ -46,7 +46,7 @@ class PuzzleLevel {
 
 }
 
-const _levels = <PuzzleLevel>[
+const _classicLevels = <PuzzleLevel>[
   PuzzleLevel(
     city: 'İstanbul', subtitle: 'Gün batımında Boğaz', letters: 'KİRAZ',
     answers: [
@@ -246,3 +246,6 @@ const _levels = <PuzzleLevel>[
   ),
 ];
 
+
+// First 18 indices remain unchanged for migration compatibility.
+final List<PuzzleLevel> _levels = <PuzzleLevel>[..._classicLevels, ..._extraLevels];

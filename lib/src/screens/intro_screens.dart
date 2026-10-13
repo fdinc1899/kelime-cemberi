@@ -7,7 +7,7 @@ class PremiumOpeningScreen extends StatefulWidget {
     required this.currentCity, required this.currentStage,
     required this.finishedCount, required this.onContinue,
     required this.onChooseCity, required this.onChooseChapter,
-    required this.onSettings, required this.onExit});
+    required this.onSettings, required this.onExit, required this.onAdventure});
 
   final String currentCity;
   final int currentStage;
@@ -17,6 +17,7 @@ class PremiumOpeningScreen extends StatefulWidget {
   final VoidCallback onChooseChapter;
   final VoidCallback onSettings;
   final VoidCallback onExit;
+  final VoidCallback onAdventure;
 
   @override
   State<PremiumOpeningScreen> createState() => _PremiumOpeningScreenState();
@@ -122,6 +123,9 @@ class _PremiumOpeningScreenState extends State<PremiumOpeningScreen>
                     _WelcomeAction(label: 'KALDIĞIM YERDEN DEVAM ET',
                       icon: Icons.subdirectory_arrow_right_rounded,
                       onPressed: widget.onContinue),
+                    const SizedBox(height: 10),
+                    _WelcomeAction(label: 'MACERA MERKEZİ · GÜNLÜK ÖDÜLLER',
+                      icon: Icons.auto_awesome_rounded, onPressed: widget.onAdventure),
                     const SizedBox(height: 10),
                     Text('Kaydedilen bölüm: ${widget.currentCity}  ${widget.currentStage}/3',
                       textAlign: TextAlign.center,

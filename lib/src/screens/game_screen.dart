@@ -9,6 +9,7 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   final math.Random _random = math.Random();
+  final AdventureProgress _adventure = AdventureProgress();
   final AudioPlayer _musicPlayer = AudioPlayer();
   final AudioPlayer _effectPlayer = AudioPlayer();
   late final AnimationController _cheerController;
@@ -62,6 +63,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   @override
   void dispose() {
     _saveProgress();
+    _adventure.save();
     WidgetsBinding.instance.removeObserver(this);
     _cheerController.dispose();
     _musicPlayer.dispose();
@@ -213,6 +215,13 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
             .map(int.tryParse).whereType<int>(),
       );
     }
+    // A user who finished the original 18 stages before V15 must be able
+    // to enter bonus chapter 19 without losing their saved level selection.
+    if (_completedLevels.contains(17) && _unlocked < 18) {
+      _unlocked = 18;
+      await prefs.setInt('unlocked_v3', 18);
+    }
+    _adventure.load(prefs, _completedLevels);
     _openLevel(_level);
     if (mounted) setState(() => _readyToPlay = true);
     _startMusic();
@@ -284,6 +293,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   bool _finishLevelIfSolved() {
     if (!_complete || !_completedLevels.add(_level)) return false;
     _coins += 40;
+    _adventure.finishedLevel(_level, _hintCells.length);
     if (_level + 1 < _levels.length) {
       _unlocked = math.max(_unlocked, _level + 1);
     }
@@ -313,6 +323,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
         _completedLevels.map((e) => '$e').toList());
     await prefs.setInt('coins', _coins);
     await prefs.setInt('unlocked_v3', _unlocked);
+    await _adventure.save();
   }
 
   // Ham dokunma olayları + EagerGestureRecognizer ile kaydırma çakışmasını
@@ -405,6 +416,9 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
         _notice = '$word bu bölümün kelime listesinde yok';
       }
     });
+    if (newWord || newBonus) {
+      _adventure.foundWord(bonus: newBonus);
+    }
     _saveProgress();
     if (newWord) {
       if (justCompleted) {
@@ -441,7 +455,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
         final col = word.col + (word.down ? 0 : i);
         final id = '$row:$col';
         if (!_hintCells.contains(id) && !_isSolvedCell(row, col)) {
-          if (_coins < 25) {
+          if (_coins < 25 && _adventure.freeHints < 1) {
             setState(() => _notice = 'İpucu için 25 altın gerekiyor');
             return;
           }
@@ -449,7 +463,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
           var justCompleted = false;
           setState(() {
             _hintCells.add(id);
-            _coins -= 25;
+            if (!_adventure.spendFreeHint()) _coins -= 25;
             autoCount = _completeFullyRevealedWords();
             justCompleted = _finishLevelIfSolved();
             _notice = justCompleted
@@ -504,8 +518,8 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
       builder: (dialogContext) => AlertDialog(
         title: const Text('Tebrikler! 🏆'),
         content: const Text(
-          'Altı şehrin 18 bulmacasını tamamladın. '
-          'Yeni şehirler ve daha geniş Türkçe sözlük sonraki sürümde eklenecek.',
+          'Altı şehirdeki 18 ana bölümü ve 12 ek bulmacayı bitirdin! '
+          'Yeni maceralar sonraki güncellemelerde gelebilir.',
         ),
         actions: [TextButton(onPressed: () => Navigator.pop(dialogContext),
           child: const Text('Harika!'))],
@@ -545,7 +559,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     final locked = start > _unlocked;
     final done = List.generate(3, (j) => start + j)
         .where((j) => _completedLevels.contains(j)).length;
-    final active = _level ~/ 3 == i;
+    final active = _level < 18 && _level ~/ 3 == i;
     // Full-size city source, not the low-resolution card thumbnail.
     final image = i == 0 ? _istanbulBackground : _cityBackgrounds[city]!;
     final nextLevel = math.min(_unlocked, start + done.clamp(0, 2).toInt());
@@ -690,7 +704,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     _premiumPage(
       'ŞEHİR HARİTASI',
       JourneyMapView(
-        completed: _completedLevels.length,
+        completed: _completedLevels.where((n) => n < 18).length,
         unlocked: _unlocked,
         cardBuilder: _cityMapCard,
       ),
@@ -721,6 +735,10 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
             _premiumMenuItem(Icons.map_rounded, 'Şehir haritası', () {
               Navigator.pop(menuContext);
               WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) _showMap(); });
+            }),
+            _premiumMenuItem(Icons.auto_awesome_rounded, 'Macera merkezi · 10 özellik', () {
+              Navigator.pop(menuContext);
+              WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) _showAdventureHub(); });
             }),
             _premiumMenuItem(Icons.person_rounded, 'Profilim', () {
               Navigator.pop(menuContext);
@@ -868,7 +886,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                 fontWeight: FontWeight.w900, fontSize: 19)),
               const Text('Şehirleri keşfet!', style: TextStyle(color: _gold,
                 fontSize: 12)),
-              Text('${_puzzle.city} · Bölüm ${_level % 3 + 1}/3',
+              Text(_level < 18 ? '${_puzzle.city} · Bölüm ${_level % 3 + 1}/3' : '${_puzzle.city} · Ek bölüm ${(_level - 18) % 2 + 1}/2',
                 style: const TextStyle(color: _cream, fontSize: 11)),
             ])),
         ])),
@@ -876,7 +894,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
       Row(children: [
         _profileStat(Icons.monetization_on, '$_coins', 'Altın'),
         const SizedBox(width: 6),
-        _profileStat(Icons.emoji_events_rounded, '${_completedLevels.length}/18', 'Bölüm'),
+        _profileStat(Icons.emoji_events_rounded, '${_completedLevels.length}/${_levels.length}', 'Bölüm'),
         const SizedBox(width: 6),
         _profileStat(Icons.stars_rounded, '$_totalBonusCount', 'Bonus'),
       ]),
@@ -918,7 +936,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
       const SizedBox(height: 15),
       ClipRRect(borderRadius: BorderRadius.circular(20),
         child: LinearProgressIndicator(
-          value: _completedLevels.length / 18,
+          value: _completedLevels.length / _levels.length,
           minHeight: 11,
           backgroundColor: const Color(0xFF42536C),
           valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF58C26E)))),
@@ -944,7 +962,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
             color: _gold, size: 23)),
         ]))),
       const SizedBox(height: 11),
-      _statsLine('Tamamlanan bölümler', '${_completedLevels.length} / 18', Icons.emoji_events),
+      _statsLine('Tamamlanan bölümler', '${_completedLevels.length} / ${_levels.length}', Icons.emoji_events),
       _statsLine('Bulunan kelimeler', '$_totalSolvedCount', Icons.abc_rounded),
       _statsLine('Bonus kelimeler', '$_totalBonusCount', Icons.stars_rounded),
       _statsLine('Mevcut altın', '$_coins', Icons.monetization_on_rounded),
@@ -981,7 +999,9 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     final level = _level;
     final total = _puzzle.answers.length;
     final bonusCount = _bonuses.length;
-    final stars = bonusCount > 0 ? 3 : 2;
+    final stageLabel = level < 18 ? '${level % 3 + 1}/3'
+        : 'EK ${(level - 18) % 2 + 1}/2';
+    final stars = _adventure.stars[level] ?? 1;
     final art = _premiumCityThumbs[_puzzle.city] ??
         (level ~/ 3 == 0 ? _istanbulBackground : _cityBackgrounds[_puzzle.city]!);
     showDialog<void>(
@@ -1013,7 +1033,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                 child: Container(width: double.infinity, padding: const EdgeInsets.all(5),
                   decoration: BoxDecoration(color: const Color(0xB50C2440),
                       borderRadius: BorderRadius.circular(60)),
-                  child: Text('${_puzzle.city.toUpperCase()}  ${level % 3 + 1}/3',
+                  child: Text('${_puzzle.city.toUpperCase()}  $stageLabel',
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: _cream,
                       fontWeight: FontWeight.w900, fontSize: 12)))),
@@ -1199,17 +1219,18 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
               )
             : PremiumOpeningScreen(
                 currentCity: _puzzle.city,
-                currentStage: (_level % 3) + 1,
-                finishedCount: _completedLevels.length,
+                currentStage: _level < 18 ? (_level % 3) + 1 : ((_level - 18) % 2) + 1,
+                finishedCount: _completedLevels.where((n) => n < 18).length,
                 onContinue: _continueFromSave,
                 onChooseCity: _chooseCityOnWelcome,
                 onChooseChapter: _chooseCityOnWelcome,
                 onSettings: _showSettings,
                 onExit: _confirmExit,
+                onAdventure: _showAdventureHub,
               ),
       );
     }
-    final firstCity = _level ~/ 3 == 0;
+    final firstCity = _puzzle.city == 'İstanbul';
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
@@ -1243,6 +1264,11 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
               ),
             ),
           ),
+          Positioned.fill(child: IgnorePointer(child: AnimatedContainer(
+            duration: const Duration(milliseconds: 400),
+            color: Color.lerp(const Color(0x6C001728), Colors.transparent,
+                (_solved.length / _puzzle.answers.length).clamp(0.0, 1.0).toDouble())!,
+          ))),
           SafeArea(
             child: LayoutBuilder(builder: (context, viewport) {
               final narrow = viewport.maxWidth < 370;
@@ -1338,6 +1364,120 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     ));
   }
 
+  void _adventureToast(String text) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text),
+      duration: const Duration(seconds: 2)));
+  }
+
+  void _showAdventureHub() {
+    _adventure.refreshPeriod();
+    _premiumPage('MACERA MERKEZİ', StatefulBuilder(builder: (pageContext, refresh) =>
+      AdventureCenterView(
+        progress: _adventure, completed: _completedLevels, unlocked: _unlocked,
+        onClaimDaily: (id, minimum, value, reward) {
+          final coins = _adventure.claimDaily(id, minimum, value, reward);
+          if (coins == 0) return;
+          setState(() => _coins += coins);
+          refresh(() {});
+          _saveProgress();
+          _celebrate('GÖREV!', '+$coins ALTIN');
+        },
+        onClaimWeekly: (id, target, reward) {
+          final coins = _adventure.claimWeekly(id, target, reward);
+          if (coins == 0) return;
+          setState(() => _coins += coins);
+          refresh(() {});
+          _saveProgress();
+          _celebrate('HAFTALIK ÖDÜL!', '+$coins ALTIN');
+        },
+        onSpin: () {
+          final result = _adventure.spin(_random);
+          if (result < 0) return;
+          const outcomes = [20, 40, 60, 100, 0, 0];
+          setState(() => _coins += outcomes[result]);
+          refresh(() {});
+          _saveProgress();
+          final notice = result == 4 ? 'ÜCRETSİZ İPUCU!'
+              : result == 5 ? 'SANDIK KAZANDIN!'
+              : '+${outcomes[result]} ALTIN';
+          _celebrate('ÇARK ÖDÜLÜ!', notice);
+        },
+        onChest: () {
+          final prize = _adventure.openChest(_random);
+          if (prize == 0) return;
+          setState(() => _coins += prize);
+          refresh(() {});
+          _saveProgress();
+          _celebrate('SANDIK AÇILDI!', '+$prize ALTIN');
+        },
+        onOpenExtra: (index) {
+          Navigator.pop(pageContext);
+          _openLevel(index);
+          setState(() { _showWelcome = false; _showCityChoice = false; });
+        },
+        onUsePower: (power) {
+          Navigator.pop(pageContext);
+          setState(() { _showWelcome = false; _showCityChoice = false; });
+          if (power == 'shuffle') {
+            _shuffle();
+          } else if (power == 'first') {
+            _revealFirstLetter();
+          } else if (power == 'word') {
+            _revealWholeWord();
+          }
+        },
+      ),
+    ));
+  }
+
+  void _revealFirstLetter() {
+    if (_coins < 15 || _complete) {
+      _adventureToast('15 altın gerekiyor veya bölüm tamamlandı');
+      return;
+    }
+    bool reveal = false;
+    bool completed = false;
+    setState(() {
+      for (final word in _puzzle.answers) {
+        if (_solved.contains(word.word)) continue;
+        final id = '${word.row}:${word.col}';
+        if (_hintCells.contains(id) || _isSolvedCell(word.row, word.col)) continue;
+        _hintCells.add(id);
+        _coins -= 15;
+        reveal = true;
+        _completeFullyRevealedWords();
+        completed = _finishLevelIfSolved();
+        _notice = 'İlk harf açıldı · −15 altın';
+        break;
+      }
+    });
+    if (reveal) _saveProgress();
+    if (completed) _announceLevelCompleted(_level);
+    if (!reveal) _adventureToast('Açılacak ilk harf kalmadı');
+  }
+
+  void _revealWholeWord() {
+    if (_coins < 80 || _complete) {
+      _adventureToast('80 altın gerekiyor veya bölüm tamamlandı');
+      return;
+    }
+    bool completed = false;
+    setState(() {
+      final target = _puzzle.answers.firstWhere(
+        (w) => !_solved.contains(w.word));
+      for (int i = 0; i < target.word.length; i++) {
+        _hintCells.add('${target.row + (target.down ? i : 0)}:${target.col + (target.down ? 0 : i)}');
+      }
+      _coins -= 80;
+      _completeFullyRevealedWords();
+      completed = _finishLevelIfSolved();
+      _notice = '${target.word} açıldı · −80 altın';
+    });
+    _saveProgress();
+    if (completed) _announceLevelCompleted(_level);
+  }
+
   Widget _premiumTopBar(bool narrow) => Row(children: [
         _goldRoundButton(_musicOn ? Icons.music_note_rounded : Icons.music_off_rounded,
           _toggleMusic, radius: narrow ? 21 : 24),
@@ -1375,15 +1515,18 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     child: OrnateTitlePlaque(
       eyebrow: '✦  Ş E H İ R   H İ K Â Y E L E R İ  ✦',
       heading: _puzzle.city.toUpperCase(),
-      footer: 'B Ö L Ü M  ${_level % 3 + 1} / 3',
+      footer: _level < 18
+          ? 'B Ö L Ü M  ${_level % 3 + 1} / 3'
+          : 'E K  B Ö L Ü M  ${(_level - 18) % 2 + 1} / 2',
     ),
   );
 
   Widget _premiumBoard(double maxCellSize) {
     final cells = _puzzle.cells;
     return LayoutBuilder(builder: (context, region) {
-      final size = math.min(maxCellSize,
-          (region.maxWidth - 4) / _puzzle.cols).toDouble();
+      final size = math.min(maxCellSize, math.min(
+          (region.maxWidth - 4) / _puzzle.cols,
+          (region.maxHeight - 4) / _puzzle.rows)).clamp(14.0, maxCellSize).toDouble();
       return Column(mainAxisSize: MainAxisSize.min, children: [
         ...List.generate(_puzzle.rows, (row) => Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -1624,9 +1767,10 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
 
   Widget _levelDots() => Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(3, (index) {
-          final localStage = _level % 3;
-          final realLevel = (_level ~/ 3) * 3 + index;
+        children: List.generate(_level < 18 ? 3 : 2, (index) {
+          final localStage = _level < 18 ? _level % 3 : (_level - 18) % 2;
+          final realLevel = _level < 18 ? (_level ~/ 3) * 3 + index
+              : 18 + ((_level - 18) ~/ 2) * 2 + index;
           final active = localStage == index;
           final locked = realLevel > _unlocked;
           return Padding(
@@ -1666,8 +1810,8 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                 fontWeight: FontWeight.w900,
                 shadows: [Shadow(color: Colors.black, blurRadius: 5)])))),
         const SizedBox(width: 12),
-        Expanded(child: _bottomButton(Icons.card_giftcard_rounded,
-            'ÖDÜLLER', _showRewards)),
+        Expanded(child: _bottomButton(Icons.auto_awesome_rounded,
+            'MACERA', _showAdventureHub)),
       ]);
 
   Widget _bottomButton(IconData icon, String title, VoidCallback onPressed) =>
@@ -1703,7 +1847,8 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26))),
           icon: const Icon(Icons.arrow_forward_rounded),
           label: Text(_level == _levels.length - 1
-              ? 'OYUNU BİTİR' : (_level % 3 == 2 ? 'SONRAKİ ŞEHİR' : 'SONRAKİ BÖLÜM'),
+              ? 'OYUNU BİTİR' : (_level < 18 && _level % 3 == 2
+                  ? 'SONRAKİ ŞEHİR' : 'SONRAKİ BÖLÜM'),
               style: const TextStyle(fontWeight: FontWeight.w900)),
         ),
       );

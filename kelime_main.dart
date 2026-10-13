@@ -12,6 +12,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 part 'src/theme/premium_theme.dart';
 part 'src/data/puzzles.dart';
+part 'src/data/extra_puzzles.dart';
+part 'src/features/adventure_features.dart';
 part 'src/screens/game_screen.dart';
 part 'src/screens/premium_page.dart';
 part 'src/screens/journey_map.dart';
