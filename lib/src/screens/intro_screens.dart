@@ -219,9 +219,11 @@ class _PremiumCityChooserState extends State<PremiumCityChooser> {
     return Scaffold(
       backgroundColor: const Color(0xFF07192D),
       body: Stack(children: [
-        Positioned.fill(child: Image.memory(_premiumCityScenes['Antalya'] ?? _istanbulBackground,
-          fit: BoxFit.cover)),
-        const Positioned.fill(child: ColoredBox(color: Color(0xC5081528))),
+        Positioned.fill(child: Image.memory(_istanbulBackground, fit: BoxFit.cover)),
+        const Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(
+          gradient: LinearGradient(begin: Alignment.topCenter,
+            end: Alignment.bottomCenter, colors: [
+              Color(0xDB061528), Color(0xED071A32), Color(0xF705132A)])))),
         SafeArea(child: Column(children: [
           Padding(padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
             child: Row(children: [
@@ -276,46 +278,92 @@ class _PremiumCityChooserState extends State<PremiumCityChooser> {
                           margin: const EdgeInsets.only(bottom: 11),
                           clipBehavior: Clip.antiAlias,
                           decoration: BoxDecoration(
-                            border: Border.all(color: const Color(0xFFFFD77D), width: 1.5),
-                            borderRadius: BorderRadius.circular(15),
-                            boxShadow: const [BoxShadow(color: Color(0x99000000), blurRadius: 8)]),
-                          child: Material(color: const Color(0xFF0A213B),
-                            child: InkWell(onTap: unlockedCity
-                              ? () => setState(() => _cityIndex = i)
-                              : () => ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Bu şehir kilitli. Önceki şehri tamamla.'))),
-                              child: SizedBox(height: 104,
-                                child: Stack(children: [
-                                  Positioned.fill(child: _cityImageWidget(province.city)),
-                                  const Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(
-                                    gradient: LinearGradient(begin: Alignment.centerLeft,
-                                      end: Alignment.centerRight,
-                                      colors: [Color(0x44061930), Color(0xF805162C)])))),
-                                  Padding(padding: const EdgeInsets.fromLTRB(12, 8, 10, 8),
-                                    child: Row(children: [
-                                      CircleAvatar(backgroundColor: const Color(0xFFFFD77D),
-                                        child: Text('${i + 1}',
-                                          style: const TextStyle(color: Color(0xFF07192D),
-                                            fontWeight: FontWeight.w900))),
-                                      const Spacer(),
-                                      Flexible(child: Column(mainAxisAlignment: MainAxisAlignment.center,
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          Text(province.title.toUpperCase(), maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(color: Colors.white,
-                                              fontWeight: FontWeight.w900, fontSize: 17)),
-                                          Text(unlockedCity ? '$done / 3 BÖLÜM' : 'KİLİTLİ',
-                                            style: const TextStyle(color: Color(0xFFFFDB7B),
-                                              fontSize: 12, fontWeight: FontWeight.bold)),
-                                          Text(List.generate(3, (j) => widget.completed.contains(province.levels[j]) ? '★' : '☆').join(' '),
-                                            style: const TextStyle(color: Color(0xFFFFD77D), fontSize: 20)),
-                                        ])),
-                                      const SizedBox(width: 10),
-                                      Icon(unlockedCity ? Icons.chevron_right_rounded : Icons.lock,
-                                        color: Colors.white),
-                                    ])),
-                                ])),
+                            border: Border.all(color: const Color(0xFFFFCF6B), width: 1.9),
+                            borderRadius: BorderRadius.circular(19),
+                            boxShadow: const [
+                              BoxShadow(color: Color(0xBB000000), blurRadius: 14,
+                                offset: Offset(0, 5)),
+                              BoxShadow(color: Color(0x33F4B954), blurRadius: 9),
+                            ]),
+                          child: Material(
+                            color: const Color(0xFF06182E),
+                            child: InkWell(
+                              onTap: unlockedCity
+                                ? () => setState(() => _cityIndex = i)
+                                : () => ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Bu şehir kilitli. Önceki şehri tamamla.'))),
+                              child: SizedBox(height: 122,
+                                child: LayoutBuilder(builder: (context, card) {
+                                  return Stack(children: [
+                                    Positioned(left: 0, top: 0, bottom: 0,
+                                      width: card.maxWidth * .71,
+                                      child: Image(image: _citySelectionImageProvider(province),
+                                        fit: BoxFit.cover, alignment: Alignment.centerLeft,
+                                        filterQuality: FilterQuality.high,
+                                      )),
+                                    const Positioned.fill(child: DecoratedBox(
+                                      decoration: BoxDecoration(gradient: LinearGradient(
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                        stops: [0, .40, .67, 1],
+                                        colors: [Color(0x10031830), Color(0x27031830),
+                                          Color(0xF0091B35), Color(0xFF061529)],
+                                      )))),
+                                    Positioned.fill(child: Padding(
+                                      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+                                      child: Row(children: [
+                                        Container(
+                                          width: 46, height: 46,
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            gradient: const LinearGradient(
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                              colors: [Color(0xFFFFECAD), Color(0xFFF7BD48)]),
+                                            border: Border.all(color: Colors.white, width: 1.6),
+                                            boxShadow: const [BoxShadow(
+                                              color: Color(0x99000000), blurRadius: 6)]),
+                                          child: Text('${i + 1}', style: const TextStyle(
+                                            fontSize: 20, color: Color(0xFF04182F),
+                                            fontWeight: FontWeight.w900)),
+                                        ),
+                                        const Spacer(),
+                                        Flexible(flex: 4, child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: [
+                                            Text(province.province.toUpperCase(),
+                                              maxLines: 1, overflow: TextOverflow.ellipsis,
+                                              textAlign: TextAlign.end,
+                                              style: const TextStyle(
+                                                color: Colors.white, fontSize: 18,
+                                                fontWeight: FontWeight.w900,
+                                                shadows: [Shadow(color: Colors.black,
+                                                  blurRadius: 6)])),
+                                            const SizedBox(height: 3),
+                                            Text(unlockedCity
+                                                ? '$done / 3 BÖLÜM' : 'KİLİTLİ',
+                                              style: const TextStyle(
+                                                color: Color(0xFFFFD87C), fontSize: 12.5,
+                                                letterSpacing: .5, fontWeight: FontWeight.w800)),
+                                            const SizedBox(height: 4),
+                                            Text(List.generate(3, (j) =>
+                                              widget.completed.contains(province.levels[j])
+                                                ? '★' : '☆').join('  '),
+                                              style: const TextStyle(
+                                                color: Color(0xFFFFD77D), fontSize: 21,
+                                                height: 1)),
+                                          ],
+                                        )),
+                                        const SizedBox(width: 8),
+                                        Icon(unlockedCity
+                                          ? Icons.chevron_right_rounded : Icons.lock_rounded,
+                                          color: Colors.white, size: 23),
+                                      ])),
+                                    ),
+                                  ]);
+                                })),
                             ),
                           ),
                         );

@@ -123,6 +123,18 @@ ImageProvider _cityImageProvider(String city) {
   return AssetImage(_provinceArt(p));
 }
 
+// Seven hero illustrations are independent, text-free art cropped from the
+// approved design concept. Remaining provinces retain their original assets.
+ImageProvider _citySelectionImageProvider(ProvinceInfo province) {
+  const featured = <String>{
+    'istanbul', 'nevsehir', 'antalya', 'mardin', 'izmir', 'ankara', 'edirne',
+  };
+  if (featured.contains(province.slug)) {
+    return AssetImage('assets/images/city_cards_hd/${province.slug}.webp');
+  }
+  return _cityImageProvider(province.city);
+}
+
 Widget _cityImageWidget(String city, {BoxFit fit = BoxFit.cover, Alignment alignment = Alignment.center}) =>
     Image(image: _cityImageProvider(city), fit: fit, alignment: alignment);
 
