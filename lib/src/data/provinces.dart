@@ -116,23 +116,65 @@ int _mainDone(Set<int> done) => _provinces.fold<int>(0, (sum, p) => sum + p.leve
 int _cityDone(Set<int> done) => _provinces.where((p) => p.levels.every(done.contains)).length;
 String _provinceArt(ProvinceInfo p) => 'assets/images/provinces/${p.slug}.webp';
 
+// V20 high-resolution province illustrations. City order and save IDs unchanged.
+const Set<String> _v20PremiumProvinceSlugs = <String>{
+  'edirne',
+  'kirklareli',
+  'tekirdag',
+  'canakkale',
+  'balikesir',
+  'bursa',
+  'yalova',
+  'kocaeli',
+  'sakarya',
+  'bilecik',
+  'denizli',
+  'bolu',
+  'eskisehir',
+  'isparta',
+  'afyonkarahisar',
+  'sivas',
+  'aksaray',
+  'kutahya',
+  'karabuk',
+};
+
 ImageProvider _cityImageProvider(String city) {
   if (city == 'İstanbul') return MemoryImage(_istanbulBackground);
   if (_premiumCityScenes.containsKey(city)) return MemoryImage(_premiumCityScenes[city]!);
   final p = _provinces.firstWhere((p) => p.city == city);
+  if (_v20PremiumProvinceSlugs.contains(p.slug)) {
+    return AssetImage('assets/images/hd_provinces/scenes/${p.slug}.webp');
+  }
   return AssetImage(_provinceArt(p));
 }
 
-// Seven hero illustrations are independent, text-free art cropped from the
-// approved design concept. Remaining provinces retain their original assets.
+// V19: Featured art for the first ten cities, one regional panorama for all
+// remaining cities. Asset paths are stable and never affect save indices.
+const Map<String, String> _regionScenicAssets = <String, String>{
+  'Marmara': 'assets/images/regional_cards/marmara.webp',
+  'Ege': 'assets/images/regional_cards/ege.webp',
+  'Akdeniz': 'assets/images/regional_cards/akdeniz.webp',
+  'İç Anadolu': 'assets/images/regional_cards/ic_anadolu.webp',
+  'Karadeniz': 'assets/images/regional_cards/karadeniz.webp',
+  'Doğu Anadolu': 'assets/images/regional_cards/dogu_anadolu.webp',
+  'Güneydoğu Anadolu': 'assets/images/regional_cards/guneydogu_anadolu.webp',
+};
+
+String _regionScenicAsset(String region) =>
+    _regionScenicAssets[region] ?? _regionScenicAssets['Marmara']!;
+
 ImageProvider _citySelectionImageProvider(ProvinceInfo province) {
-  const featured = <String>{
-    'istanbul', 'nevsehir', 'antalya', 'mardin', 'izmir', 'ankara', 'edirne',
-  };
-  if (featured.contains(province.slug)) {
-    return AssetImage('assets/images/city_cards_hd/${province.slug}.webp');
+  if (_v20PremiumProvinceSlugs.contains(province.slug)) {
+    return AssetImage('assets/images/hd_provinces/cards/${province.slug}.webp');
   }
-  return _cityImageProvider(province.city);
+  const featured = <String>{
+    'istanbul', 'nevsehir', 'antalya', 'mardin', 'izmir',
+    'ankara', 'edirne', 'bursa', 'trabzon', 'gaziantep',
+  };
+  return AssetImage(featured.contains(province.slug)
+      ? 'assets/images/city_cards_hd/${province.slug}.webp'
+      : _regionScenicAsset(province.region));
 }
 
 Widget _cityImageWidget(String city, {BoxFit fit = BoxFit.cover, Alignment alignment = Alignment.center}) =>

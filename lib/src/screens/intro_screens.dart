@@ -270,10 +270,16 @@ class _PremiumCityChooserState extends State<PremiumCityChooser> {
                         labelStyle: TextStyle(color: _selectedRegion == region
                             ? const Color(0xFF061A31) : Colors.white),
                         label: Text(region),
+                        showCheckmark: false,
+                        side: const BorderSide(color: Color(0xFFEBCB7D), width: 1.1),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(13)),
                         onSelected: (_) => setState(() => _selectedRegion = region),
                       ),
                     )).toList(),
                   )),
+                  if (_selectedRegion != 'Tümü')
+                    _V19RegionBanner(region: _selectedRegion),
                   Expanded(child: Builder(builder: (context) {
                     final filtered = List.generate(_provinces.length, (i) => i)
                         .where((i) => _selectedRegion == 'Tümü' ||
@@ -322,6 +328,57 @@ class _PremiumCityChooserState extends State<PremiumCityChooser> {
                   }),
           )),
         ])),
+      ]),
+    );
+  }
+}
+
+
+/// Scenic region header on the province-selection page.
+/// This is a real widget: chips and level-selection cards remain tappable.
+class _V19RegionBanner extends StatelessWidget {
+  const _V19RegionBanner({required this.region});
+  final String region;
+
+  @override
+  Widget build(BuildContext context) {
+    final count = _provinces.where((p) => p.region == region).length;
+    return Container(
+      margin: const EdgeInsets.fromLTRB(14, 7, 14, 3),
+      height: 82,
+      decoration: BoxDecoration(
+        color: const Color(0xFF03152A),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFFFDA83), width: 1.5),
+        boxShadow: const [BoxShadow(
+          color: Color(0x77000000), blurRadius: 10, offset: Offset(0, 4))],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Stack(children: [
+        Positioned.fill(child: Image.asset(_regionScenicAsset(region),
+          fit: BoxFit.cover, filterQuality: FilterQuality.high)),
+        const Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.centerLeft, end: Alignment.centerRight,
+            colors: [Color(0x26041931), Color(0xCE05162D),
+              Color(0xFF05162D)])))),
+        Positioned.fill(child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 13),
+          child: Row(children: [
+            const Icon(Icons.auto_awesome, color: Color(0xFFFFDC7E)),
+            const Spacer(),
+            Column(mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(region.toUpperCase(),
+                  style: const TextStyle(color: Color(0xFFFFE4A1),
+                    fontSize: 17, fontWeight: FontWeight.w900)),
+                Text('$count il · 3 bölüm / il',
+                  style: const TextStyle(color: Colors.white,
+                    fontSize: 12, fontWeight: FontWeight.w600)),
+              ]),
+          ]),
+        )),
       ]),
     );
   }

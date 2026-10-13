@@ -1,16 +1,21 @@
-# Şehir Hikâyeleri V18 — Premium Flutter oyun paketi
+# V20 görseller
 
-81 il, 243 ana bulmaca + 12 ek bulmaca içeren özgün bir Türkçe kelime oyunu.
-Bu sürümde yeni şehir seçim kartı, altın/lacivert diyaloglar ve ödül
-paneli eklenmiştir. Flutter kaynak kodları `lib/` altında; görseller
-`assets/images/` altındadır. `kelime_main.dart` eski GitHub Actions
-akışıyla uyumluluk için tutulmuştur.
+19 il için yeni HD kart ve tam ekran sahneleri eklendi. Ayrıntılar: `V20_GORSELLER.md`.
 
-**Kurulum:** ZIP içeriğini GitHub `kelime-cemberi` deposunun köküne çıkarıp
-`git add kelime_main.dart lib pubspec.yaml assets README.md V18_DEGISIKLIKLER.md`
-ve ardından commit/push yapın. GitHub Actions APK oluşturmalıdır.
+---
 
-**Önemli:** Kayıtlar `shared_preferences` içinde telefonda saklanır; uygulama
-verisini silmeyin. Flutter derlemesi ve telefon ekran kontrolü yapılmadı.
+# Şehir Hikâyeleri V19 — 81 İl / Premium Bölge Manzaraları
 
-Ayrıntılar: `V18_DEGISIKLIKLER.md`.
+81 ili kapsayan, Flutter ile hazırlanmış Türkçe kelime bulmaca oyunu.
+243 ana bölüm ve önceki 12 ek bölüm; toplam 255 bulmaca.
+
+Bu sürümde şehir seçimi ve harita kartları için 7 bölgesel manzara
+ve ilk 10 şehre özel yüksek kaliteli şehir kartları vardır. Görsel
+olmayan iller ilgili coğrafi bölge kartını kullanır. Şehir içi tam
+ekran arka planlarının tamamı henüz fotoğraf gerçekçiliğinde değildir.
+
+V18 derleme düzeltmesi (`V18SparklingBackdrop` için `required child`)
+bu tam pakete dahil edilmiştir. Bu paket mevcut GitHub projesinin
+üzerine açılır; GitHub Actions dosyaları değiştirilmez.
+
+Ayrıntılar için V19_KURULUM.md dosyasına bakın.
