@@ -150,11 +150,20 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
         backgroundColor: Colors.transparent,
         insetPadding: const EdgeInsets.symmetric(horizontal: 25),
         child: _goldFrame(child: Column(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.door_back_door_rounded, color: _gold, size: 58),
-          const SizedBox(height: 9),
-          const Text('OYUNDAN ÇIKMAK', style: TextStyle(color: _cream,
+          SizedBox(height: 76, width: double.infinity,
+            child: ClipRRect(borderRadius: BorderRadius.circular(14),
+              child: Stack(fit: StackFit.expand, children: [
+                Image.memory(_istanbulBackground, fit: BoxFit.cover,
+                  alignment: Alignment.topCenter),
+                const DecoratedBox(decoration: BoxDecoration(
+                  color: Color(0x8806172B))),
+                const Icon(Icons.exit_to_app_rounded,
+                  color: Color(0xFFFFD36E), size: 53),
+              ]))),
+          const V18GoldDivider(padding: 6),
+          const Text('OYUNDAN ÇIKMAK', style: TextStyle(color: _gold,
               fontFamily: 'serif', fontWeight: FontWeight.w900, fontSize: 21)),
-          const Text('İSTİYOR MUSUN?', style: TextStyle(color: _cream,
+          const Text('İSTİYOR MUSUN?', style: TextStyle(color: _gold,
               fontFamily: 'serif', fontWeight: FontWeight.w900, fontSize: 20)),
           const SizedBox(height: 13),
           const Text('Bulduğun kelimeler, altınların ve bölümün kaydedilecek.',
@@ -651,32 +660,23 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   }
 
   Widget _premiumMenuItem(IconData icon, String label, VoidCallback onTap,
-      {String? detail, Color? accent}) => Container(
-    margin: const EdgeInsets.symmetric(vertical: 5),
-    decoration: BoxDecoration(color: const Color(0xF208233B),
-      borderRadius: BorderRadius.circular(14),
-      border: Border.all(color: const Color(0xFF537798), width: 1)),
-    child: ListTile(
-      onTap: onTap,
-      leading: Icon(icon, color: accent ?? _gold, size: 26),
-      title: Text(label, style: const TextStyle(color: _cream,
-          fontSize: 16, fontWeight: FontWeight.w800)),
-      subtitle: detail == null ? null : Text(detail,
-        style: const TextStyle(color: Color(0xFFDBCCA9), fontSize: 11)),
-      trailing: const Icon(Icons.chevron_right_rounded, color: _gold),
-    ),
-  );
+      {String? detail, Color? accent}) => V18MenuLine(
+        icon: icon, title: label, onTap: onTap, trailing: detail);
 
   Widget _settingToggle(String label, IconData icon, bool enabled,
       ValueChanged<bool> onChange) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 10),
     margin: const EdgeInsets.symmetric(vertical: 4),
-    decoration: BoxDecoration(color: const Color(0xD60C2947),
-      borderRadius: BorderRadius.circular(13),
-      border: Border.all(color: const Color(0x7759A0C6))),
+    decoration: BoxDecoration(
+      gradient: const LinearGradient(begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [Color(0xFF1A3A59), Color(0xFF051627)]),
+      borderRadius: BorderRadius.circular(15),
+      border: Border.all(color: const Color(0xFFF4CB71), width: 1.3),
+      boxShadow: const [BoxShadow(color: Color(0x70000000), blurRadius: 8)]),
     child: SwitchListTile(
       contentPadding: EdgeInsets.zero,
-      secondary: Icon(icon, color: _cream, size: 26),
+      secondary: Icon(icon, color: _gold, size: 26),
       title: Text(label, style: const TextStyle(color: _cream, fontWeight: FontWeight.w800)),
       value: enabled, activeColor: _navy,
       activeTrackColor: _gold, inactiveTrackColor: const Color(0xFF3A5269),
@@ -767,11 +767,13 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
 
 
   Widget _goldFrame({required Widget child, EdgeInsetsGeometry? padding}) =>
-      PremiumPanel(padding: padding, child: child);
+      V18GildedPanel(padding: padding ?? const EdgeInsets.all(17), child: child);
 
   Widget _goldStar(int index, int count, {double size = 43}) => Icon(
       index < count ? Icons.star_rounded : Icons.star_outline_rounded,
-      color: _gold, size: size);
+      color: index < count ? const Color(0xFFFFE178) : _gold,
+      shadows: const [Shadow(color: Color(0xFFFA9919), blurRadius: 13)],
+      size: size);
 
   Widget _settingsHeading(String title, IconData icon) => Row(children: [
     Icon(icon, color: const Color(0xFF9C6D30)),
@@ -827,7 +829,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
         _premiumMenuItem(Icons.info_outline_rounded, 'Hakkında', () {
           showDialog<void>(context: ctx, builder: (d) => AlertDialog(
             title: const Text('Kelime Şehirleri'),
-            content: const Text('18 bulmaca, 6 şehir, müzik, bonuslar ve yerel kayıt.\n'
+            content: const Text('81 il, 243 ana bölüm, 12 ek bölüm, bonuslar ve yerel kayıt.\n'
                 'İlerleme bu cihazda saklanır; uygulama verilerini silmeyin.'),
             actions: [TextButton(onPressed: () => Navigator.pop(d), child: const Text('Tamam'))]));
         }),
@@ -1042,11 +1044,11 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                   ? 'OYUNU BİTİR' : 'SONRAKİ BÖLÜM',
                 icon: Icons.arrow_forward_rounded,
                 onPressed: () { Navigator.pop(ctx); _next(); })),
-              TextButton.icon(onPressed: () {
-                Navigator.pop(ctx); _showMap();
-              }, icon: const Icon(Icons.map_outlined, color: _cream),
-                label: const Text('HARİTAYA DÖN',
-                  style: TextStyle(color: _cream, fontWeight: FontWeight.bold))),
+              const SizedBox(height: 10),
+              SizedBox(width: double.infinity,
+                child: PremiumActionButton(title: 'HARİTAYA DÖN',
+                  accent: const Color(0xFF1478D2), icon: Icons.map_outlined,
+                  onPressed: () { Navigator.pop(ctx); _showMap(); })),
             ])),
         ),
       ),
@@ -1090,25 +1092,19 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
               Align(alignment: Alignment.centerRight,
                 child: IconButton(onPressed: () => Navigator.pop(dialogContext),
                   icon: const Icon(Icons.close_rounded, color: _cream, size: 26))),
-              const V10Ribbon(title: 'GÜNLÜK ÖDÜL'),
-              const SizedBox(height: 5),
-              const Text('Her gün giriş yap, 35 altın kazan!',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: _cream, fontSize: 14,
-                  fontWeight: FontWeight.w700)),
-              const SizedBox(height: 4),
               TweenAnimationBuilder<double>(
                 tween: Tween(begin: .80, end: 1),
                 duration: const Duration(milliseconds: 750),
                 curve: Curves.elasticOut,
                 builder: (ctx, value, child) => Transform.scale(scale: value, child: child),
                 child: Stack(alignment: Alignment.center, children: [
-                  Container(height: 210, decoration: BoxDecoration(shape: BoxShape.circle,
+                  Container(height: 224, decoration: BoxDecoration(shape: BoxShape.circle,
                     gradient: RadialGradient(colors: [
-                      _gold.withOpacity(.64), const Color(0x00FFD36E)]))),
+                      _gold.withOpacity(.83), const Color(0x22FFD36E),
+                      const Color(0x00FFD36E)]))),
                   SizedBox(height: 212, width: double.infinity,
                     child: CustomPaint(painter: V12SparklePainter())),
-                  Image.asset('assets/images/ui/reward_chest.png',
+                  Image.asset('assets/images/ui/reward_chest_v18.png',
                     height: 215, fit: BoxFit.contain),
                   const Positioned(top: 4, left: 30, child: Icon(Icons.auto_awesome_rounded,
                     color: _gold, size: 27)),
@@ -1118,10 +1114,13 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                     color: _cream, size: 20)),
                 ]),
               ),
-              const Text('GÜNLÜK HEDİYEN',
+              const V10Ribbon(title: 'GÜNLÜK ÖDÜL'),
+              const SizedBox(height: 5),
+              const Text('Her gün oyuna girerek altın kazan!',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: _cream, fontSize: 13,
-                  letterSpacing: 2, fontWeight: FontWeight.w800)),
+                style: TextStyle(color: _cream, fontSize: 14,
+                  fontWeight: FontWeight.w700)),
+              const V18GoldDivider(padding: 8),
               const SizedBox(height: 16),
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 const Icon(Icons.monetization_on_rounded, color: _gold, size: 33),
@@ -1803,7 +1802,8 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
 
   Widget _bottomButton(IconData icon, String title, VoidCallback onPressed) =>
       Material(
-        color: _navy.withOpacity(.94),
+        color: const Color(0xFF071D37),
+        shadowColor: _gold.withOpacity(.5),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(13),
           side: const BorderSide(color: _gold, width: 1.6),

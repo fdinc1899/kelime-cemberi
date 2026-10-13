@@ -32,7 +32,7 @@ class PremiumPageShell extends StatelessWidget {
               : [const Color(0xE905172A), const Color(0xE7071B32),
                   const Color(0xF105172A)])))),
         SafeArea(child: Column(children: [
-          Padding(padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+          Padding(padding: const EdgeInsets.fromLTRB(14, 12, 14, 6),
             child: Row(children: [
               Material(color: const Color(0xED061B31),
                 shape: const CircleBorder(side: BorderSide(
@@ -53,15 +53,13 @@ class PremiumPageShell extends StatelessWidget {
                 ) : null,
                 child: Center(child: FittedBox(fit: BoxFit.scaleDown,
                   child: Text(map ? '✦ ŞEHİR HARİTASI ✦' : title,
-                    style: TextStyle(color: map ? PremiumPalette.gold
-                        : PremiumPalette.cream,
+                    style: const TextStyle(color: PremiumPalette.gold,
                       fontSize: 23, fontFamily: 'serif',
                       fontWeight: FontWeight.w900,
                       shadows: const [Shadow(color: Colors.black87, blurRadius: 9)])))))),
               const SizedBox(width: 55),
             ])),
-          if (map) Container(height: 2, margin: const EdgeInsets.symmetric(horizontal: 15),
-            color: PremiumPalette.gold.withOpacity(.85)),
+          const V18GoldDivider(padding: 6),
           Expanded(child: child),
         ])),
       ])),
