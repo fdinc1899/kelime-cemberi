@@ -22,7 +22,7 @@ class V18GoldDivider extends StatelessWidget {
 }
 
 class V18SparklingBackdrop extends StatelessWidget {
-  const V18SparklingBackdrop({super.key, this.child});
+  const V18SparklingBackdrop({super.key, required this.child});
   final Widget child;
   @override
   Widget build(BuildContext context) => Stack(children: [
