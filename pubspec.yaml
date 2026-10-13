@@ -1,7 +1,7 @@
 name: kelime_cemberi
 description: Kelime Sehirleri - Ozgun Turkce bulmaca oyunu
 publish_to: none
-version: 1.22.0+22
+version: 1.23.0+23
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -21,6 +21,7 @@ flutter:
     - assets/images/hd_provinces/scenes/
     - assets/images/cards/
     - assets/images/city_cards_hd/
+    - assets/images/v23_city_cards/
     - assets/images/regional_cards/
     - assets/images/ui/
     - assets/audio/
