@@ -69,7 +69,7 @@ class _PremiumOpeningScreenState extends State<PremiumOpeningScreen>
                       border: Border.all(color: const Color(0xFFFFD76E)),
                       borderRadius: BorderRadius.circular(20),
                       color: const Color(0xD10B233B)),
-                    child: Text('${widget.finishedCount} / 18  ★',
+                    child: Text('${widget.finishedCount} / 243  ★',
                       style: const TextStyle(color: Color(0xFFFFD76E),
                       fontWeight: FontWeight.bold)),
                   ),
@@ -210,11 +210,12 @@ class PremiumCityChooser extends StatefulWidget {
 
 class _PremiumCityChooserState extends State<PremiumCityChooser> {
   int? _cityIndex;
+  String _selectedRegion = 'Tümü';
 
   @override
   Widget build(BuildContext context) {
     final which = _cityIndex;
-    final heading = which == null ? 'ŞEHİR SEÇİMİ' : '${_levels[which * 3].city.toUpperCase()} · BÖLÜMLER';
+    final heading = which == null ? 'ŞEHİR SEÇİMİ' : '${_provinces[which].title.toUpperCase()} · BÖLÜMLER';
     return Scaffold(
       backgroundColor: const Color(0xFF07192D),
       body: Stack(children: [
@@ -242,68 +243,91 @@ class _PremiumCityChooserState extends State<PremiumCityChooser> {
           Expanded(child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 250),
             child: which == null
-              ? ListView.builder(key: const ValueKey('allCities'),
-                  padding: const EdgeInsets.fromLTRB(14, 10, 14, 25),
-                  itemCount: 6,
-                  itemBuilder: (context, i) {
-                    final city = _levels[i * 3].city;
-                    final unlockedCity = i * 3 <= widget.unlocked;
-                    final done = List.generate(3, (j) => i * 3 + j)
-                      .where(widget.completed.contains).length;
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 11),
-                      clipBehavior: Clip.antiAlias,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: const Color(0xFFFFD77D), width: 1.5),
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: const [BoxShadow(color: Color(0x99000000), blurRadius: 8)]),
-                      child: Material(color: const Color(0xFF0A213B),
-                        child: InkWell(onTap: unlockedCity
-                          ? () => setState(() => _cityIndex = i)
-                          : () => ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Bu şehir henüz kilitli. Önceki şehri tamamla.'))),
-                          child: SizedBox(height: 104,
-                            child: Stack(children: [
-                              Positioned.fill(child: Image.memory(
-                                i == 0 ? _premiumCityThumbs['İstanbul']! : _premiumCityThumbs[city]!,
-                                fit: BoxFit.cover)),
-                              const Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(
-                                gradient: LinearGradient(begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                  colors: [Color(0x44061930), Color(0xEE05162C)])))),
-                              Padding(padding: const EdgeInsets.fromLTRB(12, 8, 10, 8),
-                                child: Row(children: [
-                                  CircleAvatar(backgroundColor: const Color(0xFFFFD77D),
-                                    child: Text('${i + 1}',
-                                      style: const TextStyle(color: Color(0xFF07192D),
-                                        fontWeight: FontWeight.w900))),
-                                  const Spacer(),
-                                  Column(mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text(city.toUpperCase(),
-                                        style: const TextStyle(color: Colors.white,
-                                          fontWeight: FontWeight.w900, fontSize: 17)),
-                                      Text(unlockedCity ? '$done / 3 BÖLÜM' : 'KİLİTLİ',
-                                        style: const TextStyle(color: Color(0xFFFFDB7B),
-                                          fontSize: 12, fontWeight: FontWeight.bold)),
-                                      Text(List.generate(3, (j) => j < done ? '★' : '☆').join(' '),
-                                        style: const TextStyle(color: Color(0xFFFFD77D), fontSize: 20)),
-                                    ]),
-                                  const SizedBox(width: 10),
-                                  Icon(unlockedCity ? Icons.chevron_right_rounded : Icons.lock,
-                                    color: Colors.white),
-                                ])),
-                            ])),
-                        ),
+              ? Column(key: const ValueKey('allCities'), children: [
+                  SizedBox(height: 49, child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    children: _regions.map((region) => Padding(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: ChoiceChip(
+                        selected: _selectedRegion == region,
+                        selectedColor: const Color(0xFFFFD77D),
+                        backgroundColor: const Color(0xFF0D2946),
+                        labelStyle: TextStyle(color: _selectedRegion == region
+                            ? const Color(0xFF061A31) : Colors.white),
+                        label: Text(region),
+                        onSelected: (_) => setState(() => _selectedRegion = region),
                       ),
+                    )).toList(),
+                  )),
+                  Expanded(child: Builder(builder: (context) {
+                    final filtered = List.generate(_provinces.length, (i) => i)
+                        .where((i) => _selectedRegion == 'Tümü' ||
+                            _provinces[i].region == _selectedRegion).toList();
+                    return ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(14, 10, 14, 25),
+                      itemCount: filtered.length,
+                      itemBuilder: (context, position) {
+                        final i = filtered[position];
+                        final province = _provinces[i];
+                        final unlockedCity = _cityOpen(province, widget.unlocked);
+                        final done = province.levels.where(widget.completed.contains).length;
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 11),
+                          clipBehavior: Clip.antiAlias,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: const Color(0xFFFFD77D), width: 1.5),
+                            borderRadius: BorderRadius.circular(15),
+                            boxShadow: const [BoxShadow(color: Color(0x99000000), blurRadius: 8)]),
+                          child: Material(color: const Color(0xFF0A213B),
+                            child: InkWell(onTap: unlockedCity
+                              ? () => setState(() => _cityIndex = i)
+                              : () => ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Bu şehir kilitli. Önceki şehri tamamla.'))),
+                              child: SizedBox(height: 104,
+                                child: Stack(children: [
+                                  Positioned.fill(child: _cityImageWidget(province.city)),
+                                  const Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(
+                                    gradient: LinearGradient(begin: Alignment.centerLeft,
+                                      end: Alignment.centerRight,
+                                      colors: [Color(0x44061930), Color(0xF805162C)])))),
+                                  Padding(padding: const EdgeInsets.fromLTRB(12, 8, 10, 8),
+                                    child: Row(children: [
+                                      CircleAvatar(backgroundColor: const Color(0xFFFFD77D),
+                                        child: Text('${i + 1}',
+                                          style: const TextStyle(color: Color(0xFF07192D),
+                                            fontWeight: FontWeight.w900))),
+                                      const Spacer(),
+                                      Flexible(child: Column(mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          Text(province.title.toUpperCase(), maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(color: Colors.white,
+                                              fontWeight: FontWeight.w900, fontSize: 17)),
+                                          Text(unlockedCity ? '$done / 3 BÖLÜM' : 'KİLİTLİ',
+                                            style: const TextStyle(color: Color(0xFFFFDB7B),
+                                              fontSize: 12, fontWeight: FontWeight.bold)),
+                                          Text(List.generate(3, (j) => widget.completed.contains(province.levels[j]) ? '★' : '☆').join(' '),
+                                            style: const TextStyle(color: Color(0xFFFFD77D), fontSize: 20)),
+                                        ])),
+                                      const SizedBox(width: 10),
+                                      Icon(unlockedCity ? Icons.chevron_right_rounded : Icons.lock,
+                                        color: Colors.white),
+                                    ])),
+                                ])),
+                            ),
+                          ),
+                        );
+                      },
                     );
-                  })
+                  })),
+                ])
               : ListView.builder(key: ValueKey('chapters_$which'),
                   padding: const EdgeInsets.fromLTRB(17, 15, 17, 25),
                   itemCount: 3,
                   itemBuilder: (context, stage) {
-                    final index = which * 3 + stage;
+                    final index = _provinces[which].levels[stage];
                     final locked = index > widget.unlocked;
                     final done = widget.completed.contains(index);
                     return Padding(padding: const EdgeInsets.only(bottom: 16),

@@ -217,9 +217,9 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     }
     // A user who finished the original 18 stages before V15 must be able
     // to enter bonus chapter 19 without losing their saved level selection.
-    if (_completedLevels.contains(17) && _unlocked < 18) {
-      _unlocked = 18;
-      await prefs.setInt('unlocked_v3', 18);
+    if (_completedLevels.contains(17) && _unlocked < 30) {
+      _unlocked = 30;
+      await prefs.setInt('unlocked_v3', 30);
     }
     _adventure.load(prefs, _completedLevels);
     _openLevel(_level);
@@ -295,7 +295,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     _coins += 40;
     _adventure.finishedLevel(_level, _hintCells.length);
     if (_level + 1 < _levels.length) {
-      _unlocked = math.max(_unlocked, _level + 1);
+      _unlocked = math.max(_unlocked, _nextStoryLevel(_level));
     }
     return true;
   }
@@ -505,10 +505,10 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
 
   void _next() {
     if (!_complete) return;
-    if (_level + 1 >= _levels.length) {
+    if (_nextStoryLevel(_level) >= _levels.length) {
       _showFinished();
     } else {
-      _openLevel(_level + 1);
+      _openLevel(_nextStoryLevel(_level));
     }
   }
 
@@ -518,8 +518,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
       builder: (dialogContext) => AlertDialog(
         title: const Text('Tebrikler! 🏆'),
         content: const Text(
-          'Altı şehirdeki 18 ana bölümü ve 12 ek bulmacayı bitirdin! '
-          'Yeni maceralar sonraki güncellemelerde gelebilir.',
+          'Türkiye’nin 81 iline ait 243 ana bölümü tamamladın! Tebrikler!',
         ),
         actions: [TextButton(onPressed: () => Navigator.pop(dialogContext),
           child: const Text('Harika!'))],
@@ -554,15 +553,14 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   }
 
   Widget _cityMapCard(BuildContext sheetContext, int i) {
-    final start = i * 3;
-    final city = _levels[start].city;
-    final locked = start > _unlocked;
-    final done = List.generate(3, (j) => start + j)
-        .where((j) => _completedLevels.contains(j)).length;
-    final active = _level < 18 && _level ~/ 3 == i;
-    // Full-size city source, not the low-resolution card thumbnail.
-    final image = i == 0 ? _istanbulBackground : _cityBackgrounds[city]!;
-    final nextLevel = math.min(_unlocked, start + done.clamp(0, 2).toInt());
+    final province = _provinces[i];
+    final start = province.start;
+    final city = province.city;
+    final locked = !_cityOpen(province, _unlocked);
+    final done = province.levels.where(_completedLevels.contains).length;
+    final active = province.levels.contains(_level);
+    final nextLevel = province.levels.firstWhere((n) => n <= _unlocked && !_completedLevels.contains(n),
+        orElse: () => province.levels.first);
     return Material(color: Colors.transparent, child: InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: locked ? null : () {
@@ -582,8 +580,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
           child: Stack(children: [
             Positioned.fill(child: Container(color: const Color(0xFF061A31))),
             Positioned(left: 0, top: 0, bottom: 0, width: 167,
-              child: Image.memory(image, fit: BoxFit.cover,
-                alignment: Alignment.center)),
+              child: _cityImageWidget(city)),
             Positioned(left: 136, top: 0, bottom: 0, width: 51,
               child: DecoratedBox(decoration: BoxDecoration(
                 gradient: LinearGradient(colors: [const Color(0x00051A31),
@@ -607,7 +604,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center, children: [
                   FittedBox(fit: BoxFit.scaleDown,
-                    child: Text(city, style: const TextStyle(color: Colors.white,
+                    child: Text(province.title, style: const TextStyle(color: Colors.white,
                       fontSize: 16, fontWeight: FontWeight.w900,
                       shadows: [Shadow(color: Colors.black87, blurRadius: 6)]))),
                   const SizedBox(height: 2),
@@ -618,7 +615,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                   Row(mainAxisSize: MainAxisSize.min, children: [
                     ...List.generate(3, (j) => Padding(
                       padding: const EdgeInsets.only(right: 1),
-                      child: Icon(_completedLevels.contains(start + j)
+                      child: Icon(_completedLevels.contains(province.levels[j])
                         ? Icons.star_rounded : Icons.star_border_rounded,
                         color: _gold, size: 16))),
                     const Spacer(),
@@ -704,7 +701,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     _premiumPage(
       'ŞEHİR HARİTASI',
       JourneyMapView(
-        completed: _completedLevels.where((n) => n < 18).length,
+        completed: _mainDone(_completedLevels),
         unlocked: _unlocked,
         cardBuilder: _cityMapCard,
       ),
@@ -860,10 +857,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
       (i) => _prefs?.getStringList('bonuses_v3_$i')?.length ?? 0)
       .fold<int>(0, (a, b) => a + b);
 
-  int get _citiesComplete => List.generate(6, (i) =>
-      List.generate(3, (j) => i * 3 + j)
-          .every((index) => _completedLevels.contains(index)))
-      .where((v) => v).length;
+  int get _citiesComplete => _cityDone(_completedLevels);
 
   void _showProfile() {
     _premiumPage('PROFİLİM', ListView(
@@ -886,7 +880,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                 fontWeight: FontWeight.w900, fontSize: 19)),
               const Text('Şehirleri keşfet!', style: TextStyle(color: _gold,
                 fontSize: 12)),
-              Text(_level < 18 ? '${_puzzle.city} · Bölüm ${_level % 3 + 1}/3' : '${_puzzle.city} · Ek bölüm ${(_level - 18) % 2 + 1}/2',
+              Text('${_puzzle.city} · ${_levelLabel(_level)}',
                 style: const TextStyle(color: _cream, fontSize: 11)),
             ])),
         ])),
@@ -899,17 +893,17 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
         _profileStat(Icons.stars_rounded, '$_totalBonusCount', 'Bonus'),
       ]),
       const SizedBox(height: 17),
-      _statsLine('Tamamlanan şehirler', '$_citiesComplete / 6', Icons.public_rounded),
+      _statsLine('Tamamlanan şehirler', '$_citiesComplete / 81', Icons.public_rounded),
       _statsLine('Bulunan kelimeler', '$_totalSolvedCount', Icons.abc_rounded),
       const SizedBox(height: 15),
       const Text('ŞEHİR ROZETLERİ', style: TextStyle(color: _gold,
           fontWeight: FontWeight.w900, fontSize: 17)),
       const SizedBox(height: 8),
       SizedBox(height: 104, child: ListView.builder(scrollDirection: Axis.horizontal,
-        itemCount: 6, itemBuilder: (ctx, i) {
-          final name = _levels[i * 3].city;
-          final done = List.generate(3, (k) => i * 3 + k)
-              .every((idx) => _completedLevels.contains(idx));
+        itemCount: _provinces.length, itemBuilder: (ctx, i) {
+          final province = _provinces[i];
+          final name = province.city;
+          final done = province.levels.every(_completedLevels.contains);
           return Container(width: 92, margin: const EdgeInsets.only(right: 9),
             decoration: BoxDecoration(color: const Color(0xD50C2947),
                 borderRadius: BorderRadius.circular(13), border: Border.all(color: _gold)),
@@ -917,7 +911,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
               Container(width: 54, height: 54,
                 decoration: BoxDecoration(shape: BoxShape.circle,
                   image: DecorationImage(
-                    image: MemoryImage(_premiumCityThumbs[name]!),
+                    image: _cityImageProvider(name),
                     fit: BoxFit.cover),
                   border: Border.all(color: _gold, width: 2.5),
                   boxShadow: const [BoxShadow(color: Color(0x77FFD36E), blurRadius: 7)]),
@@ -966,21 +960,21 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
       _statsLine('Bulunan kelimeler', '$_totalSolvedCount', Icons.abc_rounded),
       _statsLine('Bonus kelimeler', '$_totalBonusCount', Icons.stars_rounded),
       _statsLine('Mevcut altın', '$_coins', Icons.monetization_on_rounded),
-      _statsLine('Tamamlanan şehirler', '$_citiesComplete / 6', Icons.public),
+      _statsLine('Tamamlanan şehirler', '$_citiesComplete / 81', Icons.public),
       const SizedBox(height: 18),
       const Text('ŞEHİR İLERLEMESİ', style: TextStyle(color: _gold,
           fontWeight: FontWeight.w900, fontSize: 18)),
       const SizedBox(height: 10),
-      ...List.generate(6, (i) {
-        final done = List.generate(3, (j) => i * 3 + j)
-            .where((idx) => _completedLevels.contains(idx)).length;
+      ...List.generate(_provinces.length, (i) {
+        final province = _provinces[i];
+        final done = province.levels.where(_completedLevels.contains).length;
         return Container(padding: const EdgeInsets.symmetric(vertical: 10),
           child: Row(children: [
             CircleAvatar(radius: 18, backgroundColor: _navy,
               child: Text('${i+1}', style: const TextStyle(color: _gold))),
             const SizedBox(width: 10),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(_levels[i * 3].city, style: const TextStyle(color: _cream,
+              Text(_provinces[i].title, style: const TextStyle(color: _cream,
                   fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
               LinearProgressIndicator(value: done / 3, minHeight: 6,
@@ -999,11 +993,9 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     final level = _level;
     final total = _puzzle.answers.length;
     final bonusCount = _bonuses.length;
-    final stageLabel = level < 18 ? '${level % 3 + 1}/3'
-        : 'EK ${(level - 18) % 2 + 1}/2';
+    final stageLabel = _levelLabel(level);
     final stars = _adventure.stars[level] ?? 1;
-    final art = _premiumCityThumbs[_puzzle.city] ??
-        (level ~/ 3 == 0 ? _istanbulBackground : _cityBackgrounds[_puzzle.city]!);
+    final art = _cityImageProvider(_puzzle.city);
     showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -1027,7 +1019,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                 decoration: BoxDecoration(shape: BoxShape.rectangle,
                   borderRadius: BorderRadius.circular(60),
                   border: Border.all(color: _gold, width: 3),
-                  image: DecorationImage(image: MemoryImage(art),
+                  image: DecorationImage(image: art,
                     fit: BoxFit.cover)),
                 alignment: Alignment.bottomCenter,
                 child: Container(width: double.infinity, padding: const EdgeInsets.all(5),
@@ -1219,8 +1211,8 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
               )
             : PremiumOpeningScreen(
                 currentCity: _puzzle.city,
-                currentStage: _level < 18 ? (_level % 3) + 1 : ((_level - 18) % 2) + 1,
-                finishedCount: _completedLevels.where((n) => n < 18).length,
+                currentStage: _stageOf(_level),
+                finishedCount: _mainDone(_completedLevels),
                 onContinue: _continueFromSave,
                 onChooseCity: _chooseCityOnWelcome,
                 onChooseChapter: _chooseCityOnWelcome,
@@ -1241,10 +1233,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
       body: Stack(
         children: [
           Positioned.fill(
-            child: Image.memory(
-                firstCity ? _istanbulBackground :
-                   (_premiumCityScenes[_puzzle.city] ?? _cityBackgrounds[_puzzle.city]!),
-                fit: BoxFit.cover, alignment: Alignment.center, gaplessPlayback: true),
+            child: _cityImageWidget(_puzzle.city),
           ),
           Positioned.fill(
             child: DecoratedBox(
@@ -1515,9 +1504,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     child: OrnateTitlePlaque(
       eyebrow: '✦  Ş E H İ R   H İ K Â Y E L E R İ  ✦',
       heading: _puzzle.city.toUpperCase(),
-      footer: _level < 18
-          ? 'B Ö L Ü M  ${_level % 3 + 1} / 3'
-          : 'E K  B Ö L Ü M  ${(_level - 18) % 2 + 1} / 2',
+      footer: _levelLabel(_level),
     ),
   );
 
@@ -1767,10 +1754,10 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
 
   Widget _levelDots() => Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(_level < 18 ? 3 : 2, (index) {
-          final localStage = _level < 18 ? _level % 3 : (_level - 18) % 2;
-          final realLevel = _level < 18 ? (_level ~/ 3) * 3 + index
-              : 18 + ((_level - 18) ~/ 2) * 2 + index;
+        children: List.generate(_isBonusChapter(_level) ? 2 : 3, (index) {
+          final localStage = _stageOf(_level) - 1;
+          final realLevel = _isBonusChapter(_level) ? 18 + ((_level - 18) ~/ 2) * 2 + index
+              : _provinceForLevel(_level)!.levels[index];
           final active = localStage == index;
           final locked = realLevel > _unlocked;
           return Padding(
@@ -1847,7 +1834,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26))),
           icon: const Icon(Icons.arrow_forward_rounded),
           label: Text(_level == _levels.length - 1
-              ? 'OYUNU BİTİR' : (_level < 18 && _level % 3 == 2
+              ? 'OYUNU BİTİR' : (!_isBonusChapter(_level) && _stageOf(_level) == 3
                   ? 'SONRAKİ ŞEHİR' : 'SONRAKİ BÖLÜM'),
               style: const TextStyle(fontWeight: FontWeight.w900)),
         ),

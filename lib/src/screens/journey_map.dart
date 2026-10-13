@@ -24,7 +24,7 @@ class JourneyMapView extends StatelessWidget {
       child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         const Icon(Icons.stars_rounded, color: PremiumPalette.gold, size: 19),
         const SizedBox(width: 9),
-        Text('$completed / 18 TAMAMLANAN BÖLÜM',
+        Text('$completed / 243 TAMAMLANAN BÖLÜM',
           style: const TextStyle(color: PremiumPalette.cream,
             fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: .35)),
         const SizedBox(width: 9),
@@ -34,32 +34,29 @@ class JourneyMapView extends StatelessWidget {
     const SizedBox(height: 8),
     Padding(padding: const EdgeInsets.symmetric(horizontal: 25),
       child: ClipRRect(borderRadius: BorderRadius.circular(20),
-        child: LinearProgressIndicator(value: completed / 18,
+        child: LinearProgressIndicator(value: completed / 243,
           backgroundColor: const Color(0x99051D34), minHeight: 6,
           valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFFC95F))))),
     const SizedBox(height: 4),
-    Expanded(child: LayoutBuilder(builder: (context, constraints) {
-      final width = constraints.maxWidth;
-      const stride = 116.0;
-      const cardHeight = 92.0;
-      final totalHeight = 6 * stride + 8;
-      return ListView(children: [
-        SizedBox(height: totalHeight, child: Stack(children: [
-          Positioned.fill(child: CustomPaint(
-            painter: _JourneyRoadPainter(reachedCities: unlocked ~/ 3,
-              stepHeight: stride))),
-          for (var i = 0; i < 6; i++)
-            Positioned(
-              top: 12 + i * stride,
-              left: i.isEven ? 7 : null,
-              right: i.isOdd ? 7 : null,
-              width: width * .91,
-              height: cardHeight,
-              child: cardBuilder(context, i),
-            ),
-        ])),
-      ]);
-    })),
+    Expanded(child: ListView.builder(
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 25),
+      itemCount: _provinces.length * 2 - 1,
+      itemBuilder: (context, position) {
+        if (position.isOdd) {
+          final index = position ~/ 2;
+          return SizedBox(height: 30,
+            child: CustomPaint(painter: _ShortProvinceRoadPainter(
+              leftToRight: index.isEven,
+              open: _cityOpen(_provinces[index + 1], unlocked))));
+        }
+        final index = position ~/ 2;
+        return Align(
+          alignment: index.isEven ? Alignment.centerLeft : Alignment.centerRight,
+          child: SizedBox(width: MediaQuery.sizeOf(context).width * .90,
+            height: 102, child: cardBuilder(context, index)),
+        );
+      },
+    )),
   ]);
 }
 
@@ -106,4 +103,31 @@ class _JourneyRoadPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _JourneyRoadPainter old) =>
     old.reachedCities != reachedCities || old.stepHeight != stepHeight;
+}
+
+
+class _ShortProvinceRoadPainter extends CustomPainter {
+  const _ShortProvinceRoadPainter({required this.leftToRight, required this.open});
+  final bool leftToRight;
+  final bool open;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = Path();
+    final a = leftToRight ? size.width*.28 : size.width*.72;
+    final b = leftToRight ? size.width*.72 : size.width*.28;
+    path.moveTo(a, 0);
+    path.quadraticBezierTo(size.width*.5, size.height*.5, b, size.height);
+    canvas.drawPath(path, Paint()..color = const Color(0xFF987035)
+      ..strokeWidth = 8..style = PaintingStyle.stroke);
+    for (final metric in path.computeMetrics()) {
+      for (double k = 3; k < metric.length; k += 9) {
+        final point = metric.getTangentForOffset(k)?.position;
+        if (point != null) canvas.drawCircle(point, 2.8,
+          Paint()..color = open ? const Color(0xFFFFE191) : const Color(0xFF877D71));
+      }
+    }
+  }
+  @override
+  bool shouldRepaint(covariant _ShortProvinceRoadPainter old) =>
+      old.leftToRight != leftToRight || old.open != open;
 }

@@ -234,7 +234,7 @@ class AdventureCenterView extends StatelessWidget {
     builder: (ctx) => AlertDialog(
       backgroundColor: const Color(0xFF0D2642),
       title: Text('$city · Şehir Hikâyesi', style: const TextStyle(color: gold)),
-      content: Text(adventureCityStories[city]!, style: const TextStyle(color: cream)),
+      content: Text(adventureCityStories[city] ?? '$city, Türkiye’nin 81 ilinden biridir. Bu bölümle birlikte şehrin kültürünü ve doğal güzelliklerini keşfetmeye başlayabilirsin.', style: const TextStyle(color: cream)),
       actions: [TextButton(onPressed: ()=>Navigator.pop(ctx), child: const Text('KAPAT'))],
     ));
 
@@ -260,8 +260,8 @@ class AdventureCenterView extends StatelessWidget {
       _panel('MACERA İLERLEMESİ', Column(children: [
         _row('Deneyim puanın', 'Kelime çözerek, bonus bularak ve bölüm bitirerek kazanılır',
           '${progress.experience} XP', null, icon: Icons.military_tech_rounded),
-        _row('Klasik bölümler', '18 ana bulmaca + 12 ek bölüm',
-          '${completed.length}/30', null, icon: Icons.map_rounded),
+        _row('Klasik bölümler', '81 il × 3 = 243 bölüm + 12 eski ek bölüm',
+          '${_mainDone(completed)}/243', null, icon: Icons.map_rounded),
       ])),
       _panel('GÜNLÜK GÖREVLER', Column(children: [
         for (final t in tasks)
@@ -271,11 +271,11 @@ class AdventureCenterView extends StatelessWidget {
                 ? null : () => onClaimDaily(t.$1, t.$3, dailyValues[t.$1]!, t.$4), icon: t.$5),
       ])),
       _panel('ŞEHİR PASAPORTU', Column(children: [
-        for (int city = 0; city < 6; city++)
+        for (int city = 0; city < _provinces.length; city++)
           Builder(builder: (ctx) {
-            final name = _levels[city * 3].city;
-            final done = List.generate(3, (i) => city * 3 + i)
-                .where(completed.contains).length;
+            final province = _provinces[city];
+            final name = province.city;
+            final done = province.levels.where(completed.contains).length;
             return _row('$name mührü', '$done / 3 ana bölüm · ${done == 3 ? "Mühür kazanıldı" : "Keşfetmeye devam et"}',
               done == 3 ? '✓' : '🔒', done == 3 ? () => _story(context, name) : null,
               icon: done == 3 ? Icons.workspace_premium_rounded : Icons.lock_outline_rounded);
@@ -324,11 +324,11 @@ class AdventureCenterView extends StatelessWidget {
         const Text('Bu sürümde yarışma cihaz üzerindedir; diğer oyuncularla gerçek zamanlı sıralama veya ödüllü çevrim içi lig yoktur.',
           style: TextStyle(color: Color(0xFFD5C6AB), fontSize: 11)),
       ])),
-      _panel('YENİ BÖLÜMLER · +12', Column(children: [
-        const Text('18 klasik bölümün ardından 12 ek bulmaca açılır. Eski kayıtların bölüm sırası değişmez.',
+      _panel('ESKİ EK BÖLÜMLER · 12', Column(children: [
+        const Text('12 eski ek bölüm saklanır. 81 ilin üçer bölümü yeni şehir haritasında bulunur.',
             style: TextStyle(color: cream, fontSize: 12)),
         const SizedBox(height: 8),
-        for (var i = 18; i < _levels.length; i++)
+        for (var i = 18; i < 30; i++)
           _row('${_levels[i].city} · Ek ${((i-18)%2)+1}', _levels[i].subtitle,
             i <= unlocked ? (completed.contains(i) ? '✓' : 'OYNA') : '🔒',
             i <= unlocked ? () => onOpenExtra(i) : null, icon: Icons.grid_view_rounded),

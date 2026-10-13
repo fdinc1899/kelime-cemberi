@@ -248,4 +248,4 @@ const _classicLevels = <PuzzleLevel>[
 
 
 // First 18 indices remain unchanged for migration compatibility.
-final List<PuzzleLevel> _levels = <PuzzleLevel>[..._classicLevels, ..._extraLevels];
+final List<PuzzleLevel> _levels = <PuzzleLevel>[..._classicLevels, ..._extraLevels, ..._provinceLevels];
