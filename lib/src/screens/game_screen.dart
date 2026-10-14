@@ -1361,7 +1361,24 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   void _showAdventureHub() {
     _adventure.refreshPeriod();
     _premiumPage('MACERA MERKEZİ', StatefulBuilder(builder: (pageContext, refresh) =>
-      AdventureCenterView(
+      V29AdventureDashboard(
+        progress: _adventure,
+        prefs: _prefs,
+        completed: _completedLevels,
+        unlocked: _unlocked,
+        coins: _coins,
+        onAwardCoins: (amount, label) {
+          setState(() => _coins += amount);
+          refresh(() {});
+          _saveProgress();
+          _celebrate(label, '+$amount ALTIN');
+        },
+        onOpenLevel: (index) {
+          Navigator.pop(pageContext);
+          _openLevel(index);
+          setState(() { _showWelcome = false; _showCityChoice = false; });
+        },
+        classicCenter: AdventureCenterView(
         progress: _adventure, completed: _completedLevels, unlocked: _unlocked,
         onClaimDaily: (id, minimum, value, reward) {
           final coins = _adventure.claimDaily(id, minimum, value, reward);
@@ -1415,6 +1432,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
             _revealWholeWord();
           }
         },
+      ),
       ),
     ));
   }

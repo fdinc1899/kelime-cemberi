@@ -295,7 +295,7 @@ class AdventureCenterView extends StatelessWidget {
         _row('Çarkı çevir', progress.canSpin
              ? 'Bugünkü çevirme hakkın hazır'
              : 'Bugün çevirdin · Yarın yeniden gel',
-             progress.canSpin ? 'ÇEVİR' : 'ALINDI', progress.canSpin ? onSpin : null,
+             progress.canSpin ? 'ÇEVİR' : 'ALINDI', progress.canSpin ? () => showDialog<void>(context: context, barrierDismissible: false, builder: (ctx) => V29SpinDialog(onComplete: onSpin)) : null,
              icon: Icons.casino_rounded),
         Text('Olası ödüller: ${coinSpinRewards.map((e) => '$e altın').join(' · ')} · ipucu · sandık',
           style: const TextStyle(color: Color(0xFFD5C6AB), fontSize: 10), textAlign: TextAlign.center),

@@ -1,8 +1,7 @@
 name: kelime_cemberi
 description: Kelime Sehirleri - Ozgun Turkce bulmaca oyunu
 publish_to: none
-version: 1.26.0+26
-
+version: 2.9.0+29
 environment:
   sdk: '>=3.3.0 <4.0.0'
 

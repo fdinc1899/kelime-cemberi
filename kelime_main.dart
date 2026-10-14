@@ -17,6 +17,7 @@ part 'src/data/provinces.dart';
 part 'src/data/city_catalog.dart';
 part 'src/data/province_puzzles.dart';
 part 'src/features/adventure_features.dart';
+part 'src/features/v29_experience.dart';
 part 'src/screens/game_screen.dart';
 part 'src/screens/premium_page.dart';
 part 'src/screens/journey_map.dart';
