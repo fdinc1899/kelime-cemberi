@@ -84,7 +84,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     if (!_musicOn) return;
     try {
       // Dosya local cache'e yazılır: internet ve asset manifest gerektirmez.
-      final f = File('${Directory.systemTemp.path}/kelime_sehirleri_muzik.mp3');
+      final f = File('${Directory.systemTemp.path}/kelime_sehirleri_muzik_v30.mp3');
       if (!await f.exists()) {
         await f.writeAsBytes(_musicBytes, flush: true);
       }
@@ -115,7 +115,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   Future<void> _playEffect() async {
     if (!_effectsOn || _effectsVolume <= 0) return;
     try {
-      final f = File('${Directory.systemTemp.path}/kelime_sehirleri_tebrik_v5.wav');
+      final f = File('${Directory.systemTemp.path}/kelime_sehirleri_tebrik_v30.wav');
       if (!await f.exists()) {
         await f.writeAsBytes(_celebrationEffectBytes, flush: true);
       }

@@ -1,0 +1,16 @@
+KELIME CEMBERI V30 — SEHIRLERIN ISIGI, ORIJINAL OYUN MUZIGI
+
+- ambient.mp3: yaklasik 78,5 saniye; 44,1 kHz stereo; 192 kbps MP3.
+  Sakin kelime oyunu atmosferi icin hafif yaylilar, telli enstrumanlar,
+  nefesliler ve yumusak vurmalilarla bestelenmis ozgun enstrumantal parca.
+- success.wav: 2,3 saniye; 44,1 kHz stereo; bes notalik kutlama melodisi.
+- V30_MUZIK_UYGULA.sh: oyun kodundaki eski muzik onbellegini
+  v30 isimli yeni gecici dosyaya yonlendirir; boylece eski ses calmaz.
+- Mevcut ses ac/kapat dugmesi, ses duzeyi ve oyun kayitlari korunur.
+- GitHub build.yml degistirilmez; yeni workflow izni gerekmez.
+
+YUKLEME: ZIP'i Downloads'a indirip Termux'ta su komutu calistir:
+cd ~/kelime-cemberi && unzip -o ~/storage/downloads/kelime-cemberi-v30-premium-muzik.zip -d . && bash V30_GITHUB.sh
+
+DIKKAT: APK derlemesi ancak GitHub Actions islemi bitince kesinlesir.
+Music source: custom original composition. No external tracks / streaming.
