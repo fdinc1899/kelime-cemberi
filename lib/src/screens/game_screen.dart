@@ -589,7 +589,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
           child: Stack(children: [
             Positioned.fill(child: Container(color: const Color(0xFF061A31))),
             Positioned(left: 0, top: 0, bottom: 0, width: 167,
-              child: _cityImageWidget(city)),
+              child: Image(image: _citySelectionImageProvider(province), fit: BoxFit.cover)),
             Positioned(left: 136, top: 0, bottom: 0, width: 51,
               child: DecoratedBox(decoration: BoxDecoration(
                 gradient: LinearGradient(colors: [const Color(0x00051A31),

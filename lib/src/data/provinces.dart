@@ -63,6 +63,21 @@ String _regionScenicAsset(String region) =>
     _regionScenicAssets[region] ?? _regionScenicAssets['Marmara']!;
 
 ImageProvider _citySelectionImageProvider(ProvinceInfo province) {
+  // V28_CARD_OVERRIDE: 50 provincial HD card images, never a shared region image.
+  const v28Cities = <String>{
+    'aydin', 'mugla', 'manisa', 'usak', 'burdur', 'mersin',
+    'adana', 'osmaniye', 'hatay', 'kahramanmaras', 'konya', 'karaman',
+    'nigde', 'kirsehir', 'kirikkale', 'cankiri', 'yozgat', 'kayseri',
+    'duzce', 'zonguldak', 'bartin', 'kastamonu', 'sinop', 'samsun',
+    'ordu', 'giresun', 'trabzon', 'rize', 'artvin', 'gumushane',
+    'bayburt', 'tokat', 'amasya', 'corum', 'erzincan', 'erzurum',
+    'agri', 'igdir', 'kars', 'ardahan', 'van', 'hakkri',
+    'diyarbakir', 'sanliurfa', 'gaziantep', 'kilis', 'adiyaman', 'batman',
+    'siirt', 'sirnak',
+  };
+  if (v28Cities.contains(province.slug)) {
+    return AssetImage('assets/images/v28_city_cards/${province.slug}.webp');
+  }
   // Previous releases used the same regional photo for dozens of provinces.
   // Each province now has a different, verified image asset.
   return AssetImage(cityCatalogBySlug[province.slug]!.cardAsset);
