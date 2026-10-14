@@ -1,0 +1,19 @@
+ŞEHİR HİKÂYELERİ V26 — 81 İL TEK PARÇA KATALOG + 5 YENİ KART
+
+- Tam 81 il ve 243 ana seviye mevcut kayıtlardaki sırayla korunur.
+- 12 eski bonus seviye (18–29) olduğu gibi bırakılır.
+- V25'in mevcut 50 kart dosyası pakete dahil edildi.
+- 77 Kilis / 78 Adıyaman / 79 Batman / 80 Siirt / 81 Şırnak
+  kartları, beğenilen son referans görselinden kesilmiş 5 FARKLI
+  şehir temalı manzaraya bağlandı.
+- Bunlar referans konseptinden çıkarılan görsellerdir. Yerinde çekilmiş
+  şehir fotoğrafları veya doğal Full HD kaynaklar olarak sunulmaz.
+- Oyun içi tam ekran arka planları bu yamayla değişmez.
+- Oyun kayıtları, altın, tamamlanan bölüm numaraları korunmak üzere
+  değişiklik yalnızca katalog asset yollarına ve yeni dosyalara uygulanır.
+
+TERMUX: Önce ZIP'i Downloads klasörüne indir, sonra tek satırı çalıştır:
+
+cd ~/kelime-cemberi && cp lib/src/data/city_catalog.dart ~/city_catalog_yedek_v25.dart && unzip -o ~/storage/downloads/sehir-hikayeleri-v26-tek-parca-github.zip -d . && git add lib/src/data/city_catalog.dart assets/images/v25_city_cards assets/images/v26_city_cards pubspec.yaml V26_KURULUM.txt && git commit -m "V26 81 il katalog ve yeni kart gorselleri" && git push origin main
+
+GitHub Actions derlemesini kontrol edin. Bu ortamda Flutter APK derlemesi test edilmedi.

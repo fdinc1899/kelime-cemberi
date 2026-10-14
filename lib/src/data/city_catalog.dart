@@ -111,11 +111,11 @@ const List<CityInfo> cityCatalog = <CityInfo>[
   CityInfo(id: 74, name: 'Diyarbakır', gameCity: 'Diyarbakır', region: 'Güneydoğu Anadolu', slug: 'diyarbakir', levelIds: <int>[231, 232, 233], cardAsset: 'assets/images/v25_city_cards/diyarbakir.webp', sceneAsset: 'assets/images/provinces/diyarbakir.webp'),
   CityInfo(id: 75, name: 'Şanlıurfa', gameCity: 'Şanlıurfa', region: 'Güneydoğu Anadolu', slug: 'sanliurfa', levelIds: <int>[234, 235, 236], cardAsset: 'assets/images/v25_city_cards/sanliurfa.webp', sceneAsset: 'assets/images/provinces/sanliurfa.webp'),
   CityInfo(id: 76, name: 'Gaziantep', gameCity: 'Gaziantep', region: 'Güneydoğu Anadolu', slug: 'gaziantep', levelIds: <int>[237, 238, 239], cardAsset: 'assets/images/v25_city_cards/gaziantep.webp', sceneAsset: 'assets/images/provinces/gaziantep.webp'),
-  CityInfo(id: 77, name: 'Kilis', gameCity: 'Kilis', region: 'Güneydoğu Anadolu', slug: 'kilis', levelIds: <int>[240, 241, 242], cardAsset: 'assets/images/v25_city_cards/kilis.webp', sceneAsset: 'assets/images/provinces/kilis.webp'),
-  CityInfo(id: 78, name: 'Adıyaman', gameCity: 'Adıyaman', region: 'Güneydoğu Anadolu', slug: 'adiyaman', levelIds: <int>[243, 244, 245], cardAsset: 'assets/images/v25_city_cards/adiyaman.webp', sceneAsset: 'assets/images/provinces/adiyaman.webp'),
-  CityInfo(id: 79, name: 'Batman', gameCity: 'Batman', region: 'Güneydoğu Anadolu', slug: 'batman', levelIds: <int>[246, 247, 248], cardAsset: 'assets/images/v25_city_cards/batman.webp', sceneAsset: 'assets/images/provinces/batman.webp'),
-  CityInfo(id: 80, name: 'Siirt', gameCity: 'Siirt', region: 'Güneydoğu Anadolu', slug: 'siirt', levelIds: <int>[249, 250, 251], cardAsset: 'assets/images/v25_city_cards/siirt.webp', sceneAsset: 'assets/images/provinces/siirt.webp'),
-  CityInfo(id: 81, name: 'Şırnak', gameCity: 'Şırnak', region: 'Güneydoğu Anadolu', slug: 'sirnak', levelIds: <int>[252, 253, 254], cardAsset: 'assets/images/v25_city_cards/sirnak.webp', sceneAsset: 'assets/images/provinces/sirnak.webp'),
+  CityInfo(id: 77, name: 'Kilis', gameCity: 'Kilis', region: 'Güneydoğu Anadolu', slug: 'kilis', levelIds: <int>[240, 241, 242], cardAsset: 'assets/images/v26_city_cards/kilis.webp', sceneAsset: 'assets/images/provinces/kilis.webp'),
+  CityInfo(id: 78, name: 'Adıyaman', gameCity: 'Adıyaman', region: 'Güneydoğu Anadolu', slug: 'adiyaman', levelIds: <int>[243, 244, 245], cardAsset: 'assets/images/v26_city_cards/adiyaman.webp', sceneAsset: 'assets/images/provinces/adiyaman.webp'),
+  CityInfo(id: 79, name: 'Batman', gameCity: 'Batman', region: 'Güneydoğu Anadolu', slug: 'batman', levelIds: <int>[246, 247, 248], cardAsset: 'assets/images/v26_city_cards/batman.webp', sceneAsset: 'assets/images/provinces/batman.webp'),
+  CityInfo(id: 80, name: 'Siirt', gameCity: 'Siirt', region: 'Güneydoğu Anadolu', slug: 'siirt', levelIds: <int>[249, 250, 251], cardAsset: 'assets/images/v26_city_cards/siirt.webp', sceneAsset: 'assets/images/provinces/siirt.webp'),
+  CityInfo(id: 81, name: 'Şırnak', gameCity: 'Şırnak', region: 'Güneydoğu Anadolu', slug: 'sirnak', levelIds: <int>[252, 253, 254], cardAsset: 'assets/images/v26_city_cards/sirnak.webp', sceneAsset: 'assets/images/provinces/sirnak.webp'),
 ];
 
 final Map<String, CityInfo> cityCatalogBySlug = <String, CityInfo>{
