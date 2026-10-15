@@ -626,11 +626,17 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
   ]);
 
   @override Widget build(BuildContext context) {
-    const titles = ['MARATON', 'HATIRALAR', 'GÖRÜNÜM', 'YEDEK', 'ŞEHİRLER', 'İSTATİSTİK'];
+    // V316_EXPEDITION_TAB: offline daily, 81 questions and achievement medals.
+    const titles = ['MARATON', 'HATIRALAR', 'GÖRÜNÜM', 'YEDEK', 'ŞEHİRLER', 'İSTATİSTİK',
+      'GÜNLÜK+'];
     const icons = [Icons.abc, Icons.collections_bookmark, Icons.nightlight,
-      Icons.cloud_upload_outlined, Icons.map_outlined, Icons.bar_chart_rounded];
+      Icons.cloud_upload_outlined, Icons.map_outlined, Icons.bar_chart_rounded,
+      Icons.emoji_events_outlined];
     final views = [_challengeView(), _memoriesView(), _visualsView(),
-      _backupView(), _v314CityGuide(), _v314Statistics()];
+      _backupView(), _v314CityGuide(), _v314Statistics(),
+      V316Expedition(prefs: widget.prefs,
+        mainCompleted: widget.completed, marathonCompleted: _marathonDone,
+        treasures: _treasures, coins: widget.coins, onReward: widget.onReward)];
     return Column(children: [
       SizedBox(height: 54, child: ListView.builder(scrollDirection: Axis.horizontal,
         itemCount: titles.length, itemBuilder: (context, i) => Padding(
