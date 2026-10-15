@@ -1,6 +1,7 @@
 library kelime_sehirleri;
 
 import 'dart:io';
+import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:typed_data';
 
@@ -18,6 +19,7 @@ part 'src/data/city_catalog.dart';
 part 'src/data/province_puzzles.dart';
 part 'src/features/adventure_features.dart';
 part 'src/features/v29_experience.dart';
+part 'src/features/v31_world.dart';
 part 'src/screens/game_screen.dart';
 part 'src/screens/premium_page.dart';
 part 'src/screens/journey_map.dart';

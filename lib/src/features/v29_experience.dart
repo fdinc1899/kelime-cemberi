@@ -6,7 +6,10 @@ class V29AdventureDashboard extends StatefulWidget {
   const V29AdventureDashboard({super.key, required this.progress,
     required this.prefs, required this.completed, required this.unlocked,
     required this.coins, required this.classicCenter,
-    required this.onAwardCoins, required this.onOpenLevel});
+    required this.onAwardCoins, required this.onOpenLevel,
+    required this.night, required this.regionMusic,
+    required this.onNightChange, required this.onRegionMusicChange,
+    required this.onRestoreProgress});
 
   final AdventureProgress progress;
   final SharedPreferences? prefs;
@@ -14,6 +17,11 @@ class V29AdventureDashboard extends StatefulWidget {
   final int unlocked;
   final int coins;
   final Widget classicCenter;
+  final bool night;
+  final bool regionMusic;
+  final ValueChanged<bool> onNightChange;
+  final ValueChanged<bool> onRegionMusicChange;
+  final VoidCallback onRestoreProgress;
   final void Function(int, String) onAwardCoins;
   final void Function(int) onOpenLevel;
 
@@ -427,13 +435,20 @@ class _V29AdventureDashboardState extends State<V29AdventureDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    final titles = ['GÜNLÜK', 'PASAPORT', 'YOLCULUK', 'LİG', 'ÖDÜLLER', 'PROFİL'];
+    final titles = ['GÜNLÜK', 'PASAPORT', 'YOLCULUK', 'LİG', 'ÖDÜLLER', 'PROFİL', 'V31'];
     final icons = [Icons.today_rounded, Icons.collections_bookmark_rounded,
       Icons.route_rounded, Icons.emoji_events_rounded,
-      Icons.card_giftcard_rounded, Icons.account_circle_rounded];
+      Icons.card_giftcard_rounded, Icons.account_circle_rounded,
+      Icons.rocket_launch_rounded];
     final views = <Widget>[
       _todayTab(), _atlasTab(), _routeTab(), _leagueTab(),
       widget.classicCenter, _profileTab(),
+      V31WorldCenter(prefs: widget.prefs, completed: widget.completed,
+        unlocked: widget.unlocked, coins: widget.coins,
+        night: widget.night, regionMusic: widget.regionMusic,
+        onTheme: widget.onNightChange, onMusic: widget.onRegionMusicChange,
+        onReward: widget.onAwardCoins, onOpenLevel: widget.onOpenLevel,
+        onRestore: widget.onRestoreProgress),
     ];
     return Column(children: [
       SizedBox(height: 55, child: ListView.builder(

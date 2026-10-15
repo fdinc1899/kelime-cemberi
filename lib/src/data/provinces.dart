@@ -40,10 +40,20 @@ String _provinceArt(ProvinceInfo p) => 'assets/images/provinces/${p.slug}.webp';
 
 // V21: One province -> one card art + one game-scene art.
 // Filenames all point to real files shipped with the V21 full bundle.
+// V31: dedicated province art selection. Keep names and level IDs unchanged.
+const Set<String> _v31V28Slugs = <String>{'adana', 'adiyaman', 'agri', 'amasya', 'ardahan', 'artvin', 'aydin', 'bartin', 'batman', 'bayburt', 'burdur', 'cankiri', 'corum', 'diyarbakir', 'duzce', 'erzincan', 'erzurum', 'gaziantep', 'giresun', 'gumushane', 'hakkri', 'hatay', 'igdir', 'kahramanmaras', 'karaman', 'kars', 'kastamonu', 'kayseri', 'kilis', 'kirikkale', 'kirsehir', 'konya', 'manisa', 'mersin', 'mugla', 'nigde', 'ordu', 'osmaniye', 'rize', 'samsun', 'sanliurfa', 'siirt', 'sinop', 'sirnak', 'tokat', 'trabzon', 'usak', 'van', 'yozgat', 'zonguldak'};
+const Set<String> _v31HdSlugs = <String>{'afyonkarahisar', 'aksaray', 'balikesir', 'bilecik', 'bingol', 'bitlis', 'bolu', 'bursa', 'canakkale', 'denizli', 'edirne', 'elazig', 'eskisehir', 'isparta', 'karabuk', 'kirklareli', 'kocaeli', 'kutahya', 'malatya', 'mus', 'sakarya', 'sivas', 'tekirdag', 'tunceli', 'yalova'};
+
 ImageProvider _cityImageProvider(String city) {
   if (city == 'İstanbul') return MemoryImage(_istanbulBackground);
   if (_premiumCityScenes.containsKey(city)) return MemoryImage(_premiumCityScenes[city]!);
   final p = _provinces.firstWhere((p) => p.city == city);
+  if (_v31HdSlugs.contains(p.slug)) {
+    return AssetImage('assets/images/hd_provinces/scenes/${p.slug}.webp');
+  }
+  if (_v31V28Slugs.contains(p.slug)) {
+    return AssetImage('assets/images/v28_city_cards/${p.slug}.webp');
+  }
   return AssetImage(cityCatalogBySlug[p.slug]!.sceneAsset);
 }
 
@@ -63,6 +73,9 @@ String _regionScenicAsset(String region) =>
     _regionScenicAssets[region] ?? _regionScenicAssets['Marmara']!;
 
 ImageProvider _citySelectionImageProvider(ProvinceInfo province) {
+  if (_v31HdSlugs.contains(province.slug) && !_v31V28Slugs.contains(province.slug)) {
+    return AssetImage('assets/images/hd_provinces/cards/${province.slug}.webp');
+  }
   // V28_CARD_OVERRIDE: 50 provincial HD card images, never a shared region image.
   const v28Cities = <String>{
     'aydin', 'mugla', 'manisa', 'usak', 'burdur', 'mersin',

@@ -39,6 +39,8 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
   bool _readyToPlay = false;
   bool _showWelcome = true;
   bool _showCityChoice = false;
+  bool _v31Night = false;
+  bool _v31RegionalMusic = false;
 
   PuzzleLevel get _puzzle => _levels[_level];
   bool get _complete => _puzzle.answers.every((w) => _solved.contains(w.word));
@@ -90,7 +92,13 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
       }
       await _musicPlayer.setReleaseMode(ReleaseMode.loop);
       await _musicPlayer.setVolume(_musicVolume);
-      await _musicPlayer.play(DeviceFileSource(f.path));
+      if (_v31RegionalMusic) {
+        final province = _provinceForLevel(_level);
+        final regionalTrack = v31RegionTrack(province?.region ?? 'Marmara');
+        await _musicPlayer.play(AssetSource(regionalTrack));
+      } else {
+        await _musicPlayer.play(DeviceFileSource(f.path));
+      }
     } catch (e) {
       // Bazı cihazlarda medya motoru çalışmayabilir; oyun devam eder.
       debugPrint('Müzik başlatılamadı: $e');
@@ -197,6 +205,8 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     _coins = prefs.getInt('coins') ?? 120;
     _lastGiftDay = prefs.getString('gift_date') ?? '';
     _musicOn = prefs.getBool('music_enabled_v3') ?? true;
+    _v31Night = prefs.getBool('v31_night_mode') ?? false;
+    _v31RegionalMusic = prefs.getBool('v31_regional_music') ?? false;
     _effectsOn = prefs.getBool('effects_enabled_v5') ?? true;
     _vibrationOn = prefs.getBool('vibration_enabled_v5') ?? true;
     _musicVolume = (prefs.getDouble('music_volume_v5') ?? .23).clamp(0.0, 1.0).toDouble();
@@ -266,6 +276,9 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     _prefs?.setInt('current_level_v3', index);
     if (recovered || justCompleted) _saveProgress();
     if (justCompleted) _announceLevelCompleted(index);
+    if (_readyToPlay && _v31RegionalMusic && _musicOn) {
+      _startMusic(); // switch audio only when the chosen region changes
+    }
   }
 
   // Bulmaca hücrelerinin görünmesi ile kelimenin çözüldü olarak sayılması
@@ -383,6 +396,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     final index = LetterWheelPainter.hitLetter(local, size, _wheelLetters.length);
     if (index == null) return;
     if (_dragged.isNotEmpty && _dragged.last == index) return;
+    if (_vibrationOn && !_dragged.contains(index)) HapticFeedback.selectionClick();
     setState(() {
       if (_dragged.length > 1 && _dragged[_dragged.length - 2] == index) {
         _dragged.removeLast();
@@ -1232,7 +1246,10 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
       body: Stack(
         children: [
           Positioned.fill(
-            child: _cityImageWidget(_puzzle.city),
+            child: V31LivingBackdrop(
+              night: _v31Night,
+              child: _cityImageWidget(_puzzle.city),
+            ),
           ),
           Positioned.fill(
             child: DecoratedBox(
@@ -1367,6 +1384,22 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
         completed: _completedLevels,
         unlocked: _unlocked,
         coins: _coins,
+        night: _v31Night,
+        regionMusic: _v31RegionalMusic,
+        onNightChange: (on) {
+          setState(() => _v31Night = on);
+          _prefs?.setBool('v31_night_mode', on);
+          refresh(() {});
+        },
+        onRestoreProgress: () {
+          _restore(); // refresh in-memory coins before the next autosave
+        },
+        onRegionMusicChange: (on) {
+          setState(() => _v31RegionalMusic = on);
+          _prefs?.setBool('v31_regional_music', on);
+          refresh(() {});
+          if (_musicOn) _startMusic();
+        },
         onAwardCoins: (amount, label) {
           setState(() => _coins += amount);
           refresh(() {});
