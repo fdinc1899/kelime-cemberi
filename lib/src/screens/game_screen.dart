@@ -248,6 +248,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
 
   void _openLevel(int index) {
     if (index > _unlocked || index < 0 || index >= _levels.length) return;
+    final wasInCity = _provinceForLevel(_level)?.slug;
     bool recovered = false;
     bool justCompleted = false;
     setState(() {
@@ -279,6 +280,65 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     if (_readyToPlay && _v31RegionalMusic && _musicOn) {
       _startMusic(); // switch audio only when the chosen region changes
     }
+    final entering = _provinceForLevel(index);
+    if (_readyToPlay && entering != null && entering.slug != wasInCity) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _level == index) _v312RevealCity(entering);
+      });
+    }
+  }
+
+  void _v312RevealCity(ProvinceInfo p) {
+    if (!mounted) return;
+    showGeneralDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Şehir tanıtımını kapat',
+      barrierColor: const Color(0xC9000D25),
+      transitionDuration: const Duration(milliseconds: 650),
+      transitionBuilder: (context, animation, secondary, child) => FadeTransition(
+        opacity: animation,
+        child: ScaleTransition(
+          scale: Tween<double>(begin: .87, end: 1).animate(
+            CurvedAnimation(parent: animation, curve: Curves.easeOutBack)),
+          child: child)),
+      pageBuilder: (dialogContext, animation, secondary) => Center(
+        child: Padding(padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Material(color: const Color(0xFF071D35),
+            borderRadius: BorderRadius.circular(24),
+            child: Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(border: Border.all(
+                color: const Color(0xFFFFD36E), width: 2),
+                borderRadius: BorderRadius.circular(24)),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                const Icon(Icons.auto_awesome, color: Color(0xFFFFD36E), size: 30),
+                const Text('YENİ ŞEHİR', style: TextStyle(
+                  fontWeight: FontWeight.bold, color: Color(0xFFFFD36E),
+                  letterSpacing: 4)),
+                const SizedBox(height: 9),
+                Text(p.title.toUpperCase(), textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white, fontSize: 25,
+                    fontWeight: FontWeight.bold, fontFamily: 'serif')),
+                const SizedBox(height: 14),
+                ClipRRect(borderRadius: BorderRadius.circular(16),
+                  child: SizedBox(height: 176, width: double.infinity,
+                    child: Image(image: _citySelectionImageProvider(p),
+                      fit: BoxFit.cover, filterQuality: FilterQuality.high))),
+                const SizedBox(height: 14),
+                Text('${p.region} · Yeni macera seni bekliyor!',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Color(0xFFFFE6AB), fontSize: 13)),
+                const SizedBox(height: 14),
+                FilledButton.icon(onPressed: () => Navigator.of(dialogContext).pop(),
+                  icon: const Icon(Icons.explore),
+                  label: const Text('KEŞFE BAŞLA'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFFFFD36E),
+                    foregroundColor: const Color(0xFF071D35))),
+              ]),
+            )))),
+    );
   }
 
   // Bulmaca hücrelerinin görünmesi ile kelimenin çözüldü olarak sayılması
@@ -1027,9 +1087,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                 style: TextStyle(color: _cream, fontFamily: 'serif',
                   fontSize: 21, fontWeight: FontWeight.w900)),
               const SizedBox(height: 8),
-              Row(mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(3, (i) => _goldStar(i, stars,
-                  size: i == 1 ? 67 : 51))),
+              V312RewardStars(stars: stars),
               const SizedBox(height: 8),
               Container(height: 130, width: 240,
                 decoration: BoxDecoration(shape: BoxShape.rectangle,
@@ -1246,9 +1304,20 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
       body: Stack(
         children: [
           Positioned.fill(
-            child: V31LivingBackdrop(
-              night: _v31Night,
-              child: _cityImageWidget(_puzzle.city),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 740),
+              switchInCurve: Curves.easeOutCubic,
+              switchOutCurve: Curves.easeInCubic,
+              transitionBuilder: (child, animation) => FadeTransition(
+                opacity: animation,
+                child: ScaleTransition(
+                  scale: Tween<double>(begin: .985, end: 1).animate(animation),
+                  child: child)),
+              child: V31LivingBackdrop(
+                key: ValueKey('v312_city_${_puzzle.city}'),
+                night: _v31Night,
+                child: _cityImageWidget(_puzzle.city),
+              ),
             ),
           ),
           Positioned.fill(

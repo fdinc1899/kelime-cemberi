@@ -97,7 +97,8 @@ ImageProvider _citySelectionImageProvider(ProvinceInfo province) {
 }
 
 Widget _cityImageWidget(String city, {BoxFit fit = BoxFit.cover, Alignment alignment = Alignment.center}) =>
-    Image(image: _cityImageProvider(city), fit: fit, alignment: alignment);
+    Image(image: _cityImageProvider(city), fit: fit, alignment: alignment,
+      filterQuality: FilterQuality.high);
 
 /// Old bonus indices 18..29 are preserved, but province 7 starts at 30.
 int _nextStoryLevel(int index) => index == 17 ? 30 : index + 1;

@@ -71,6 +71,29 @@ class _V31LivingBackdropState extends State<V31LivingBackdrop>
   ));
 }
 
+// V312_CINEMATIC — staged reward stars; never changes awarded coins.
+class V312RewardStars extends StatelessWidget {
+  const V312RewardStars({super.key, required this.stars});
+  final int stars;
+  @override
+  Widget build(BuildContext context) => Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: List.generate(3, (i) => TweenAnimationBuilder<double>(
+      key: ValueKey('v312_reward_star_$i'),
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: Duration(milliseconds: 520 + 210 * i),
+      curve: Curves.elasticOut,
+      builder: (context, v, _) => Transform.scale(
+        scale: v.clamp(0.0, 1.35).toDouble(),
+        child: Padding(padding: const EdgeInsets.symmetric(horizontal: 3),
+          child: Icon(i < stars ? Icons.star_rounded : Icons.star_outline_rounded,
+            size: i == 1 ? 62 : 49,
+            color: const Color(0xFFFFD36E))),
+      ),
+    )),
+  );
+}
+
 class V31WorldCenter extends StatefulWidget {
   const V31WorldCenter({super.key, required this.prefs, required this.completed,
     required this.unlocked, required this.coins, required this.night,
@@ -97,6 +120,21 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
   bool _busy = false;
   Set<int> _marathonDone = <int>{};
   Set<int> _treasures = <int>{};
+  // V312_ADAPTIVE: wrong attempts affect hints but NEVER the saved answer or ID.
+  final Map<int, int> _v312Wrong = <int, int>{};
+  int get _v312Tier => _challengeSlot < 4 ? 0 : (_challengeSlot < 9 ? 1 : 2);
+  int get _v312Reward => _v312Tier == 0 ? 3 : (_v312Tier == 1 ? 5 : 8);
+  String get _v312TierName => const ['KOLAY', 'ORTA', 'ZOR'][_v312Tier];
+  String _v312Hint(int id) {
+    final misses = _v312Wrong[id] ?? 0;
+    final answer = v31ChallengeAnswer(id);
+    final needed = _v312Tier == 0 ? 0 : (_v312Tier == 1 ? 2 : 4);
+    if (misses < needed) return 'İpucu $needed yanlış denemeden sonra açılır.';
+    if (misses >= needed + 3 && answer.length > 3) {
+      return 'İPUCU: ${answer[0]}${List.filled(answer.length - 2, '·').join()}${answer[answer.length - 1]}';
+    }
+    return 'İPUCU: ${answer[0]} ile başlayan ${answer.length} harfli kelime';
+  }
   final TextEditingController _answer = TextEditingController();
   final TextEditingController _importText = TextEditingController();
 
@@ -135,6 +173,7 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
     borderRadius: BorderRadius.circular(14), child: SizedBox(height: height,
       width: double.infinity, child: Stack(fit: StackFit.expand, children: [
         Image(image: _citySelectionImageProvider(city), fit: BoxFit.cover,
+          filterQuality: FilterQuality.high,
           errorBuilder: (_, __, ___) => const ColoredBox(color: _v31Navy,
             child: Icon(Icons.landscape, color: _v31Gold, size: 48))),
         const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(
@@ -153,10 +192,13 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
     if (_busy || _marathonDone.contains(_challengeIndex)) return;
     final entered = v31TurkishUpper(_answer.text.trim()).replaceAll(' ', '');
     if (entered != v31ChallengeAnswer(_challengeIndex)) {
-      _notice('Kelime henüz doğru değil. Tekrar dene.');
+      setState(() => _v312Wrong.update(_challengeIndex,
+        (old) => old + 1, ifAbsent: () => 1));
+      _notice('Tekrar dene. Gerekirse yeni ipucunu kullan.');
       return;
     }
     final id = _challengeIndex;
+    final reward = _v312Reward;
     setState(() => _busy = true);
     final newSet = <int>{..._marathonDone, id};
     final ok = await widget.prefs?.setStringList('v31_marathon_done',
@@ -167,7 +209,7 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
     }
     if (!mounted) return;
     setState(() { _marathonDone = newSet; _busy = false; _answer.clear(); });
-    widget.onReward(3, 'MARATON +3');
+    widget.onReward(reward, 'MARATON +$reward');
     _notice('Tebrikler! Görev tamamlandı.');
   }
 
@@ -176,7 +218,7 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
       .where(_marathonDone.contains).length;
     return ListView(children: [
       _panel('1053 EK KELİME GÖREVİ', Column(children: [
-        _text('${_marathonDone.length} / $v31ChallengeCount tamamlandı · Her görev +3 altın'),
+        _text('${_marathonDone.length} / $v31ChallengeCount tamamlandı · Zorluğa göre 3–8 altın'),
         const SizedBox(height: 10), _cityPicker(), const SizedBox(height: 10),
         _cityPicture(_provinces[_cityIndex]),
         const SizedBox(height: 7), _text('Bu şehirde: $doneForCity / 13', color: _v31Gold),
@@ -194,7 +236,13 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
             fontWeight: FontWeight.w900, letterSpacing: 1)),
         const SizedBox(height: 7),
         _text('${v31ChallengeAnswer(_challengeIndex).length} harf · '
-          'Kolay / Orta / Zor görev serisi', color: Colors.white70),
+          '$_v312TierName · +$_v312Reward altın', color: _v31Gold),
+        const SizedBox(height: 5),
+        AnimatedSwitcher(duration: const Duration(milliseconds: 280),
+          child: Text(_v312Hint(_challengeIndex),
+            key: ValueKey('${_challengeIndex}_${_v312Wrong[_challengeIndex] ?? 0}'),
+            style: const TextStyle(color: Colors.white70, fontSize: 12),
+            textAlign: TextAlign.center)),
         const SizedBox(height: 7),
         TextField(controller: _answer, enabled: !_marathonDone.contains(_challengeIndex),
           textCapitalization: TextCapitalization.characters,
@@ -212,7 +260,8 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
           _answer.clear();
         }), icon: Icons.arrow_forward),
         const SizedBox(height: 7),
-        _text('Bu 1053 aşama, şehir başına 13 kayıtlı kelime görevidir. '
+        _text('Zorluk 1–4 kolay, 5–9 orta, 10–13 zor. Takılırsan ipucu açılır. '
+          'Bu 1053 aşama, şehir başına 13 kayıtlı kelime görevidir. '
           'Kelime havuzu bilinçli olarak yeniden kullanılır; 1053 farklı kelime değildir.',
           size: 11, color: Colors.white70),
       ])),
