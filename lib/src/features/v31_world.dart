@@ -314,7 +314,7 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
   Future<void> _exportBackup() async {
     final prefs = widget.prefs;
     if (prefs == null) return;
-    final data = <String, Object>{};
+    final data = <String, Object?>{};
     for (final k in prefs.getKeys()) {
       if (!_allowedKey(k)) continue;
       final val = prefs.get(k);
