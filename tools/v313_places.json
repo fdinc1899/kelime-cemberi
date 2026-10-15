@@ -1,0 +1,488 @@
+[
+  {
+    "id": 1,
+    "name": "İstanbul",
+    "slug": "istanbul",
+    "search": "Istanbul Galata Tower Bosphorus"
+  },
+  {
+    "id": 2,
+    "name": "Nevşehir",
+    "slug": "nevsehir",
+    "search": "Cappadocia Goreme fairy chimneys"
+  },
+  {
+    "id": 3,
+    "name": "Antalya",
+    "slug": "antalya",
+    "search": "Antalya Kaleici marina"
+  },
+  {
+    "id": 4,
+    "name": "Mardin",
+    "slug": "mardin",
+    "search": "Mardin old city panorama"
+  },
+  {
+    "id": 5,
+    "name": "İzmir",
+    "slug": "izmir",
+    "search": "Izmir Konak clock tower"
+  },
+  {
+    "id": 6,
+    "name": "Ankara",
+    "slug": "ankara",
+    "search": "Ankara Anitkabir"
+  },
+  {
+    "id": 7,
+    "name": "Edirne",
+    "slug": "edirne",
+    "search": "Edirne Selimiye mosque"
+  },
+  {
+    "id": 8,
+    "name": "Kırklareli",
+    "slug": "kirklareli",
+    "search": "Kirklareli Dupnisa cave"
+  },
+  {
+    "id": 9,
+    "name": "Tekirdağ",
+    "slug": "tekirdag",
+    "search": "Tekirdag Rakoczi Museum"
+  },
+  {
+    "id": 10,
+    "name": "Çanakkale",
+    "slug": "canakkale",
+    "search": "Canakkale Trojan horse"
+  },
+  {
+    "id": 11,
+    "name": "Balıkesir",
+    "slug": "balikesir",
+    "search": "Balikesir Ayvalik waterfront"
+  },
+  {
+    "id": 12,
+    "name": "Bursa",
+    "slug": "bursa",
+    "search": "Bursa Ulu Cami"
+  },
+  {
+    "id": 13,
+    "name": "Yalova",
+    "slug": "yalova",
+    "search": "Yalova Sudusen waterfall"
+  },
+  {
+    "id": 14,
+    "name": "Kocaeli",
+    "slug": "kocaeli",
+    "search": "Izmit clock tower Kocaeli"
+  },
+  {
+    "id": 15,
+    "name": "Sakarya",
+    "slug": "sakarya",
+    "search": "Sakarya Sapanca lake"
+  },
+  {
+    "id": 16,
+    "name": "Bilecik",
+    "slug": "bilecik",
+    "search": "Bilecik Sogut Ertugrul tomb"
+  },
+  {
+    "id": 17,
+    "name": "Aydın",
+    "slug": "aydin",
+    "search": "Aydin Aphrodisias ruins"
+  },
+  {
+    "id": 18,
+    "name": "Muğla",
+    "slug": "mugla",
+    "search": "Mugla Fethiye Oludeniz"
+  },
+  {
+    "id": 19,
+    "name": "Denizli",
+    "slug": "denizli",
+    "search": "Denizli Pamukkale travertines"
+  },
+  {
+    "id": 20,
+    "name": "Manisa",
+    "slug": "manisa",
+    "search": "Manisa Spil mountain"
+  },
+  {
+    "id": 21,
+    "name": "Uşak",
+    "slug": "usak",
+    "search": "Usak Ulubey canyon"
+  },
+  {
+    "id": 22,
+    "name": "Kütahya",
+    "slug": "kutahya",
+    "search": "Kutahya Aizanoi temple"
+  },
+  {
+    "id": 23,
+    "name": "Afyonkarahisar",
+    "slug": "afyonkarahisar",
+    "search": "Afyonkarahisar castle"
+  },
+  {
+    "id": 24,
+    "name": "Isparta",
+    "slug": "isparta",
+    "search": "Isparta Egirdir lake"
+  },
+  {
+    "id": 25,
+    "name": "Burdur",
+    "slug": "burdur",
+    "search": "Burdur Salda lake"
+  },
+  {
+    "id": 26,
+    "name": "Mersin",
+    "slug": "mersin",
+    "search": "Mersin Maiden castle Kizkalesi"
+  },
+  {
+    "id": 27,
+    "name": "Adana",
+    "slug": "adana",
+    "search": "Adana Tas Kopru Sabanci mosque"
+  },
+  {
+    "id": 28,
+    "name": "Osmaniye",
+    "slug": "osmaniye",
+    "search": "Osmaniye Kastabala ancient city"
+  },
+  {
+    "id": 29,
+    "name": "Hatay",
+    "slug": "hatay",
+    "search": "Hatay Antakya Saint Pierre church"
+  },
+  {
+    "id": 30,
+    "name": "Kahramanmaraş",
+    "slug": "kahramanmaras",
+    "search": "Kahramanmaras castle"
+  },
+  {
+    "id": 31,
+    "name": "Konya",
+    "slug": "konya",
+    "search": "Konya Mevlana Museum"
+  },
+  {
+    "id": 32,
+    "name": "Karaman",
+    "slug": "karaman",
+    "search": "Karaman castle"
+  },
+  {
+    "id": 33,
+    "name": "Aksaray",
+    "slug": "aksaray",
+    "search": "Aksaray Ihlara valley"
+  },
+  {
+    "id": 34,
+    "name": "Niğde",
+    "slug": "nigde",
+    "search": "Nigde Alaeddin mosque"
+  },
+  {
+    "id": 35,
+    "name": "Kırşehir",
+    "slug": "kirsehir",
+    "search": "Kirsehir Cacabey madrasa"
+  },
+  {
+    "id": 36,
+    "name": "Kırıkkale",
+    "slug": "kirikkale",
+    "search": "Kirikkale Cesnigir bridge"
+  },
+  {
+    "id": 37,
+    "name": "Çankırı",
+    "slug": "cankiri",
+    "search": "Cankiri salt cave"
+  },
+  {
+    "id": 38,
+    "name": "Yozgat",
+    "slug": "yozgat",
+    "search": "Yozgat Camlik National Park"
+  },
+  {
+    "id": 39,
+    "name": "Kayseri",
+    "slug": "kayseri",
+    "search": "Kayseri Erciyes Mountain"
+  },
+  {
+    "id": 40,
+    "name": "Sivas",
+    "slug": "sivas",
+    "search": "Sivas Divrigi great mosque"
+  },
+  {
+    "id": 41,
+    "name": "Eskişehir",
+    "slug": "eskisehir",
+    "search": "Eskisehir Odunpazari houses"
+  },
+  {
+    "id": 42,
+    "name": "Bolu",
+    "slug": "bolu",
+    "search": "Bolu Abant lake"
+  },
+  {
+    "id": 43,
+    "name": "Düzce",
+    "slug": "duzce",
+    "search": "Duzce Guzeldere waterfall"
+  },
+  {
+    "id": 44,
+    "name": "Zonguldak",
+    "slug": "zonguldak",
+    "search": "Zonguldak lighthouse coast"
+  },
+  {
+    "id": 45,
+    "name": "Bartın",
+    "slug": "bartin",
+    "search": "Bartin Amasra harbour"
+  },
+  {
+    "id": 46,
+    "name": "Karabük",
+    "slug": "karabuk",
+    "search": "Karabuk Safranbolu houses"
+  },
+  {
+    "id": 47,
+    "name": "Kastamonu",
+    "slug": "kastamonu",
+    "search": "Kastamonu castle town"
+  },
+  {
+    "id": 48,
+    "name": "Sinop",
+    "slug": "sinop",
+    "search": "Sinop harbour fortress"
+  },
+  {
+    "id": 49,
+    "name": "Samsun",
+    "slug": "samsun",
+    "search": "Samsun Bandirma ferry"
+  },
+  {
+    "id": 50,
+    "name": "Ordu",
+    "slug": "ordu",
+    "search": "Ordu Boztepe cable car"
+  },
+  {
+    "id": 51,
+    "name": "Giresun",
+    "slug": "giresun",
+    "search": "Giresun island"
+  },
+  {
+    "id": 52,
+    "name": "Trabzon",
+    "slug": "trabzon",
+    "search": "Trabzon Sumela monastery"
+  },
+  {
+    "id": 53,
+    "name": "Rize",
+    "slug": "rize",
+    "search": "Rize Ayder plateau"
+  },
+  {
+    "id": 54,
+    "name": "Artvin",
+    "slug": "artvin",
+    "search": "Artvin Karagol lake"
+  },
+  {
+    "id": 55,
+    "name": "Gümüşhane",
+    "slug": "gumushane",
+    "search": "Gumushane Karaca cave"
+  },
+  {
+    "id": 56,
+    "name": "Bayburt",
+    "slug": "bayburt",
+    "search": "Bayburt castle"
+  },
+  {
+    "id": 57,
+    "name": "Tokat",
+    "slug": "tokat",
+    "search": "Tokat Ballıca cave"
+  },
+  {
+    "id": 58,
+    "name": "Amasya",
+    "slug": "amasya",
+    "search": "Amasya king tombs river"
+  },
+  {
+    "id": 59,
+    "name": "Çorum",
+    "slug": "corum",
+    "search": "Corum Hattusa ruins"
+  },
+  {
+    "id": 60,
+    "name": "Erzincan",
+    "slug": "erzincan",
+    "search": "Erzincan Girlevik waterfall"
+  },
+  {
+    "id": 61,
+    "name": "Erzurum",
+    "slug": "erzurum",
+    "search": "Erzurum Cifte Minareli Medrese"
+  },
+  {
+    "id": 62,
+    "name": "Ağrı",
+    "slug": "agri",
+    "search": "Agri Ishak Pasha Palace"
+  },
+  {
+    "id": 63,
+    "name": "Iğdır",
+    "slug": "igdir",
+    "search": "Igdir Ararat mountain"
+  },
+  {
+    "id": 64,
+    "name": "Kars",
+    "slug": "kars",
+    "search": "Kars Ani ruins"
+  },
+  {
+    "id": 65,
+    "name": "Ardahan",
+    "slug": "ardahan",
+    "search": "Ardahan Cildir lake"
+  },
+  {
+    "id": 66,
+    "name": "Malatya",
+    "slug": "malatya",
+    "search": "Malatya Arslantepe archaeological"
+  },
+  {
+    "id": 67,
+    "name": "Elazığ",
+    "slug": "elazig",
+    "search": "Elazig Harput castle"
+  },
+  {
+    "id": 68,
+    "name": "Tunceli",
+    "slug": "tunceli",
+    "search": "Tunceli Munzur valley"
+  },
+  {
+    "id": 69,
+    "name": "Bingöl",
+    "slug": "bingol",
+    "search": "Bingol floating islands"
+  },
+  {
+    "id": 70,
+    "name": "Muş",
+    "slug": "mus",
+    "search": "Mus Malazgirt plain"
+  },
+  {
+    "id": 71,
+    "name": "Bitlis",
+    "slug": "bitlis",
+    "search": "Bitlis Nemrut crater lake"
+  },
+  {
+    "id": 72,
+    "name": "Van",
+    "slug": "van",
+    "search": "Van Akdamar church island"
+  },
+  {
+    "id": 73,
+    "name": "Hakkâri",
+    "slug": "hakkri",
+    "search": "Hakkari Cilo mountain"
+  },
+  {
+    "id": 74,
+    "name": "Diyarbakır",
+    "slug": "diyarbakir",
+    "search": "Diyarbakir city walls Hevsel gardens"
+  },
+  {
+    "id": 75,
+    "name": "Şanlıurfa",
+    "slug": "sanliurfa",
+    "search": "Sanliurfa Gobeklitepe"
+  },
+  {
+    "id": 76,
+    "name": "Gaziantep",
+    "slug": "gaziantep",
+    "search": "Gaziantep castle"
+  },
+  {
+    "id": 77,
+    "name": "Kilis",
+    "slug": "kilis",
+    "search": "Kilis Ravanda castle"
+  },
+  {
+    "id": 78,
+    "name": "Adıyaman",
+    "slug": "adiyaman",
+    "search": "Adiyaman Nemrut mountain statues"
+  },
+  {
+    "id": 79,
+    "name": "Batman",
+    "slug": "batman",
+    "search": "Batman Hasankeyf Tigris"
+  },
+  {
+    "id": 80,
+    "name": "Siirt",
+    "slug": "siirt",
+    "search": "Siirt Tillo glass terrace"
+  },
+  {
+    "id": 81,
+    "name": "Şırnak",
+    "slug": "sirnak",
+    "search": "Sirnak Cizre Mem u Zin tomb"
+  }
+]
