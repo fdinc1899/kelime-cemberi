@@ -202,6 +202,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     final prefs = await SharedPreferences.getInstance();
     if (!mounted) return;
     _prefs = prefs;
+    V325AdventureTheme.load(prefs);
     v324RingTheme.value = (prefs.getInt('v324_ring_theme') ?? 0).clamp(0, 2).toInt();
     _coins = prefs.getInt('coins') ?? 120;
     _lastGiftDay = prefs.getString('gift_date') ?? '';

@@ -1,4 +1,5 @@
 part of kelime_sehirleri;
+// V326_THEME_EXT: persistent palette for optional gameplay modes.
 
 // V32.2. Offline optional adventures; nothing here changes legacy level IDs.
 // The hand-written clue bank intentionally rotates across different cities.
@@ -133,24 +134,24 @@ class _V322JourneyState extends State<V322Journey> {
   Widget _card(String title, Widget child) => Container(
     margin: const EdgeInsets.fromLTRB(9, 9, 9, 5),
     padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(color: const Color(0xF5081C35),
+    decoration: BoxDecoration(color: _v326Panel,
       borderRadius: BorderRadius.circular(17),
-      border: Border.all(color: _v31Gold, width: 1.2)),
+      border: Border.all(color: _v326Gold, width: 1.2)),
     child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Text(title, style: const TextStyle(color: _v31Gold, fontSize: 19,
+      Text(title, style:  TextStyle(color: _v326Gold, fontSize: 19,
         fontWeight: FontWeight.w800)),
       const SizedBox(height: 12), child,
     ]));
-  Widget _label(String text, {Color color = _v31Cream,
+  Widget _label(String text, {Color? color,
       double size = 14, TextAlign align = TextAlign.center}) => Text(text,
-    textAlign: align, style: TextStyle(color: color, fontSize: size));
+    textAlign: align, style: TextStyle(color: color ?? _v326Cream, fontSize: size));
   Widget _action(String text, VoidCallback? onPressed,
       {IconData icon = Icons.check_circle_outline}) => Padding(
     padding: const EdgeInsets.only(top: 11), child: ElevatedButton.icon(
       onPressed: onPressed, icon: Icon(icon), label: Text(text,
         textAlign: TextAlign.center),
       style: ElevatedButton.styleFrom(
-        backgroundColor: _v31Gold, foregroundColor: _v31Navy,
+        backgroundColor: _v326Gold, foregroundColor: _v326Navy,
         disabledBackgroundColor: const Color(0xFF34465A),
         disabledForegroundColor: Colors.white70,
         padding: const EdgeInsets.symmetric(vertical: 13),
@@ -160,23 +161,23 @@ class _V322JourneyState extends State<V322Journey> {
     itemBuilder: (context, index) => Padding(
       padding: const EdgeInsets.only(right: 6),
       child: ChoiceChip(selected: _city == index,
-        selectedColor: _v31Gold,
+        selectedColor: _v326Gold,
         label: Text('${index + 1} · ${_provinces[index].province}',
-          style: const TextStyle(color: _v31Navy, fontWeight: FontWeight.w700)),
+          style:  TextStyle(color: _v326Navy, fontWeight: FontWeight.w700)),
         onSelected: _busy ? null : (_) => setState(() {
           _city = index; _entry.clear();
         })))));
   Widget _field() => Padding(padding: const EdgeInsets.only(top: 13),
     child: TextField(controller: _entry, enabled: !_busy,
       textCapitalization: TextCapitalization.characters,
-      style: const TextStyle(color: _v31Cream, fontSize: 17),
-      decoration: const InputDecoration(labelText: 'Şifre kelimesi',
-        labelStyle: TextStyle(color: _v31Gold),
+      style:  TextStyle(color: _v326Cream, fontSize: 17),
+      decoration:  InputDecoration(labelText: 'Şifre kelimesi',
+        labelStyle: TextStyle(color: _v326Gold),
         hintText: 'Buraya cevabı yaz', hintStyle: TextStyle(color: Colors.white54),
         enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: _v31Gold)),
+          borderSide: BorderSide(color: _v326Gold)),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: _v31Gold, width: 2)))));
+          borderSide: BorderSide(color: _v326Gold, width: 2)))));
 
   Widget _detectiveView() {
     final step = _nextCityStep(_detective, _city, 3);
@@ -188,23 +189,23 @@ class _V322JourneyState extends State<V322Journey> {
         const SizedBox(height: 10), _cityPicker(),
         const SizedBox(height: 11),
         _label('${_provinces[_city].province} · $step / 3 ipucu çözüldü',
-          color: _v31Gold, size: 17),
+          color: _v326Gold, size: 17),
         const SizedBox(height: 9),
         LinearProgressIndicator(value: step / 3, minHeight: 8,
           backgroundColor: Colors.white12,
-          valueColor: const AlwaysStoppedAnimation<Color>(_v31Gold)),
+          valueColor:  AlwaysStoppedAnimation<Color>(_v326Gold)),
       ])),
       _card(step == 3 ? 'DOSYA KAPANDI ✓' : _chapters[step],
         step == 3 ? Column(children: [
-          const Icon(Icons.verified, color: _v31Gold, size: 58),
+           Icon(Icons.verified, color: _v326Gold, size: 58),
           _label('Bu şehrin kayıp seyahat defterini buldun. Ödül kaydedildi.'),
         ]) : Column(children: [
-          const Icon(Icons.travel_explore, color: _v31Gold, size: 52),
+           Icon(Icons.travel_explore, color: _v326Gold, size: 52),
           const SizedBox(height: 6),
           _label(clue.hint, size: 17),
           const SizedBox(height: 10),
           _label(_shuffle(clue.answer, _city * 41 + step * 97),
-            color: _v31Gold, size: 23),
+            color: _v326Gold, size: 23),
           _field(),
           _action('ŞİFREYİ ÇÖZ', _busy ? null : () {
             if (v31TurkishUpper(_entry.text.trim()) == clue.answer) {
@@ -224,8 +225,8 @@ class _V322JourneyState extends State<V322Journey> {
       builder: (context, box) => Stack(fit: StackFit.expand, children: [
         Image(image: _citySelectionImageProvider(_provinces[_city]),
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => const ColoredBox(color: _v31Navy,
-            child: Icon(Icons.landscape, color: _v31Gold, size: 60))),
+          errorBuilder: (_, __, ___) =>  ColoredBox(color: _v326Navy,
+            child: Icon(Icons.landscape, color: _v326Gold, size: 60))),
         GridView.builder(
           physics: const NeverScrollableScrollPhysics(),
           padding: EdgeInsets.zero, itemCount: 6,
@@ -234,12 +235,12 @@ class _V322JourneyState extends State<V322Journey> {
             childAspectRatio: (box.maxWidth / 3) / (box.maxHeight / 2)),
           itemBuilder: (context, i) => DecoratedBox(
             decoration: BoxDecoration(
-              color: i < step ? Colors.transparent : const Color(0xE5081C35),
+              color: i < step ? Colors.transparent : _v326Panel,
               border: Border.all(color: const Color(0x77FFD479), width: 0.8)),
             child: i < step ? const SizedBox.shrink() : Center(
               child: Column(mainAxisSize: MainAxisSize.min, children: [
-                const Icon(Icons.lock_outline, color: _v31Gold, size: 20),
-                Text('${i + 1}', style: const TextStyle(color: _v31Gold)),
+                 Icon(Icons.lock_outline, color: _v326Gold, size: 20),
+                Text('${i + 1}', style:  TextStyle(color: _v326Gold)),
               ]))),
         ),
       ]))));
@@ -254,17 +255,17 @@ class _V322JourneyState extends State<V322Journey> {
         const SizedBox(height: 13), _sceneryGrid(step),
         const SizedBox(height: 12),
         _label('${_provinces[_city].province} · $step / 6 parça açık',
-          color: _v31Gold, size: 17),
+          color: _v326Gold, size: 17),
       ])),
       _card(step == 6 ? 'MANZARA KEŞFEDİLDİ ✓' : 'PARÇA ${step + 1} · KELİME BUL',
         step == 6 ? Column(children: [
-          const Icon(Icons.landscape, color: _v31Gold, size: 46),
+           Icon(Icons.landscape, color: _v326Gold, size: 46),
           _label('Şehrin manzarası tamamen açıldı. Tek seferlik ödül verildi.'),
         ]) : Column(children: [
           _label(clue.hint, size: 17),
           const SizedBox(height: 9),
           _label(_shuffle(clue.answer, _city * 59 + step * 71),
-            size: 23, color: _v31Gold),
+            size: 23, color: _v326Gold),
           _field(),
           _action('PARÇAYI AÇ', _busy ? null : () {
             if (v31TurkishUpper(_entry.text.trim()) == clue.answer) {
@@ -299,32 +300,32 @@ class _V322JourneyState extends State<V322Journey> {
           itemBuilder: (context, i) => Padding(
             padding: const EdgeInsets.only(right: 7),
             child: ChoiceChip(selected: _route == i,
-              selectedColor: _v31Gold,
+              selectedColor: _v326Gold,
               label: Text(_regionNames[i],
-                style: const TextStyle(color: _v31Navy, fontSize: 12,
+                style:  TextStyle(color: _v326Navy, fontSize: 12,
                   fontWeight: FontWeight.w700)),
               onSelected: _busy ? null : (_) => setState(() => _route = i))))),
         const SizedBox(height: 12),
         _label('${_regionNames[_route]} · $step / 4 durak bulundu',
-          color: _v31Gold, size: 17),
+          color: _v326Gold, size: 17),
         const SizedBox(height: 9),
         LinearProgressIndicator(value: step / 4, minHeight: 8,
           backgroundColor: Colors.white12,
-          valueColor: const AlwaysStoppedAnimation<Color>(_v31Gold)),
+          valueColor:  AlwaysStoppedAnimation<Color>(_v326Gold)),
         const SizedBox(height: 15),
         Wrap(alignment: WrapAlignment.center, spacing: 8, runSpacing: 8,
           children: List.generate(4, (i) => Chip(
-            backgroundColor: i < step ? _v31Gold : const Color(0xFF243D57),
+            backgroundColor: i < step ? _v326Gold : const Color(0xFF243D57),
             label: Text(i < step ? cities[i].province : 'Durak ${i + 1} 🔒',
-              style: TextStyle(color: i < step ? _v31Navy : _v31Cream,
+              style: TextStyle(color: i < step ? _v326Navy : _v326Cream,
                 fontWeight: FontWeight.bold))))),
       ])),
       _card(step == 4 ? 'ROTA TAMAMLANDI ✓' : 'SIRADAKİ DURAĞI BUL',
         step == 4 ? Column(children: [
-          const Icon(Icons.map_rounded, color: _v31Gold, size: 58),
+           Icon(Icons.map_rounded, color: _v326Gold, size: 58),
           _label('Bu bölgenin dört durağını tamamladın. Ödül kaydedildi.'),
         ]) : Column(children: [
-          const Icon(Icons.route, color: _v31Gold, size: 45),
+           Icon(Icons.route, color: _v326Gold, size: 45),
           _label('Bu bölgedeki sıradaki şehir ${city.province.length} karakterli '
             've "${city.province.substring(0, 1)}" harfi ile başlıyor.'),
           const SizedBox(height: 11),
@@ -341,7 +342,12 @@ class _V322JourneyState extends State<V322Journey> {
     ]);
   }
 
-  @override Widget build(BuildContext context) => Column(children: [
+  @override Widget build(BuildContext context) => ValueListenableBuilder<int>(
+    valueListenable: V325AdventureTheme.selected,
+    builder: (context, _, __) => _v326Build(context),
+  );
+
+  Widget _v326Build(BuildContext context) => Column(children: [
     Padding(padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
       child: Row(children: [
         Expanded(child: _menu('DEDEKTİF', Icons.search, 0)),
@@ -358,11 +364,11 @@ class _V322JourneyState extends State<V322Journey> {
       _section = index; _entry.clear();
     }),
     style: ElevatedButton.styleFrom(
-      backgroundColor: _section == index ? _v31Gold : const Color(0xFF162E4A),
-      foregroundColor: _section == index ? _v31Navy : _v31Cream,
+      backgroundColor: _section == index ? _v326Gold : _v326Surface,
+      foregroundColor: _section == index ? _v326Navy : _v326Cream,
       minimumSize: const Size(0, 45), padding: const EdgeInsets.all(4),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11),
-        side: const BorderSide(color: _v31Gold))),
+        side:  BorderSide(color: _v326Gold))),
     child: FittedBox(fit: BoxFit.scaleDown, child: Row(mainAxisSize: MainAxisSize.min,
       children: [Icon(icon, size: 14), const SizedBox(width: 4),
         Text(text, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800))])));

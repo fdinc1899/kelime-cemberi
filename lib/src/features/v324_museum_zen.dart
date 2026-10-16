@@ -1,4 +1,5 @@
 part of kelime_sehirleri;
+// V326_THEME_EXT: persistent palette for optional gameplay modes.
 
 // V32.4: offline museum, endless zen puzzles and persistent ring themes.
 // Separate storage; no changes to chapter ids, progression, coins or awards.
@@ -74,18 +75,18 @@ class _V324MuseumZenState extends State<V324MuseumZen> {
     margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
     padding: const EdgeInsets.all(15),
     decoration: BoxDecoration(
-      color: const Color(0xF0082038),
-      border: Border.all(color: _v31Gold, width: 1.3),
+      color: _v326Panel,
+      border: Border.all(color: _v326Gold, width: 1.3),
       borderRadius: BorderRadius.circular(18)),
     child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Text(title, style: const TextStyle(color: _v31Gold,
+      Text(title, style:  TextStyle(color: _v326Gold,
         fontSize: 19, fontWeight: FontWeight.w900)),
       const SizedBox(height: 12), child,
     ]));
 
-  Widget _label(String value, {Color color = _v31Cream, double size = 14}) =>
+  Widget _label(String value, {Color? color, double size = 14}) =>
     Text(value, textAlign: TextAlign.center,
-      style: TextStyle(color: color, fontSize: size));
+      style: TextStyle(color: color ?? _v326Cream, fontSize: size));
 
   Widget _action(String value, VoidCallback? tap, {IconData icon = Icons.check}) =>
     Padding(padding: const EdgeInsets.only(top: 10),
@@ -94,7 +95,7 @@ class _V324MuseumZenState extends State<V324MuseumZen> {
         icon: Icon(icon, size: 18),
         label: Text(value, textAlign: TextAlign.center),
         style: ElevatedButton.styleFrom(
-          backgroundColor: _v31Gold, foregroundColor: _v31Navy,
+          backgroundColor: _v326Gold, foregroundColor: _v326Navy,
           disabledBackgroundColor: const Color(0xFF34445A),
           disabledForegroundColor: Colors.white70,
           padding: const EdgeInsets.symmetric(vertical: 14),
@@ -107,10 +108,10 @@ class _V324MuseumZenState extends State<V324MuseumZen> {
       padding: const EdgeInsets.only(right: 7),
       child: ChoiceChip(
         selected: i == _city,
-        selectedColor: _v31Gold,
-        backgroundColor: _v31Cream,
+        selectedColor: _v326Gold,
+        backgroundColor: _v326Cream,
         label: Text('${i + 1} · ${_provinces[i].province}',
-          style: const TextStyle(color: _v31Navy, fontWeight: FontWeight.w800)),
+          style:  TextStyle(color: _v326Navy, fontWeight: FontWeight.w800)),
         onSelected: (_) => setState(() => _city = i)))));
 
   Widget _museumTile({required IconData icon, required String title,
@@ -118,21 +119,21 @@ class _V324MuseumZenState extends State<V324MuseumZen> {
     Padding(padding: const EdgeInsets.symmetric(vertical: 5),
       child: Container(padding: const EdgeInsets.all(11),
         decoration: BoxDecoration(
-          color: unlocked ? const Color(0xFF173B57) : const Color(0xFF28364A),
+          color: unlocked ? _v326Surface : const Color(0xFF28364A),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: unlocked ? _v31Gold : Colors.white24)),
+          border: Border.all(color: unlocked ? _v326Gold : Colors.white24)),
         child: Row(children: [
           Icon(unlocked ? icon : Icons.lock_outline,
-            color: unlocked ? _v31Gold : Colors.white54, size: 26),
+            color: unlocked ? _v326Gold : Colors.white54, size: 26),
           const SizedBox(width: 10),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(title, style: TextStyle(
-                color: unlocked ? _v31Gold : Colors.white70,
+                color: unlocked ? _v326Gold : Colors.white70,
                 fontWeight: FontWeight.w800)),
               const SizedBox(height: 4),
               Text(unlocked ? detail : 'Ana şehir bölümlerini oynayarak aç.',
-                style: const TextStyle(color: _v31Cream, fontSize: 12)),
+                style:  TextStyle(color: _v326Cream, fontSize: 12)),
             ])),
         ])));
 
@@ -149,11 +150,11 @@ class _V324MuseumZenState extends State<V324MuseumZen> {
         _label('Üç ana bölümü tamamlayarak o şehrin koleksiyonunu aç. '
           'Müze keşif amaçlıdır; tekrar altın dağıtmaz.'),
         const SizedBox(height: 8),
-        _label('$collected / 243 koleksiyon eseri', color: _v31Gold, size: 17),
+        _label('$collected / 243 koleksiyon eseri', color: _v326Gold, size: 17),
         const SizedBox(height: 12),
         LinearProgressIndicator(value: collected / 243,
           minHeight: 7, backgroundColor: Colors.white12,
-          valueColor: const AlwaysStoppedAnimation<Color>(_v31Gold)),
+          valueColor:  AlwaysStoppedAnimation<Color>(_v326Gold)),
         const SizedBox(height: 12),
         _cityPicker(),
         const SizedBox(height: 12),
@@ -161,11 +162,11 @@ class _V324MuseumZenState extends State<V324MuseumZen> {
           child: AspectRatio(aspectRatio: 16 / 9,
             child: Image(image: _citySelectionImageProvider(city),
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => const ColoredBox(
-                color: _v31Navy,
-                child: Icon(Icons.landscape, color: _v31Gold, size: 60))))),
+              errorBuilder: (_, __, ___) =>  ColoredBox(
+                color: _v326Navy,
+                child: Icon(Icons.landscape, color: _v326Gold, size: 60))))),
         const SizedBox(height: 8),
-        _label('${city.province} · $count / 3 eser', color: _v31Gold),
+        _label('${city.province} · $count / 3 eser', color: _v326Gold),
         _museumTile(icon: Icons.photo_library_outlined,
           title: '1 · Şehir manzarası',
           detail: '${city.province} manzarası koleksiyona eklendi.',
@@ -203,13 +204,13 @@ class _V324MuseumZenState extends State<V324MuseumZen> {
           final selected = _chosen.contains(i);
           return Positioned(left: x, top: y,
             child: Material(
-              color: selected ? const Color(0xFFE2E8F0) : _v31Cream,
+              color: selected ? const Color(0xFFE2E8F0) : _v326Cream,
               shape: CircleBorder(side: BorderSide(color: _theme, width: 2)),
               child: InkWell(customBorder: const CircleBorder(),
                 onTap: selected ? null : () => setState(() => _chosen.add(i)),
                 child: SizedBox(width: tileSize, height: tileSize,
                   child: Center(child: Text(letters[i],
-                    style: const TextStyle(color: _v31Navy,
+                    style:  TextStyle(color: _v326Navy,
                       fontSize: 22, fontWeight: FontWeight.w900)))))));
         }),
         Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -262,7 +263,7 @@ class _V324MuseumZenState extends State<V324MuseumZen> {
       const SizedBox(height: 6),
       _label('${_clue.answer.length} harf · Üzerine dokunarak birleştir.'),
       if (_hintVisible) Padding(padding: const EdgeInsets.only(top: 9),
-        child: _label(_clue.hint, color: _v31Gold)),
+        child: _label(_clue.hint, color: _v326Gold)),
       Row(children: [
         Expanded(child: _action('GERİ AL', _chosen.isEmpty || _saving ? null :
           () => setState(() => _chosen.removeLast()), icon: Icons.undo)),
@@ -305,14 +306,14 @@ class _V324MuseumZenState extends State<V324MuseumZen> {
             onPressed: () => _selectTheme(i),
             style: OutlinedButton.styleFrom(
               backgroundColor: active ? c : const Color(0xFF173550),
-              foregroundColor: active ? _v31Navy : _v31Cream,
+              foregroundColor: active ? _v326Navy : _v326Cream,
               side: BorderSide(color: c, width: active ? 2.4 : 1.2),
               padding: const EdgeInsets.symmetric(vertical: 17)),
             child: Row(mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CircleAvatar(radius: 12, backgroundColor: c,
-                  child: Text('A', style: const TextStyle(
-                    color: _v31Navy, fontSize: 13, fontWeight: FontWeight.w900))),
+                  child: Text('A', style:  TextStyle(
+                    color: _v326Navy, fontSize: 13, fontWeight: FontWeight.w900))),
                 const SizedBox(width: 10),
                 Text(_v324ThemeLabels[i], style: const TextStyle(
                   fontWeight: FontWeight.w800)),
@@ -327,7 +328,12 @@ class _V324MuseumZenState extends State<V324MuseumZen> {
   ]);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ValueListenableBuilder<int>(
+    valueListenable: V325AdventureTheme.selected,
+    builder: (context, _, __) => _v326Build(context),
+  );
+
+  Widget _v326Build(BuildContext context) {
     const sections = <String>['MÜZE', 'RAHATLAMA', 'TEMALAR'];
     const icons = <IconData>[
       Icons.museum_outlined, Icons.spa_outlined, Icons.palette_outlined,
@@ -338,15 +344,15 @@ class _V324MuseumZenState extends State<V324MuseumZen> {
         scrollDirection: Axis.horizontal, itemCount: sections.length,
         itemBuilder: (context, i) => Padding(
           padding: const EdgeInsets.all(4),
-          child: ChoiceChip(selected: i == _mode, selectedColor: _v31Gold,
-            backgroundColor: const Color(0xFF143651),
+          child: ChoiceChip(selected: i == _mode, selectedColor: _v326Gold,
+            backgroundColor: _v326Surface,
             label: Row(mainAxisSize: MainAxisSize.min, children: [
               Icon(icons[i], size: 18,
-                color: i == _mode ? _v31Navy : _v31Gold),
+                color: i == _mode ? _v326Navy : _v326Gold),
               const SizedBox(width: 5),
               Text(sections[i], style: TextStyle(
                 fontSize: 11, fontWeight: FontWeight.w800,
-                color: i == _mode ? _v31Navy : _v31Cream)),
+                color: i == _mode ? _v326Navy : _v326Cream)),
             ]), onSelected: (_) => setState(() => _mode = i))))),
       Expanded(child: views[_mode]),
     ]);

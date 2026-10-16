@@ -1,4 +1,5 @@
 part of kelime_sehirleri;
+// V326_THEME_EXT: persistent palette for optional gameplay modes.
 
 // V32.1: three offline word modes + one optional boss for each of 81 cities.
 // Saves are isolated from all V3/V29/V31 chapter, coin and achievement keys.
@@ -104,21 +105,21 @@ class _V321ArcadeState extends State<V321Arcade> {
   Widget _panel(String title, Widget body) => Container(
     margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
     padding: const EdgeInsets.all(15),
-    decoration: BoxDecoration(color: const Color(0xF708213B),
+    decoration: BoxDecoration(color: _v326Panel,
       borderRadius: BorderRadius.circular(18),
-      border: Border.all(color: _v31Gold, width: 1.2)),
+      border: Border.all(color: _v326Gold, width: 1.2)),
     child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Text(title, style: const TextStyle(color: _v31Gold, fontSize: 19,
+      Text(title, style:  TextStyle(color: _v326Gold, fontSize: 19,
         fontWeight: FontWeight.w900)),
       const SizedBox(height: 11), body,
     ]));
-  Widget _label(String text, {Color color = _v31Cream, double size = 14}) =>
-    Text(text, textAlign: TextAlign.center, style: TextStyle(color: color, fontSize: size));
+  Widget _label(String text, {Color? color, double size = 14}) =>
+    Text(text, textAlign: TextAlign.center, style: TextStyle(color: color ?? _v326Cream, fontSize: size));
   Widget _button(String text, VoidCallback? tap, {IconData icon = Icons.check}) =>
     Padding(padding: const EdgeInsets.only(top: 11), child: ElevatedButton.icon(
       onPressed: tap, icon: Icon(icon, size: 19), label: Text(text, textAlign: TextAlign.center),
-      style: ElevatedButton.styleFrom(backgroundColor: _v31Gold,
-        foregroundColor: _v31Navy, disabledBackgroundColor: const Color(0xFF43536A),
+      style: ElevatedButton.styleFrom(backgroundColor: _v326Gold,
+        foregroundColor: _v326Navy, disabledBackgroundColor: const Color(0xFF43536A),
         disabledForegroundColor: Colors.white70,
         padding: const EdgeInsets.symmetric(vertical: 13),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)))));
@@ -128,8 +129,8 @@ class _V321ArcadeState extends State<V321Arcade> {
     itemBuilder: (context, index) => Padding(
       padding: const EdgeInsets.only(right: 6),
       child: ChoiceChip(label: Text('${index + 1} · ${_provinces[index].province}',
-          style: const TextStyle(color: _v31Navy, fontWeight: FontWeight.w700)),
-        selected: _city == index, selectedColor: _v31Gold,
+          style:  TextStyle(color: _v326Navy, fontWeight: FontWeight.w700)),
+        selected: _city == index, selectedColor: _v326Gold,
         onSelected: _busy ? null : (_) => setState(() { _city = index; _resetRound(); })))));
 
   Widget _reorderGame({required bool special}) {
@@ -144,10 +145,10 @@ class _V321ArcadeState extends State<V321Arcade> {
       const SizedBox(height: 12),
       Container(width: double.infinity, constraints: const BoxConstraints(minHeight: 52),
         alignment: Alignment.center, padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(color: const Color(0xFF163650),
-          borderRadius: BorderRadius.circular(12), border: Border.all(color: _v31Gold)),
+        decoration: BoxDecoration(color: _v326Surface,
+          borderRadius: BorderRadius.circular(12), border: Border.all(color: _v326Gold)),
         child: _label(_typed.isEmpty ? 'Harfleri seç…' : _typed,
-          size: 24, color: _v31Gold)),
+          size: 24, color: _v326Gold)),
       const SizedBox(height: 14),
       Wrap(alignment: WrapAlignment.center, spacing: 9, runSpacing: 9,
         children: List.generate(order.length, (index) {
@@ -157,18 +158,18 @@ class _V321ArcadeState extends State<V321Arcade> {
           return SizedBox(width: 51, height: 59, child: OutlinedButton(
             style: OutlinedButton.styleFrom(padding: EdgeInsets.zero,
               backgroundColor: taken ? const Color(0xFF223750) :
-                golden ? _v31Gold : const Color(0xFFFFF7E7),
-              foregroundColor: _v31Navy,
-              side: BorderSide(color: taken ? Colors.white24 : _v31Gold),
+                golden ? _v326Gold : const Color(0xFFFFF7E7),
+              foregroundColor: _v326Navy,
+              side: BorderSide(color: taken ? Colors.white24 : _v326Gold),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
             onPressed: taken || frozen || _done || _busy ? null
               : () => setState(() => _chosen.add(index)),
             child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
               Text(frozen ? '🔒' : taken ? '✓' : letters[order[index]],
-                style: TextStyle(color: taken ? Colors.white70 : _v31Navy,
+                style: TextStyle(color: taken ? Colors.white70 : _v326Navy,
                   fontSize: frozen ? 19 : 23, fontWeight: FontWeight.bold)),
-              if (golden && !taken) const Text('✦ ALTIN', style: TextStyle(
-                fontSize: 8, fontWeight: FontWeight.bold, color: _v31Navy)),
+              if (golden && !taken)  Text('✦ ALTIN', style: TextStyle(
+                fontSize: 8, fontWeight: FontWeight.bold, color: _v326Navy)),
             ])));
         })),
       if (special) ...[
@@ -200,14 +201,14 @@ class _V321ArcadeState extends State<V321Arcade> {
     return Column(children: [
       _label('Eksik harfi seçerek kelimeyi tamamla.'),
       const SizedBox(height: 13),
-      _label(shown.join('  '), size: 27, color: _v31Gold),
+      _label(shown.join('  '), size: 27, color: _v326Gold),
       const SizedBox(height: 14),
       Wrap(alignment: WrapAlignment.center, spacing: 9, runSpacing: 9,
         children: _missingChoices.map((letter) => SizedBox(width: 64, height: 55,
           child: ElevatedButton(onPressed: _done || _busy ? null
             : () => _finish(letter == letters[_missingIndex]),
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFF6E7),
-              foregroundColor: _v31Navy, padding: EdgeInsets.zero),
+              foregroundColor: _v326Navy, padding: EdgeInsets.zero),
             child: Text(letter, style: const TextStyle(fontSize: 22,
               fontWeight: FontWeight.w900))))).toList()),
       const SizedBox(height: 10),
@@ -220,28 +221,28 @@ class _V321ArcadeState extends State<V321Arcade> {
     if (!_bossOpen) {
       final finished = p.levels.where(widget.completed.contains).length;
       return Column(children: [
-        const Icon(Icons.lock, color: _v31Gold, size: 56),
+         Icon(Icons.lock, color: _v326Gold, size: 56),
         _label('${p.province} finalini açmak için 3 ana bölüm gerekiyor.'),
-        _label('$finished / ${p.levels.length} ana bölüm tamamlandı', color: _v31Gold),
+        _label('$finished / ${p.levels.length} ana bölüm tamamlandı', color: _v326Gold),
         const SizedBox(height: 8),
         _label('Mevcut bölümlerin kaydı değiştirilmez. Final ayrı bir ödüldür.', size: 12),
       ]);
     }
     final mixed = _tileOrder.map((index) => _target.split('')[index]).join('  ');
     return Column(children: [
-      const Icon(Icons.emoji_events, color: _v31Gold, size: 50),
+       Icon(Icons.emoji_events, color: _v326Gold, size: 50),
       _label('${p.province} Şehir Finali · ZOR'),
       const SizedBox(height: 14),
-      _label(mixed, color: _v31Gold, size: 23),
+      _label(mixed, color: _v326Gold, size: 23),
       const SizedBox(height: 8),
       _label('${_target.length} harfli gizli kelimeyi bul. +30 altın.'),
       const SizedBox(height: 11),
       TextField(controller: _bossEntry, enabled: !_busy && !_done,
         textCapitalization: TextCapitalization.characters,
-        style: const TextStyle(color: _v31Cream),
-        decoration: const InputDecoration(labelText: 'Final kelimesi',
-          labelStyle: TextStyle(color: _v31Gold),
-          enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _v31Gold)),
+        style:  TextStyle(color: _v326Cream),
+        decoration:  InputDecoration(labelText: 'Final kelimesi',
+          labelStyle: TextStyle(color: _v326Gold),
+          enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _v326Gold)),
           border: OutlineInputBorder())),
       _button(_done ? 'FİNAL KAZANILDI ✓' : 'FİNALİ TAMAMLA',
         _done || _busy ? null : () => _finish(
@@ -250,7 +251,12 @@ class _V321ArcadeState extends State<V321Arcade> {
     ]);
   }
 
-  @override Widget build(BuildContext context) {
+  @override Widget build(BuildContext context) => ValueListenableBuilder<int>(
+    valueListenable: V325AdventureTheme.selected,
+    builder: (context, _, __) => _v326Build(context),
+  );
+
+  Widget _v326Build(BuildContext context) {
     const modeNames = <String>['KARIŞIK HARFLER', 'EKSİK HARF', 'ÖZEL HARFLER', 'ŞEHİR FİNALİ'];
     const modeIcons = <IconData>[Icons.shuffle, Icons.edit, Icons.auto_awesome,
       Icons.emoji_events];
@@ -261,17 +267,17 @@ class _V321ArcadeState extends State<V321Arcade> {
         const SizedBox(height: 10),
         LinearProgressIndicator(value: (count / 324).clamp(0.0, 1.0).toDouble(),
           backgroundColor: const Color(0xFF29425B),
-          valueColor: const AlwaysStoppedAnimation<Color>(_v31Gold), minHeight: 7),
-        const SizedBox(height: 7), _label('$count / 324 tamamlandı', color: _v31Gold),
+          valueColor:  AlwaysStoppedAnimation<Color>(_v326Gold), minHeight: 7),
+        const SizedBox(height: 7), _label('$count / 324 tamamlandı', color: _v326Gold),
         const SizedBox(height: 12), _cityStrip(),
         const SizedBox(height: 12),
         Wrap(alignment: WrapAlignment.center, spacing: 7, runSpacing: 9,
           children: List.generate(modeNames.length, (i) => ChoiceChip(
-            selected: _mode == i, selectedColor: _v31Gold,
+            selected: _mode == i, selectedColor: _v326Gold,
             label: Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(modeIcons[i], size: 15, color: _v31Navy),
+              Icon(modeIcons[i], size: 15, color: _v326Navy),
               const SizedBox(width: 5),
-              Text(modeNames[i], style: const TextStyle(color: _v31Navy,
+              Text(modeNames[i], style:  TextStyle(color: _v326Navy,
                 fontSize: 11, fontWeight: FontWeight.bold)),
             ]),
             onSelected: _busy ? null : (_) => setState(() { _mode = i; _resetRound(); }),
@@ -280,8 +286,8 @@ class _V321ArcadeState extends State<V321Arcade> {
       _panel('${_provinces[_city].province.toUpperCase()} · ${modeNames[_mode]}',
         Column(children: [
           if (_done) ...[
-            const Icon(Icons.verified, color: _v31Gold, size: 44),
-            _label('Bu görevin ödülü daha önce kazanıldı.', color: _v31Gold),
+             Icon(Icons.verified, color: _v326Gold, size: 44),
+            _label('Bu görevin ödülü daha önce kazanıldı.', color: _v326Gold),
             const SizedBox(height: 9),
           ],
           if (_mode == 0 || _mode == 2) _reorderGame(special: _mode == 2),

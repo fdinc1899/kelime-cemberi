@@ -12,7 +12,7 @@ class PremiumPageShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (title == 'MACERA MERKEZİ') {
-      return _V318AdventurePage(background: background,
+      return V325AdventureShell(background: background,
         onClose: onClose, child: child);
     }
     final map = title == 'ŞEHİR HARİTASI';

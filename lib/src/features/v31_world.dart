@@ -1,4 +1,5 @@
 part of kelime_sehirleri;
+// V326_THEME_EXT: persistent palette for optional gameplay modes.
 
 // V31 is strictly additive: legacy V3 keys and all 255 stage IDs stay fixed.
 const Color _v31Navy = Color(0xFF081C35);
@@ -161,21 +162,21 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
   }
   Widget _panel(String title, Widget child) => Container(
     margin: const EdgeInsets.fromLTRB(10, 9, 10, 7), padding: const EdgeInsets.all(13),
-    decoration: BoxDecoration(color: const Color(0xF2081D36),
-      border: Border.all(color: _v31Gold, width: 1.2),
+    decoration: BoxDecoration(color: _v326Panel,
+      border: Border.all(color: _v326Gold, width: 1.2),
       borderRadius: BorderRadius.circular(18)),
     child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Text(title, style: const TextStyle(fontFamily: 'serif', color: _v31Gold,
+      Text(title, style:  TextStyle(fontFamily: 'serif', color: _v326Gold,
         fontSize: 18, fontWeight: FontWeight.w900)),
       const SizedBox(height: 10), child,
     ]));
-  Widget _text(String text, {Color color = _v31Cream, double size = 14}) => Text(text,
-    style: TextStyle(color: color, fontSize: size));
+  Widget _text(String text, {Color? color, double size = 14}) => Text(text,
+    style: TextStyle(color: color ?? _v326Cream, fontSize: size));
   Widget _action(String label, VoidCallback? onPressed, {IconData icon = Icons.auto_awesome}) =>
     Padding(padding: const EdgeInsets.only(top: 9), child: ElevatedButton.icon(
       icon: Icon(icon, size: 18), label: Text(label, textAlign: TextAlign.center),
-      style: ElevatedButton.styleFrom(backgroundColor: _v31Gold,
-        foregroundColor: _v31Navy, disabledBackgroundColor: Colors.blueGrey,
+      style: ElevatedButton.styleFrom(backgroundColor: _v326Gold,
+        foregroundColor: _v326Navy, disabledBackgroundColor: Colors.blueGrey,
         padding: const EdgeInsets.symmetric(vertical: 13),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13))),
       onPressed: onPressed));
@@ -184,8 +185,8 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
       width: double.infinity, child: Stack(fit: StackFit.expand, children: [
         Image(image: _citySelectionImageProvider(city), fit: BoxFit.cover,
           filterQuality: FilterQuality.high,
-          errorBuilder: (_, __, ___) => const ColoredBox(color: _v31Navy,
-            child: Icon(Icons.landscape, color: _v31Gold, size: 48))),
+          errorBuilder: (_, __, ___) =>  ColoredBox(color: _v326Navy,
+            child: Icon(Icons.landscape, color: _v326Gold, size: 48))),
         const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(
           begin: Alignment.topCenter, end: Alignment.bottomCenter,
           colors: [Colors.transparent, Color(0x99020D20)]))),
@@ -194,7 +195,7 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
     scrollDirection: Axis.horizontal, itemCount: 81,
     itemBuilder: (context, i) => Padding(padding: const EdgeInsets.only(right: 7),
       child: ChoiceChip(label: Text('${i + 1} · ${_provinces[i].province}'),
-        selected: _cityIndex == i, selectedColor: _v31Gold,
+        selected: _cityIndex == i, selectedColor: _v326Gold,
         onSelected: (_) { _answer.clear(); setState(() { _cityIndex = i; _challengeSlot = 0; }); }))));
 
   int get _challengeIndex => _cityIndex * 13 + _challengeSlot;
@@ -231,22 +232,22 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
         _text('${_marathonDone.length} / $v31ChallengeCount tamamlandı · Zorluğa göre 3–8 altın'),
         const SizedBox(height: 10), _cityPicker(), const SizedBox(height: 10),
         _cityPicture(_provinces[_cityIndex]),
-        const SizedBox(height: 7), _text('Bu şehirde: $doneForCity / 13', color: _v31Gold),
+        const SizedBox(height: 7), _text('Bu şehirde: $doneForCity / 13', color: _v326Gold),
         const SizedBox(height: 10),
         Wrap(spacing: 6, runSpacing: 6, children: List.generate(13, (i) {
           final solved = _marathonDone.contains(_cityIndex * 13 + i);
           return ChoiceChip(label: Text('${i+1}${solved ? ' ✓' : ''}'),
             selected: _challengeSlot == i,
-            selectedColor: _v31Gold,
+            selectedColor: _v326Gold,
             onSelected: (_) { _answer.clear(); setState(() => _challengeSlot = i); });
         })),
         const SizedBox(height: 13),
         Text(v31Scramble(_challengeIndex), textAlign: TextAlign.center,
-          style: const TextStyle(color: _v31Gold, fontSize: 24,
+          style:  TextStyle(color: _v326Gold, fontSize: 24,
             fontWeight: FontWeight.w900, letterSpacing: 1)),
         const SizedBox(height: 7),
         _text('${v31ChallengeAnswer(_challengeIndex).length} harf · '
-          '$_v312TierName · +$_v312Reward altın', color: _v31Gold),
+          '$_v312TierName · +$_v312Reward altın', color: _v326Gold),
         const SizedBox(height: 5),
         AnimatedSwitcher(duration: const Duration(milliseconds: 280),
           child: Text(_v312Hint(_challengeIndex),
@@ -256,10 +257,10 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
         const SizedBox(height: 7),
         TextField(controller: _answer, enabled: !_marathonDone.contains(_challengeIndex),
           textCapitalization: TextCapitalization.characters,
-          style: const TextStyle(color: _v31Cream),
-          decoration: const InputDecoration(labelText: 'Bulduğun kelime',
-            labelStyle: TextStyle(color: _v31Gold),
-            enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _v31Gold)),
+          style:  TextStyle(color: _v326Cream),
+          decoration:  InputDecoration(labelText: 'Bulduğun kelime',
+            labelStyle: TextStyle(color: _v326Gold),
+            enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: _v326Gold)),
             border: OutlineInputBorder())),
         _action(_marathonDone.contains(_challengeIndex) ? 'TAMAMLANDI ✓' : 'KELİMEYİ KONTROL ET',
           _marathonDone.contains(_challengeIndex) || _busy ? null : _solve,
@@ -306,7 +307,7 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
         const SizedBox(height: 12), _cityPicker(), const SizedBox(height: 13),
         _cityPicture(p, height: 195),
         const SizedBox(height: 10),
-        Text(p.title, style: const TextStyle(color: _v31Gold, fontSize: 22,
+        Text(p.title, style:  TextStyle(color: _v326Gold, fontSize: 22,
           fontWeight: FontWeight.w900)),
         _text('$count / 3 bölüm · ${collected ? 'Hazine alındı' : 'Keşfedilecek'}'),
         const SizedBox(height: 10),
@@ -314,7 +315,7 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
           children: List.generate(3, (i) => Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8), child: Icon(
               i < count ? Icons.star_rounded : Icons.star_outline_rounded,
-              color: _v31Gold, size: 36)))),
+              color: _v326Gold, size: 36)))),
         const SizedBox(height: 12),
         _text(v29CityFacts[p.province] ??
           '${p.province}, ${p.region} bölgesinde keşfedilmeyi bekliyor.'),
@@ -327,20 +328,20 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
             (id) => id <= widget.unlocked && !widget.completed.contains(id),
             orElse: () => p.start)) : null, icon: Icons.map),
         const SizedBox(height: 8),
-        _text('Toplanan hatıralar: ${_treasures.length} / 81', color: _v31Gold),
+        _text('Toplanan hatıralar: ${_treasures.length} / 81', color: _v326Gold),
       ])),
     ]);
   }
 
   Widget _visualsView() => ListView(children: [
     _panel('SİNEMATİK GÖRÜNÜM', Column(children: [
-      const Icon(Icons.movie_filter, color: _v31Gold, size: 52),
+       Icon(Icons.movie_filter, color: _v326Gold, size: 52),
       _text('Manzaralarda yavaş kamera hareketi. Gece modu seçiliyse '
         'karanlık gökyüzü efekti uygulanır.'),
       SwitchListTile(value: widget.night, onChanged: widget.onTheme,
-        title: const Text('Gece manzarası', style: TextStyle(color: _v31Cream)),
-        activeThumbColor: _v31Gold, secondary: const Icon(Icons.nightlight,
-          color: _v31Gold)),
+        title:  Text('Gece manzarası', style: TextStyle(color: _v326Cream)),
+        activeThumbColor: _v326Gold, secondary:  Icon(Icons.nightlight,
+          color: _v326Gold)),
       const SizedBox(height: 12),
       V31LivingBackdrop(night: widget.night,
         child: _cityPicture(_provinces[_cityIndex], height: 165)),
@@ -354,10 +355,10 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
     _panel('BÖLGEYE ÖZEL MÜZİK', Column(children: [
       _text('7 bölge için 7 özgün enstrümantal döngü. V30 ana müzik varsayılan olarak kalır.'),
       SwitchListTile(value: widget.regionMusic, onChanged: widget.onMusic,
-        title: const Text('Şehre göre müzik çal', style: TextStyle(color: _v31Cream)),
+        title:  Text('Şehre göre müzik çal', style: TextStyle(color: _v326Cream)),
         subtitle: _text('Müzik kapalıysa bu seçenek de ses çalmaz', size: 11),
-        activeThumbColor: _v31Gold, secondary: const Icon(Icons.music_note,
-          color: _v31Gold)),
+        activeThumbColor: _v326Gold, secondary:  Icon(Icons.music_note,
+          color: _v326Gold)),
     ])),
   ]);
 
@@ -486,12 +487,12 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Expanded(child: _text(caption)),
-        _text(value, color: _v31Gold),
+        _text(value, color: _v326Gold),
       ]),
       const SizedBox(height: 8),
       LinearProgressIndicator(value: ratio.clamp(0.0, 1.0).toDouble(),
         backgroundColor: const Color(0xFF41536A),
-        valueColor: const AlwaysStoppedAnimation<Color>(_v31Gold), minHeight: 6),
+        valueColor:  AlwaysStoppedAnimation<Color>(_v326Gold), minHeight: 6),
     ]));
 
   Widget _v314CityGuide() {
@@ -511,9 +512,9 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
       SliverToBoxAdapter(child: _panel('81 ŞEHİR REHBERİ', Column(children: [
         TextField(controller: _v314Search,
           onChanged: (_) => setState(() {}),
-          style: const TextStyle(color: _v31Cream),
+          style:  TextStyle(color: _v326Cream),
           decoration: InputDecoration(
-            prefixIcon: const Icon(Icons.search, color: _v31Gold),
+            prefixIcon:  Icon(Icons.search, color: _v326Gold),
             hintText: 'Şehir ara (ör. Amasya)',
             hintStyle: const TextStyle(color: Colors.white54),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(14))),
@@ -523,20 +524,20 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
           children: regions.map((name) => Padding(
             padding: const EdgeInsets.only(right: 6),
             child: ChoiceChip(label: Text(name), selected: _v314Region == name,
-              selectedColor: _v31Gold,
+              selectedColor: _v326Gold,
               onSelected: (_) => setState(() => _v314Region = name)))) .toList())),
         SwitchListTile(contentPadding: EdgeInsets.zero,
-          title: const Text('Yalnız favorilerim',
-            style: TextStyle(color: _v31Cream)),
+          title:  Text('Yalnız favorilerim',
+            style: TextStyle(color: _v326Cream)),
           value: _v314FavoritesOnly,
-          activeThumbColor: _v31Gold,
+          activeThumbColor: _v326Gold,
           onChanged: (v) => setState(() => _v314FavoritesOnly = v)),
         _action('KALDIĞIM AÇIK BÖLÜME DÖN',
           resume == null ? null : () => widget.onOpenLevel(resume),
           icon: Icons.play_circle_fill),
         const SizedBox(height: 8),
         _text('${entries.length} şehir bulundu · ${_v314Favorites.length} favori',
-          color: _v31Gold, size: 12),
+          color: _v326Gold, size: 12),
       ]))),
       if (entries.isEmpty) SliverToBoxAdapter(child: _panel('SONUÇ YOK',
         _text('Aramayı veya bölge filtresini değiştir.'))),
@@ -554,15 +555,15 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
             const SizedBox(height: 8),
             Row(children: [
               Expanded(child: _text('$done / ${city.levels.length} ana bölüm',
-                color: _v31Gold)),
+                color: _v326Gold)),
               IconButton(tooltip: fav ? 'Favorilerden çıkar' : 'Favorilere ekle',
                 onPressed: () => _v314ToggleFavorite(city),
                 icon: Icon(fav ? Icons.favorite : Icons.favorite_border,
-                  color: _v31Gold)),
+                  color: _v326Gold)),
             ]),
             LinearProgressIndicator(value: city.levels.isEmpty ? 0.0 : done / city.levels.length,
               minHeight: 5, backgroundColor: const Color(0xFF41536A),
-              valueColor: const AlwaysStoppedAnimation<Color>(_v31Gold)),
+              valueColor:  AlwaysStoppedAnimation<Color>(_v326Gold)),
             _action(open ? 'ŞEHRE GİT' : 'ŞEHİR KİLİTLİ',
               open ? () => widget.onOpenLevel(destination) : null,
               icon: open ? Icons.explore : Icons.lock),
@@ -593,7 +594,7 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
         _text('Açılan bölüm: ${widget.unlocked} · Favoriler: ${_v314Favorites.length}',
           size: 12, color: Colors.white70),
         const SizedBox(height: 4),
-        _text('Mevcut altın: ${widget.coins}', color: _v31Gold),
+        _text('Mevcut altın: ${widget.coins}', color: _v326Gold),
       ])),
       _panel('İLERLEDİĞİN ŞEHİRLER', top.isEmpty
         ? _text('İlk bölümü tamamladığında şehir ilerlemen burada görünecek.')
@@ -601,7 +602,7 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
             padding: const EdgeInsets.symmetric(vertical: 5),
             child: Row(children: [
               Expanded(child: _text(p.province)),
-              _text('${_v314DoneIn(p)} / ${p.levels.length}', color: _v31Gold),
+              _text('${_v314DoneIn(p)} / ${p.levels.length}', color: _v326Gold),
             ]))).toList())),
       _panel('KAYIT GÜVENLİĞİ', _text(
         'İstatistikler cihazdaki mevcut kayıtlarından hesaplanır; internet bağlantısı '
@@ -611,17 +612,17 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
 
   Widget _backupView() => ListView(children: [
     _panel('GÜVENLİ YEREL KAYIT YEDEĞİ', Column(children: [
-      const Icon(Icons.backup_rounded, color: _v31Gold, size: 65),
+       Icon(Icons.backup_rounded, color: _v326Gold, size: 65),
       _text('Oyunun bölüm kayıtlarını, altınlarını ve ödül verilerini '
         'şifrelenmemiş bir yedek koduna dönüştürür. '
         'Kodu yalnızca güvendiğin yerde sakla; içinde oyuncu adı da bulunabilir.'),
       _action('YEDEĞİ KOPYALA', _exportBackup, icon: Icons.copy),
       const SizedBox(height: 20),
       TextField(controller: _importText, maxLines: 4, minLines: 2,
-        style: const TextStyle(color: _v31Cream, fontSize: 11),
-        decoration: const InputDecoration(hintText: 'KC31. ile başlayan yedeği yapıştır',
+        style:  TextStyle(color: _v326Cream, fontSize: 11),
+        decoration:  InputDecoration(hintText: 'KC31. ile başlayan yedeği yapıştır',
           hintStyle: TextStyle(color: Colors.white54),
-          border: OutlineInputBorder(borderSide: BorderSide(color: _v31Gold)))),
+          border: OutlineInputBorder(borderSide: BorderSide(color: _v326Gold)))),
       _action('YEDEĞİ GÜVENLİ GERİ YÜKLE', _busy ? null : _importBackup,
         icon: Icons.restore),
       const SizedBox(height: 8),
@@ -631,7 +632,12 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
     ])),
   ]);
 
-  @override Widget build(BuildContext context) {
+  @override Widget build(BuildContext context) => ValueListenableBuilder<int>(
+    valueListenable: V325AdventureTheme.selected,
+    builder: (context, _, __) => _v326Build(context),
+  );
+
+  Widget _v326Build(BuildContext context) {
     // V316_EXPEDITION_TAB: offline daily, 81 questions and achievement medals.
     // V321_NEW_GAME_MODES
     // V322_JOURNEY_TAB
@@ -664,11 +670,12 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
       SizedBox(height: 54, child: ListView.builder(scrollDirection: Axis.horizontal,
         itemCount: titles.length, itemBuilder: (context, i) => Padding(
           padding: const EdgeInsets.all(4), child: ChoiceChip(
-            selected: _tab == i, selectedColor: _v31Gold,
+            selected: _tab == i, selectedColor: _v326Gold,
+            backgroundColor: _v326Surface,
             label: Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(icons[i], size: 17, color: _v31Navy),
+              Icon(icons[i], size: 17, color: _v326Navy),
               const SizedBox(width: 4), Text(titles[i], style: TextStyle(
-                fontSize: 11, color: _v31Navy)),
+                fontSize: 11, color: _v326Navy)),
             ]), onSelected: (_) => setState(() => _tab = i))))),
       Expanded(child: views[_tab]),
     ]);

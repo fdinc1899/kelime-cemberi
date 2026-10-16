@@ -30,12 +30,12 @@ class V29AdventureDashboard extends StatefulWidget {
 }
 
 class _V29AdventureDashboardState extends State<V29AdventureDashboard> {
-  static const _navy = Color(0xFF061B34);
-  static const _navyLight = Color(0xFF123655);
-  static const _gold = Color(0xFFFFD473);
-  static const _cream = Color(0xFFFFF6E6);
-  static const _muted = Color(0xFFD6C5A6);
-  static const _answers = <String>[
+  Color get _navy => V325AdventureTheme.background;
+  Color get _navyLight => V325AdventureTheme.surface;
+  Color get _gold => V325AdventureTheme.accent;
+  Color get _cream => V325AdventureTheme.text;
+  Color get _muted => V325AdventureTheme.secondaryText;
+  static final _answers = <String>[
     'İSTANBUL', 'KAPADOKYA', 'BOĞAZ', 'DENİZ', 'YILDIZ',
     'KÜLTÜR', 'SEYAHAT', 'ANADOLU', 'TARİH', 'KALE',
     'KÖPRÜ', 'GÜNEŞ', 'ŞEHİR', 'ORMAN', 'SAHİL',
@@ -44,7 +44,7 @@ class _V29AdventureDashboardState extends State<V29AdventureDashboard> {
     'GÖKYÜZÜ', 'KERVAN', 'HİKÂYE', 'BAŞKENT', 'ANIT',
   ];
 
-  static const _avatars = ['🧭', '🦉', '👑', '🦊', '🗺️', '⭐', '🏆', '🚀'];
+  static final _avatars = ['🧭', '🦉', '👑', '🦊', '🗺️', '⭐', '🏆', '🚀'];
   int _page = 0;
   String _avatar = '🧭';
   String _nickname = 'Şehir Gezgini';
@@ -110,44 +110,44 @@ class _V29AdventureDashboardState extends State<V29AdventureDashboard> {
   }
 
   Widget _panel(String title, Widget child) => Container(
-    margin: const EdgeInsets.fromLTRB(12, 9, 12, 5),
-    padding: const EdgeInsets.all(13),
+    margin: EdgeInsets.fromLTRB(12, 9, 12, 5),
+    padding: EdgeInsets.all(13),
     decoration: BoxDecoration(
-      color: const Color(0xEF071E36),
+      color: V325AdventureTheme.panel.withOpacity(.94),
       borderRadius: BorderRadius.circular(20),
       border: Border.all(color: _gold, width: 1.3),
-      boxShadow: const [BoxShadow(color: Color(0xAA000000), blurRadius: 14)],
+      boxShadow: [BoxShadow(color: Color(0xAA000000), blurRadius: 14)],
     ),
     child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Text(title, style: const TextStyle(color: _gold, fontSize: 19,
+      Text(title, style: TextStyle(color: _gold, fontSize: 19,
         fontWeight: FontWeight.w900, fontFamily: 'serif')),
-      const SizedBox(height: 11), child,
+      SizedBox(height: 11), child,
     ]),
   );
 
   Widget _button(String title, VoidCallback? action, {IconData? icon}) =>
-    Padding(padding: const EdgeInsets.only(top: 8), child: SizedBox(
+    Padding(padding: EdgeInsets.only(top: 8), child: SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
         onPressed: action,
         icon: Icon(icon ?? Icons.stars_rounded, size: 20),
-        label: Text(title, style: const TextStyle(fontWeight: FontWeight.w900)),
+        label: Text(title, style: TextStyle(fontWeight: FontWeight.w900)),
         style: ElevatedButton.styleFrom(
-          backgroundColor: action == null ? const Color(0xFF566577) : _gold,
-          foregroundColor: _navy, padding: const EdgeInsets.symmetric(vertical: 13),
+          backgroundColor: action == null ? Color(0xFF566577) : _gold,
+          foregroundColor: _navy, padding: EdgeInsets.symmetric(vertical: 13),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         ),
       ),
     ));
 
   Widget _miniInfo(String title, String info, IconData icon) =>
-    Container(margin: const EdgeInsets.only(bottom: 9), padding: const EdgeInsets.all(10),
+    Container(margin: EdgeInsets.only(bottom: 9), padding: EdgeInsets.all(10),
       decoration: BoxDecoration(color: _navyLight,
         borderRadius: BorderRadius.circular(12)),
-      child: Row(children: [Icon(icon, color: _gold), const SizedBox(width: 10),
+      child: Row(children: [Icon(icon, color: _gold), SizedBox(width: 10),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(title, style: const TextStyle(color: _cream, fontWeight: FontWeight.w800)),
-          Text(info, style: const TextStyle(color: _muted, fontSize: 12)),
+          Text(title, style: TextStyle(color: _cream, fontWeight: FontWeight.w800)),
+          Text(info, style: TextStyle(color: _muted, fontSize: 12)),
         ]))]));
 
   void _message(String msg) {
@@ -195,7 +195,7 @@ class _V29AdventureDashboardState extends State<V29AdventureDashboard> {
     if (s >= 200) return 1;
     return 0;
   }
-  String get _rankName => const ['Çırak', 'Bronz', 'Gümüş', 'Altın', 'Elmas'][_rank];
+  String get _rankName => ['Çırak', 'Bronz', 'Gümüş', 'Altın', 'Elmas'][_rank];
   String get _title {
     final xp = widget.progress.experience;
     if (xp >= 15000) return 'Kelime Efsanesi';
@@ -212,31 +212,31 @@ class _V29AdventureDashboardState extends State<V29AdventureDashboard> {
       'Bölümleri tamamladıkça bu şehir için koleksiyon mührü kazanırsın.';
     showDialog<void>(context: context, builder: (ctx) => AlertDialog(
       backgroundColor: _navy, title: Text('${province.province} · Şehir Hikâyesi',
-        style: const TextStyle(color: _gold)),
+        style: TextStyle(color: _gold)),
       content: SingleChildScrollView(child: Text(story,
-        style: const TextStyle(color: _cream))),
+        style: TextStyle(color: _cream))),
       actions: [TextButton(onPressed: () => Navigator.pop(ctx),
-        child: const Text('KAPAT', style: TextStyle(color: _gold)))],
+        child: Text('KAPAT', style: TextStyle(color: _gold)))],
     ));
   }
 
   Widget _todayTab() => ListView(children: [
     _panel('GÜNLÜK KELİME MEYDAN OKUMASI', Column(children: [
-      const Text('Bugünün karışık kelimesini çöz · +45 altın',
+      Text('Bugünün karışık kelimesini çöz · +45 altın',
         style: TextStyle(color: _cream)),
-      const SizedBox(height: 12),
-      Container(padding: const EdgeInsets.symmetric(vertical: 17),
+      SizedBox(height: 12),
+      Container(padding: EdgeInsets.symmetric(vertical: 17),
         width: double.infinity, decoration: BoxDecoration(
           color: _navyLight, borderRadius: BorderRadius.circular(13)),
         child: Text(_scrambled, textAlign: TextAlign.center,
-          style: const TextStyle(color: _gold, fontSize: 22,
+          style: TextStyle(color: _gold, fontSize: 22,
             fontWeight: FontWeight.w900, letterSpacing: 1))),
-      const SizedBox(height: 10),
+      SizedBox(height: 10),
       TextField(controller: _answer, enabled: _dailyClaimDate != _today,
         textCapitalization: TextCapitalization.characters,
-        style: const TextStyle(color: _cream),
+        style: TextStyle(color: _cream),
         decoration: InputDecoration(
-          hintText: 'Kelimeyi yaz', hintStyle: const TextStyle(color: _muted),
+          hintText: 'Kelimeyi yaz', hintStyle: TextStyle(color: _muted),
           filled: true, fillColor: _navyLight,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)))),
       _button(_dailyClaimDate == _today ? 'BUGÜN TAMAMLANDI ✓' : 'KELİMEYİ KONTROL ET',
@@ -244,7 +244,7 @@ class _V29AdventureDashboardState extends State<V29AdventureDashboard> {
         icon: Icons.check_circle_rounded),
     ])),
     _panel(_seasonName, Column(children: [
-      const Icon(Icons.celebration_rounded, color: _gold, size: 68),
+      Icon(Icons.celebration_rounded, color: _gold, size: 68),
       _miniInfo('Aylık özel ödül',
         '${widget.progress.experience} / 250 deneyim puanı · +75 altın',
         Icons.card_giftcard_rounded),
@@ -256,7 +256,7 @@ class _V29AdventureDashboardState extends State<V29AdventureDashboard> {
       _miniInfo('Kelime görevi', '${widget.progress.dailyWords} kelime bulundu', Icons.abc),
       _miniInfo('Bonus avı', '${widget.progress.dailyBonuses} bonus kelime bulundu', Icons.star),
       _miniInfo('Tamamlanan bölüm', '${widget.progress.dailyLevels} bölüm', Icons.flag),
-      const Text('Günlük görev ödülleri, çark ve sandıklar Ödüller sekmesinde.',
+      Text('Günlük görev ödülleri, çark ve sandıklar Ödüller sekmesinde.',
         style: TextStyle(color: _muted, fontSize: 12)),
     ])),
   ]);
@@ -268,14 +268,14 @@ class _V29AdventureDashboardState extends State<V29AdventureDashboard> {
       ClipRRect(borderRadius: BorderRadius.circular(12),
         child: LinearProgressIndicator(value: _cityCompletedCount() / 81,
           minHeight: 10, backgroundColor: _navyLight,
-          valueColor: const AlwaysStoppedAnimation<Color>(_gold))),
-      const SizedBox(height: 6),
-      const Text('Her şehrin 3 bölümünü bitir, manzarasını ve altın mührünü koleksiyonuna ekle.',
+          valueColor: AlwaysStoppedAnimation<Color>(_gold))),
+      SizedBox(height: 6),
+      Text('Her şehrin 3 bölümünü bitir, manzarasını ve altın mührünü koleksiyonuna ekle.',
         style: TextStyle(color: _muted, fontSize: 12)),
     ])),
     Expanded(child: GridView.builder(
-      padding: const EdgeInsets.all(10), itemCount: _provinces.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      padding: EdgeInsets.all(10), itemCount: _provinces.length,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2, childAspectRatio: .88, crossAxisSpacing: 8, mainAxisSpacing: 8),
       itemBuilder: (ctx, index) {
         final p = _provinces[index];
@@ -283,22 +283,22 @@ class _V29AdventureDashboardState extends State<V29AdventureDashboard> {
         final unlocked = _cityOpen(p, widget.unlocked);
         return InkWell(onTap: () => _showCityStory(p), child: Container(
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(15),
-            border: Border.all(color: done == 3 ? _gold : const Color(0xFF667080)),
+            border: Border.all(color: done == 3 ? _gold : Color(0xFF667080)),
             color: _navy),
           clipBehavior: Clip.antiAlias, child: Column(children: [
             Expanded(child: Stack(fit: StackFit.expand, children: [
               Image(image: _citySelectionImageProvider(p), fit: BoxFit.cover),
-              if (!unlocked) Container(color: const Color(0x77000000)),
-              if (done == 3) const Align(alignment: Alignment.topRight,
+              if (!unlocked) Container(color: Color(0x77000000)),
+              if (done == 3) Align(alignment: Alignment.topRight,
                 child: Padding(padding: EdgeInsets.all(6), child: Icon(
                   Icons.workspace_premium_rounded, color: _gold, size: 33))),
             ])),
-            Padding(padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 6),
+            Padding(padding: EdgeInsets.symmetric(horizontal: 5, vertical: 6),
               child: Column(children: [
                 Text(p.province, maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: _cream, fontWeight: FontWeight.w800)),
+                  style: TextStyle(color: _cream, fontWeight: FontWeight.w800)),
                 Text('$done / 3 · ${done == 3 ? 'MÜHÜRLENDİ' : unlocked ? 'KEŞFET' : 'KİLİTLİ'}',
-                  style: const TextStyle(color: _gold, fontSize: 10)),
+                  style: TextStyle(color: _gold, fontSize: 10)),
               ])),
           ])),
         );
@@ -313,7 +313,7 @@ class _V29AdventureDashboardState extends State<V29AdventureDashboard> {
     _panel('ALTIN ROTA · TÜRKİYE TURU', Column(children: [
       _miniInfo('Ana bölümler', '${_mainDone(widget.completed)} / 243', Icons.route_rounded),
       _miniInfo('Toplam yıldız', '${widget.progress.totalStars} ★', Icons.stars_rounded),
-      const Text('Şehri tamamladıkça sonraki şehre ilerle. Açık şehir kartına dokunup oynamaya devam et.',
+      Text('Şehri tamamladıkça sonraki şehre ilerle. Açık şehir kartına dokunup oynamaya devam et.',
         style: TextStyle(color: _muted, fontSize: 12)),
     ])),
     Expanded(child: ListView.builder(itemCount: _provinces.length,
@@ -324,7 +324,7 @@ class _V29AdventureDashboardState extends State<V29AdventureDashboard> {
         final next = p.levels.firstWhere((i) => i <= widget.unlocked &&
           !widget.completed.contains(i), orElse: () => p.levels.first);
         return Column(children: [
-          Container(margin: const EdgeInsets.fromLTRB(12, 2, 12, 2),
+          Container(margin: EdgeInsets.fromLTRB(12, 2, 12, 2),
             decoration: BoxDecoration(color: _navy,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: _gold)),
@@ -334,15 +334,15 @@ class _V29AdventureDashboardState extends State<V29AdventureDashboard> {
                 borderRadius: BorderRadius.circular(8),
                 child: Image(image: _citySelectionImageProvider(p), fit: BoxFit.cover))),
               title: Text('${index + 1}. ${p.province}', style:
-                const TextStyle(color: _cream, fontWeight: FontWeight.w800)),
+                TextStyle(color: _cream, fontWeight: FontWeight.w800)),
               subtitle: Text('$done/3 bölüm · ${done == 3 ? '★★★' : '☆☆☆'}',
-                style: const TextStyle(color: _gold)),
+                style: TextStyle(color: _gold)),
               trailing: Icon(active ? Icons.chevron_right : Icons.lock,
                 color: _gold),
             ),
           ),
           if (index < _provinces.length - 1) SizedBox(height: 19,
-            child: CustomPaint(size: const Size(60, 19), painter:
+            child: CustomPaint(size: Size(60, 19), painter:
               _ShortProvinceRoadPainter(leftToRight: index.isEven,
                 open: _cityOpen(_provinces[index + 1], widget.unlocked)))),
         ]);
@@ -354,17 +354,17 @@ class _V29AdventureDashboardState extends State<V29AdventureDashboard> {
     final limits = [0, 200, 500, 1200, 2400];
     return ListView(children: [
       _panel('HAFTALIK YEREL LİG', Column(children: [
-        const Icon(Icons.emoji_events_rounded, color: _gold, size: 68),
-        Text(_rankName.toUpperCase(), style: const TextStyle(
+        Icon(Icons.emoji_events_rounded, color: _gold, size: 68),
+        Text(_rankName.toUpperCase(), style: TextStyle(
           color: _gold, fontSize: 23, fontWeight: FontWeight.w900)),
-        const SizedBox(height: 4),
+        SizedBox(height: 4),
         Text('Bu haftaki puanın: ${widget.progress.weeklyScore}',
-          style: const TextStyle(color: _cream)),
-        const SizedBox(height: 10),
+          style: TextStyle(color: _cream)),
+        SizedBox(height: 10),
         for (var i = 0; i < names.length; i++) _miniInfo(
           names[i], '${limits[i]} puan eşiği',
           i <= _rank ? Icons.check_circle_rounded : Icons.lock_outline),
-        const Text('Bu bir çevrimdışı puan ligi. Gerçek oyuncu sıralaması, '
+        Text('Bu bir çevrimdışı puan ligi. Gerçek oyuncu sıralaması, '
           'sunucu veya para ödülü içermez. Haftalık puanlar pazartesi sıfırlanır.',
           style: TextStyle(color: _muted, fontSize: 12)),
       ])),
@@ -389,15 +389,15 @@ class _V29AdventureDashboardState extends State<V29AdventureDashboard> {
     var proposedName = _nickname;
     final name = await showDialog<String>(context: context, builder: (ctx) => AlertDialog(
       backgroundColor: _navy,
-      title: const Text('Oyuncu adını seç', style: TextStyle(color: _gold)),
+      title: Text('Oyuncu adını seç', style: TextStyle(color: _gold)),
       content: TextFormField(initialValue: _nickname, maxLength: 22,
         onChanged: (value) => proposedName = value,
-        style: const TextStyle(color: _cream),
-        decoration: const InputDecoration(hintText: 'Takma ad')),
+        style: TextStyle(color: _cream),
+        decoration: InputDecoration(hintText: 'Takma ad')),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('VAZGEÇ')),
+        TextButton(onPressed: () => Navigator.pop(ctx), child: Text('VAZGEÇ')),
         TextButton(onPressed: () => Navigator.pop(ctx, proposedName.trim()),
-          child: const Text('KAYDET')),
+          child: Text('KAYDET')),
       ],
     ));
     if (name == null || name.isEmpty) return;
@@ -408,13 +408,13 @@ class _V29AdventureDashboardState extends State<V29AdventureDashboard> {
   Widget _profileTab() => ListView(children: [
     _panel('OYUNCU PROFİLİ', Column(children: [
       Text(_avatar, textAlign: TextAlign.center,
-        style: const TextStyle(fontSize: 72)),
+        style: TextStyle(fontSize: 72)),
       Text(_nickname, textAlign: TextAlign.center,
-        style: const TextStyle(color: _cream, fontSize: 21, fontWeight: FontWeight.w900)),
+        style: TextStyle(color: _cream, fontSize: 21, fontWeight: FontWeight.w900)),
       Text(_title, textAlign: TextAlign.center,
-        style: const TextStyle(color: _gold, fontSize: 17)),
+        style: TextStyle(color: _gold, fontSize: 17)),
       _button('İSMİ DEĞİŞTİR', _editName, icon: Icons.edit_rounded),
-      const SizedBox(height: 12),
+      SizedBox(height: 12),
       Wrap(spacing: 8, runSpacing: 8, children: [for (final a in _avatars)
         InkWell(onTap: () => _pickAvatar(a), child: Container(
           width: 57, height: 57, alignment: Alignment.center,
@@ -422,19 +422,24 @@ class _V29AdventureDashboardState extends State<V29AdventureDashboard> {
             color: _navyLight, borderRadius: BorderRadius.circular(12),
             border: Border.all(color: a == _avatar ? _gold : Colors.white24,
               width: a == _avatar ? 2.5 : 1)),
-          child: Text(a, style: const TextStyle(fontSize: 29))))]),
-      const SizedBox(height: 12),
+          child: Text(a, style: TextStyle(fontSize: 29))))]),
+      SizedBox(height: 12),
       _miniInfo('Deneyim', '${widget.progress.experience} XP', Icons.bolt_rounded),
       _miniInfo('Altın', '${widget.coins}', Icons.monetization_on_rounded),
       _miniInfo('Tamamlanan il', '${_cityCompletedCount()} / 81', Icons.map_rounded),
       _miniInfo('Toplam yıldız', '${widget.progress.totalStars}', Icons.star_rounded),
-      const Text('Oyuncu adı ve avatar bu cihazda saklanır. Şifre veya hesap gerektirmez.',
+      Text('Oyuncu adı ve avatar bu cihazda saklanır. Şifre veya hesap gerektirmez.',
         style: TextStyle(color: _muted, fontSize: 12)),
     ])),
   ]);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ValueListenableBuilder<int>(
+    valueListenable: V325AdventureTheme.selected,
+    builder: (context, _, __) => _v325Build(context),
+  );
+
+  Widget _v325Build(BuildContext context) {
     final titles = ['GÜNLÜK', 'PASAPORT', 'YOLCULUK', 'LİG', 'ÖDÜLLER', 'PROFİL', 'V31'];
     final icons = [Icons.today_rounded, Icons.collections_bookmark_rounded,
       Icons.route_rounded, Icons.emoji_events_rounded,
@@ -453,20 +458,20 @@ class _V29AdventureDashboardState extends State<V29AdventureDashboard> {
     return Column(children: [
       SizedBox(height: 55, child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: titles.length, padding: const EdgeInsets.symmetric(horizontal: 8),
-        itemBuilder: (ctx, i) => Padding(padding: const EdgeInsets.all(4),
+        itemCount: titles.length, padding: EdgeInsets.symmetric(horizontal: 8),
+        itemBuilder: (ctx, i) => Padding(padding: EdgeInsets.all(4),
           child: ChoiceChip(
             selected: _page == i, onSelected: (_) => setState(() => _page = i),
             label: Row(mainAxisSize: MainAxisSize.min, children: [
               Icon(icons[i], size: 16,
                 color: _page == i ? _navy : _gold),
-              const SizedBox(width: 4), Text(titles[i]),
+              SizedBox(width: 4), Text(titles[i]),
             ]),
             labelStyle: TextStyle(fontSize: 11,
               fontWeight: FontWeight.w900,
               color: _page == i ? _navy : _cream),
             selectedColor: _gold, backgroundColor: _navyLight,
-            side: const BorderSide(color: _gold),
+            side: BorderSide(color: _gold),
           )),
       )),
       Expanded(child: KeyedSubtree(key: ValueKey<int>(_page), child: views[_page])),

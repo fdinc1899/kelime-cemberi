@@ -1,4 +1,5 @@
 part of kelime_sehirleri;
+// V326_THEME_EXT: persistent palette for optional gameplay modes.
 
 // V32.3 – offline word sprint, simulated rival and ten-floor mastery tower.
 // Never uses or modifies the original main-level progress/save IDs.
@@ -273,26 +274,26 @@ class _V323ChallengesState extends State<V323Challenges>
   Widget _panel(String title, Widget content) => Container(
     margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
     padding: const EdgeInsets.all(15),
-    decoration: BoxDecoration(color: const Color(0xF4081C35),
-      border: Border.all(color: _v31Gold, width: 1.2),
+    decoration: BoxDecoration(color: _v326Panel,
+      border: Border.all(color: _v326Gold, width: 1.2),
       borderRadius: BorderRadius.circular(18)),
     child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Text(title, style: const TextStyle(color: _v31Gold,
+      Text(title, style:  TextStyle(color: _v326Gold,
         fontSize: 19, fontWeight: FontWeight.w900)),
       const SizedBox(height: 13), content,
     ]));
 
-  Widget _info(String text, {double size = 15, Color color = _v31Cream}) =>
+  Widget _info(String text, {double size = 15, Color? color}) =>
     Text(text, textAlign: TextAlign.center,
-      style: TextStyle(color: color, fontSize: size, height: 1.35));
+      style: TextStyle(color: color ?? _v326Cream, fontSize: size, height: 1.35));
 
   Widget _button(String text, VoidCallback? onTap, {IconData icon = Icons.check_circle}) =>
     Padding(padding: const EdgeInsets.only(top: 12), child: SizedBox(
       width: double.infinity, child: ElevatedButton.icon(
         onPressed: onTap, icon: Icon(icon, size: 19), label: Text(text,
           textAlign: TextAlign.center),
-        style: ElevatedButton.styleFrom(backgroundColor: _v31Gold,
-          foregroundColor: _v31Navy, disabledBackgroundColor: const Color(0xFF465771),
+        style: ElevatedButton.styleFrom(backgroundColor: _v326Gold,
+          foregroundColor: _v326Navy, disabledBackgroundColor: const Color(0xFF465771),
           disabledForegroundColor: Colors.white70,
           padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 8),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13))))));
@@ -300,21 +301,21 @@ class _V323ChallengesState extends State<V323Challenges>
   Widget _wordField() => TextField(
     controller: _answer, textCapitalization: TextCapitalization.characters,
     autocorrect: false, enableSuggestions: false, onSubmitted: (_) => _submitWord(),
-    style: const TextStyle(color: _v31Cream, fontSize: 18),
+    style:  TextStyle(color: _v326Cream, fontSize: 18),
     decoration: InputDecoration(hintText: 'Bulduğun kelime',
       hintStyle: const TextStyle(color: Colors.white70),
-      enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: _v31Gold),
+      enabledBorder: OutlineInputBorder(borderSide:  BorderSide(color: _v326Gold),
         borderRadius: BorderRadius.circular(10)),
-      focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: _v31Gold, width: 2),
+      focusedBorder: OutlineInputBorder(borderSide:  BorderSide(color: _v326Gold, width: 2),
         borderRadius: BorderRadius.circular(10)),
       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12)));
 
   Widget _questionCard(int salt) => Column(children: [
-    _info('KARIŞIK HARFLER', size: 11, color: _v31Gold),
+    _info('KARIŞIK HARFLER', size: 11, color: _v326Gold),
     const SizedBox(height: 8),
     FittedBox(fit: BoxFit.scaleDown,
       child: Text(_scramble(_clue.answer, salt),
-        style: const TextStyle(color: _v31Gold, fontSize: 26,
+        style:  TextStyle(color: _v326Gold, fontSize: 26,
           fontWeight: FontWeight.w900, letterSpacing: 2))),
     const SizedBox(height: 11),
     _info('İpucu: ${_clue.hint}'),
@@ -328,14 +329,14 @@ class _V323ChallengesState extends State<V323Challenges>
     return ListView(children: [
       _panel('60 SANİYE · KELİME SÜRATİ', Column(children: [
         _info('60 saniyede 5 doğru kelimeyi çöz. Bugün ilk başarına +12 altın.',
-          color: _v31Cream),
+          color: _v326Cream),
         const SizedBox(height: 12),
         _info('⏱  $_secondsLeft sn    ·    $_solved / 5 kelime',
-          color: _v31Gold, size: 24),
+          color: _v326Gold, size: 24),
         const SizedBox(height: 9),
         LinearProgressIndicator(value: _solved / 5, minHeight: 9,
           backgroundColor: Colors.white12,
-          valueColor: const AlwaysStoppedAnimation<Color>(_v31Gold)),
+          valueColor:  AlwaysStoppedAnimation<Color>(_v326Gold)),
         if (wonToday) Padding(padding: const EdgeInsets.only(top: 10),
           child: _info('Bugünkü ödül kazanıldı ✓ Tekrar oynayabilirsin.', size: 12)),
         _button(_running ? 'YARIŞ DEVAM EDİYOR' : '60 SANİYELİK YARIŞI BAŞLAT',
@@ -362,8 +363,8 @@ class _V323ChallengesState extends State<V323Challenges>
       Wrap(spacing: 8, runSpacing: 8, alignment: WrapAlignment.center,
         children: List.generate(3, (i) => ChoiceChip(
           selected: _difficulty == i,
-          selectedColor: _v31Gold,
-          label: Text(_rivalNames[i], style: const TextStyle(color: _v31Navy,
+          selectedColor: _v326Gold,
+          label: Text(_rivalNames[i], style:  TextStyle(color: _v326Navy,
             fontWeight: FontWeight.bold)),
           onSelected: _running || _saving ? null : (_) => setState(() {
             _difficulty = i;
@@ -371,7 +372,7 @@ class _V323ChallengesState extends State<V323Challenges>
           })))),
       const SizedBox(height: 12),
       _info('SEN $_solved   —   $_rival ${_rivalNames[_difficulty].toUpperCase()}',
-        color: _v31Gold, size: 22),
+        color: _v326Gold, size: 22),
       _info('Kalan süre: $_secondsLeft saniye · Hedef: önce 5 kelime', size: 13),
       if (_duelRewards.contains('$_difficulty'))
         _info('Bu rakibin ilk galibiyet ödülü alındı ✓', size: 12),
@@ -399,22 +400,22 @@ class _V323ChallengesState extends State<V323Challenges>
             width: 55, height: 55,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: i < floor ? _v31Gold : const Color(0xFF183651),
+              color: i < floor ? _v326Gold : _v326Surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: _v31Gold)),
+              border: Border.all(color: _v326Gold)),
             child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
               Icon(i < floor ? Icons.check : i == floor ? Icons.lock_open : Icons.lock,
-                size: 15, color: i < floor ? _v31Navy : _v31Gold),
+                size: 15, color: i < floor ? _v326Navy : _v326Gold),
               Text('${i + 1}', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold,
-                color: i < floor ? _v31Navy : _v31Cream)),
+                color: i < floor ? _v326Navy : _v326Cream)),
             ])))),
         const SizedBox(height: 13),
-        _info('$floor / 10 kat tamamlandı', size: 19, color: _v31Gold),
+        _info('$floor / 10 kat tamamlandı', size: 19, color: _v326Gold),
       ])),
       _panel(floor >= 10 ? 'USTALIK KULESİ TAMAMLANDI ✓' :
           'KAT ${floor + 1} · +${floor + 4} ALTIN',
         floor >= 10 ? Column(children: [
-          const Icon(Icons.emoji_events, color: _v31Gold, size: 58),
+           Icon(Icons.emoji_events, color: _v326Gold, size: 58),
           _info('Tüm katları bitirdin. Ödüller bir defa verildi.'),
         ]) : _questionCard(floor * 13 + 31)),
       _panel('USTALIK ÖDÜLLERİ', _info(
@@ -429,10 +430,10 @@ class _V323ChallengesState extends State<V323Challenges>
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 3),
         minimumSize: const Size(0, 47),
-        backgroundColor: _mode == index ? _v31Gold : const Color(0xFF18324E),
-        foregroundColor: _mode == index ? _v31Navy : _v31Cream,
+        backgroundColor: _mode == index ? _v326Gold : _v326Surface,
+        foregroundColor: _mode == index ? _v326Navy : _v326Cream,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11),
-          side: const BorderSide(color: _v31Gold))),
+          side:  BorderSide(color: _v326Gold))),
       child: FittedBox(fit: BoxFit.scaleDown, child: Row(
         mainAxisSize: MainAxisSize.min, children: [
           Icon(icon, size: 15), const SizedBox(width: 3),
@@ -440,7 +441,12 @@ class _V323ChallengesState extends State<V323Challenges>
         ])))));
 
   @override
-  Widget build(BuildContext context) => Column(children: [
+  Widget build(BuildContext context) => ValueListenableBuilder<int>(
+    valueListenable: V325AdventureTheme.selected,
+    builder: (context, _, __) => _v326Build(context),
+  );
+
+  Widget _v326Build(BuildContext context) => Column(children: [
     Padding(padding: const EdgeInsets.fromLTRB(6, 6, 6, 1), child: Row(children: [
       _menu('SÜRELİ', Icons.timer, 0),
       _menu('DÜELLO', Icons.sports_martial_arts, 1),
