@@ -26,7 +26,8 @@ class _TrailPainter extends CustomPainter {
 class LetterWheelPainter extends CustomPainter {
   final List<String> letters;
   final List<int> selected;
-  LetterWheelPainter(this.letters, this.selected);
+  final int themeIndex;
+  LetterWheelPainter(this.letters, this.selected, {this.themeIndex = 0});
 
   static Offset centerFor(int i, int count, double size) {
     final angle = -math.pi / 2 + math.pi * 2 * i / count;
@@ -47,21 +48,32 @@ class LetterWheelPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final s = size.width;
     final midpoint = Offset(s / 2, s / 2);
+    final rimColors = themeIndex == 1
+      ? const [Color(0xFFAAF8EB), Color(0xFF26A98F),
+          Color(0xFFBDFFF2), Color(0xFF137967)]
+      : themeIndex == 2
+      ? const [Color(0xFFD9C8FF), Color(0xFF8662D3),
+          Color(0xFFE8DEFF), Color(0xFF5C419E)]
+      : const [Color(0xFFFFF1B6), Color(0xFFD99A22),
+          Color(0xFFFFE7A0), Color(0xFFBE7E13)];
+    final baseColor = themeIndex == 1 ? const Color(0xFFDDFCF6) :
+      themeIndex == 2 ? const Color(0xFFF3EDFF) : const Color(0xFFFFEFD7);
+    final accentColor = themeIndex == 1 ? const Color(0xFF148876) :
+      themeIndex == 2 ? const Color(0xFF7955BF) : const Color(0xFFC88E22);
     canvas.drawCircle(midpoint + const Offset(0, 5), s * .485,
         Paint()..color = const Color(0x66000000));
     canvas.drawCircle(midpoint, s * .49, Paint()
-      ..shader = const LinearGradient(begin: Alignment.topLeft,
+      ..shader = LinearGradient(begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFFFF1B6), Color(0xFFD99A22),
-            Color(0xFFFFE7A0), Color(0xFFBE7E13)])
+          colors: rimColors)
           .createShader(Rect.fromLTWH(0, 0, s, s)));
     canvas.drawCircle(midpoint, s * .465,
         Paint()..color = const Color(0xFFFFF4E2));
     canvas.drawCircle(midpoint, s * .45,
-        Paint()..color = const Color(0xFFFFEFD7));
+        Paint()..color = baseColor);
     canvas.drawCircle(midpoint, s * .46,
         Paint()..style = PaintingStyle.stroke
-          ..strokeWidth = 1.7..color = const Color(0xFFB88639));
+          ..strokeWidth = 1.7..color = accentColor);
 
     if (selected.length > 1) {
       final path = Path();
@@ -74,7 +86,7 @@ class LetterWheelPainter extends CustomPainter {
         }
       }
       canvas.drawPath(path, Paint()
-        ..color = const Color(0xC7C88E22)
+        ..color = accentColor.withOpacity(.83)
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round
         ..strokeWidth = s * .036
@@ -90,7 +102,7 @@ class LetterWheelPainter extends CustomPainter {
         ..shader = LinearGradient(begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: active
-                ? const [Color(0xFFFFDA75), Color(0xFFE0A53C)]
+                ? [rimColors.first, rimColors[1]]
                 : const [Colors.white, Color(0xFFF3ECE5)])
             .createShader(Rect.fromCircle(center: p, radius: r)));
       canvas.drawCircle(p, r, Paint()
@@ -110,7 +122,8 @@ class LetterWheelPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant LetterWheelPainter old) =>
       old.letters.join() != letters.join() ||
-      old.selected.join(',') != selected.join(',');
+      old.selected.join(',') != selected.join(',') ||
+      old.themeIndex != themeIndex;
 }
 
 class ScenicCityPainter extends CustomPainter {

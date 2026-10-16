@@ -202,6 +202,7 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     final prefs = await SharedPreferences.getInstance();
     if (!mounted) return;
     _prefs = prefs;
+    v324RingTheme.value = (prefs.getInt('v324_ring_theme') ?? 0).clamp(0, 2).toInt();
     _coins = prefs.getInt('coins') ?? 120;
     _lastGiftDay = prefs.getString('gift_date') ?? '';
     _musicOn = prefs.getBool('music_enabled_v3') ?? true;
@@ -1737,9 +1738,13 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
               onPointerMove: (event) => _wheelTouchMove(event, size),
               onPointerUp: _wheelTouchUp,
               onPointerCancel: _wheelTouchCancel,
-              child: CustomPaint(
-                size: Size.square(size),
-                painter: LetterWheelPainter(_wheelLetters, _dragged),
+              child: ValueListenableBuilder<int>(
+                valueListenable: v324RingTheme,
+                builder: (_, themeIndex, __) => CustomPaint(
+                  size: Size.square(size),
+                  painter: LetterWheelPainter(_wheelLetters, _dragged,
+                    themeIndex: themeIndex),
+                ),
               ),
             ),
           ),
