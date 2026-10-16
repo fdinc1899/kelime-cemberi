@@ -367,7 +367,7 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
     key == 'unlocked_v3' || key == 'finished_levels_v3' ||
     key.startsWith('solved_v3_') || key.startsWith('bonuses_v3_') ||
     key.startsWith('hints_v3_') || key.startsWith('adv15_') ||
-    key.startsWith('v29_') || key.startsWith('v31_') || key.startsWith('v321_') || key.startsWith('v322_');
+    key.startsWith('v29_') || key.startsWith('v31_') || key.startsWith('v321_') || key.startsWith('v322_') || key.startsWith('v323_');
   int _check(String data) => data.codeUnits.fold<int>(2166136261,
     (sum, unit) => ((sum ^ unit) * 16777619) & 0xFFFFFFFF);
   Future<void> _exportBackup() async {
@@ -629,15 +629,18 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
     // V316_EXPEDITION_TAB: offline daily, 81 questions and achievement medals.
     // V321_NEW_GAME_MODES
     // V322_JOURNEY_TAB
+    // V323_CHALLENGES_TAB
     const titles = ['MARATON', 'HATIRALAR', 'GÖRÜNÜM', 'YEDEK', 'ŞEHİRLER', 'İSTATİSTİK',
       'GÜNLÜK+',
       'OYUN MODLARI',
-      'KEŞİF+'];
+      'KEŞİF+',
+      'YARIŞ+',];
     const icons = [Icons.abc, Icons.collections_bookmark, Icons.nightlight,
       Icons.cloud_upload_outlined, Icons.map_outlined, Icons.bar_chart_rounded,
       Icons.emoji_events_outlined,
       Icons.extension_rounded,
-      Icons.travel_explore];
+      Icons.travel_explore,
+      Icons.timer_outlined,];
     final views = [_challengeView(), _memoriesView(), _visualsView(),
       _backupView(), _v314CityGuide(), _v314Statistics(),
       V316Expedition(prefs: widget.prefs,
@@ -645,7 +648,8 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
         treasures: _treasures, coins: widget.coins, onReward: widget.onReward),
       V321Arcade(prefs: widget.prefs, completed: widget.completed,
         onReward: widget.onReward),
-      V322Journey(prefs: widget.prefs, onReward: widget.onReward)];
+      V322Journey(prefs: widget.prefs, onReward: widget.onReward),
+      V323Challenges(prefs: widget.prefs, onReward: widget.onReward),];
     return Column(children: [
       SizedBox(height: 54, child: ListView.builder(scrollDirection: Axis.horizontal,
         itemCount: titles.length, itemBuilder: (context, i) => Padding(
