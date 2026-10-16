@@ -643,9 +643,9 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
           padding: const EdgeInsets.all(4), child: ChoiceChip(
             selected: _tab == i, selectedColor: _v31Gold,
             label: Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(icons[i], size: 17, color: _tab == i ? _v31Navy : _v31Gold),
+              Icon(icons[i], size: 17, color: _v31Navy),
               const SizedBox(width: 4), Text(titles[i], style: TextStyle(
-                fontSize: 11, color: _tab == i ? _v31Navy : _v31Cream)),
+                fontSize: 11, color: _v31Navy)),
             ]), onSelected: (_) => setState(() => _tab = i))))),
       Expanded(child: views[_tab]),
     ]);

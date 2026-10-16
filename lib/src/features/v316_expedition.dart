@@ -362,11 +362,11 @@ class _V316ExpeditionState extends State<V316Expedition> {
               selectedColor: _v31Gold,
               label: Row(mainAxisSize: MainAxisSize.min, children: [
                 Icon(icons[i], size: 14,
-                  color: _section == i ? _v31Navy : _v31Gold),
+                  color: _v31Navy),
                 const SizedBox(width: 3),
                 Flexible(child: Text(labels[i], maxLines: 1,
                   overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11,
-                    color: _section == i ? _v31Navy : _v31Cream))),
+                    color: _v31Navy))),
               ]), onSelected: (_) => setState(() => _section = i))))))),
       Expanded(child: _section == 0 ? _dailyView() :
         _section == 1 ? _regionQuizView() : _medalsView()),

@@ -14,6 +14,7 @@ dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/images/v318/
     - assets/images/v28_city_cards/
     - assets/images/cities/
     - assets/images/provinces/
