@@ -1288,6 +1288,8 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
                 onChooseCity: _chooseCityOnWelcome,
                 onChooseChapter: _chooseCityOnWelcome,
                 onSettings: _showSettings,
+                musicOn: _musicOn,
+                onMusicToggle: _toggleMusic,
                 onExit: _confirmExit,
                 onAdventure: _showAdventureHub,
               ),

@@ -7,7 +7,8 @@ class PremiumOpeningScreen extends StatefulWidget {
     required this.currentCity, required this.currentStage,
     required this.finishedCount, required this.onContinue,
     required this.onChooseCity, required this.onChooseChapter,
-    required this.onSettings, required this.onExit, required this.onAdventure});
+    required this.onSettings, required this.onExit, required this.onAdventure,
+    required this.musicOn, required this.onMusicToggle});
 
   final String currentCity;
   final int currentStage;
@@ -18,132 +19,315 @@ class PremiumOpeningScreen extends StatefulWidget {
   final VoidCallback onSettings;
   final VoidCallback onExit;
   final VoidCallback onAdventure;
+  final bool musicOn;
+  final VoidCallback onMusicToggle;
 
   @override
   State<PremiumOpeningScreen> createState() => _PremiumOpeningScreenState();
 }
 
+// V317_PREMIUM_HOME: existing routes/saves stay connected, music button actually controls playback.
 class _PremiumOpeningScreenState extends State<PremiumOpeningScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _appear;
+  late final AnimationController _scenery;
 
   @override
   void initState() {
     super.initState();
-    _appear = AnimationController(vsync: this,
-      duration: const Duration(milliseconds: 900))..forward();
+    _appear = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    )..forward();
+    _scenery = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 22),
+    )..repeat(reverse: true);
   }
 
   @override
   void dispose() {
     _appear.dispose();
+    _scenery.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final bg = _premiumCityScenes['Kapadokya'] ?? _istanbulBackground;
+    const gold = Color(0xFFFFD57D);
     return Scaffold(
-      backgroundColor: const Color(0xFF06162D),
+      backgroundColor: const Color(0xFF071629),
       body: Stack(children: [
-        Positioned.fill(child: Image.memory(bg,
-          fit: BoxFit.cover, alignment: Alignment.center)),
-        const Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter, end: Alignment.bottomCenter,
-            stops: [0, .24, .58, 1],
-            colors: [Color(0xB5041731), Color(0x33031930),
-              Color(0x77051B33), Color(0xEB061325)])))),
-        SafeArea(child: LayoutBuilder(builder: (context, area) {
-          return SingleChildScrollView(child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: area.maxHeight),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(22, 17, 22, 25),
-              child: Column(children: [
-                Row(children: [
-                  _WelcomeRound(icon: Icons.music_note_rounded, onTap: widget.onSettings),
-                  const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: const Color(0xFFFFD76E)),
-                      borderRadius: BorderRadius.circular(20),
-                      color: const Color(0xD10B233B)),
-                    child: Text('${widget.finishedCount} / 243  ★',
-                      style: const TextStyle(color: Color(0xFFFFD76E),
-                      fontWeight: FontWeight.bold)),
+        Positioned.fill(
+          child: RepaintBoundary(
+            child: AnimatedBuilder(
+              animation: _scenery,
+              child: Image.memory(bg, fit: BoxFit.cover,
+                filterQuality: FilterQuality.high, gaplessPlayback: true),
+              builder: (context, image) => ClipRect(
+                child: Transform.scale(
+                  scale: 1.045 + .065 * _scenery.value,
+                  child: Transform.translate(
+                    offset: Offset(4 * _scenery.value, -7 * _scenery.value),
+                    child: SizedBox.expand(child: image),
                   ),
-                  const SizedBox(width: 8),
-                  _WelcomeRound(icon: Icons.settings_rounded, onTap: widget.onSettings),
-                ]),
-                SizedBox(height: area.maxHeight * .12),
-                FadeTransition(opacity: _appear,
-                  child: SlideTransition(
-                    position: Tween(begin: const Offset(0, .22), end: Offset.zero)
-                      .animate(CurvedAnimation(parent: _appear, curve: Curves.easeOutCubic)),
+                ),
+              ),
+            ),
+          ),
+        ),
+        const Positioned.fill(child: DecoratedBox(
+          decoration: BoxDecoration(gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            stops: [0, .26, .52, .81, 1],
+            colors: [Color(0xBF06152C), Color(0x3808162D),
+              Color(0x7306162B), Color(0xBD05152A), Color(0xEB051429)],
+          )),
+        )),
+        Positioned.fill(child: IgnorePointer(child: Align(
+          alignment: const Alignment(.76, -.37),
+          child: Container(
+            width: 250, height: 250,
+            decoration: const BoxDecoration(
+              gradient: RadialGradient(colors: [Color(0x22FFD57D),
+                Color(0x00FFD57D)]),
+              shape: BoxShape.circle,
+            ),
+          ),
+        ))),
+        SafeArea(child: LayoutBuilder(builder: (context, area) {
+          final narrow = area.maxWidth < 365;
+          final titleSpace = (area.maxHeight * .075).clamp(22.0, 65.0).toDouble();
+          final actionSpace = (area.maxHeight * .085).clamp(28.0, 68.0).toDouble();
+          return SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: area.maxHeight),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(narrow ? 14 : 20, 10,
+                    narrow ? 14 : 20, 18),
+                child: Column(children: [
+                  Row(children: [
+                    Tooltip(
+                      message: widget.musicOn ? 'Müziği kapat' : 'Müziği aç',
+                      child: _WelcomeRound(
+                        icon: widget.musicOn
+                            ? Icons.volume_up_rounded : Icons.volume_off_rounded,
+                        onTap: widget.onMusicToggle,
+                      ),
+                    ),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14,
+                          vertical: 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(22),
+                        gradient: const LinearGradient(colors: [
+                          Color(0xEA102C4A), Color(0xE7071B32),
+                        ]),
+                        border: Border.all(color: gold, width: 1.5),
+                        boxShadow: const [BoxShadow(color: Color(0x8B020812),
+                          blurRadius: 13, offset: Offset(0, 4))],
+                      ),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        const Icon(Icons.stars_rounded,
+                            color: gold, size: 21),
+                        const SizedBox(width: 6),
+                        Text('${widget.finishedCount} / 243',
+                          style: const TextStyle(color: Color(0xFFFFE5A5),
+                            fontSize: 16, fontWeight: FontWeight.w900)),
+                      ]),
+                    ),
+                    const SizedBox(width: 12),
+                    Tooltip(message: 'Ayarlar', child: _WelcomeRound(
+                      icon: Icons.settings_rounded,
+                      onTap: widget.onSettings,
+                    )),
+                  ]),
+                  SizedBox(height: titleSpace),
+                  FadeTransition(opacity: _appear, child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0, .12), end: Offset.zero,
+                    ).animate(CurvedAnimation(
+                      parent: _appear, curve: Curves.easeOutCubic)),
                     child: Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 24),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 22),
                       decoration: BoxDecoration(
-                        color: const Color(0xEB081B34),
-                        border: Border.all(color: const Color(0xFFFFD76E), width: 2),
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: const [BoxShadow(color: Color(0xC6000000),
-                          blurRadius: 22, offset: Offset(0, 8))],
+                        borderRadius: BorderRadius.circular(27),
+                        gradient: const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Color(0xF50B294B), Color(0xF6071933),
+                            Color(0xF70B2445)],
+                        ),
+                        border: Border.all(color: gold, width: 2.0),
+                        boxShadow: const [
+                          BoxShadow(color: Color(0xC3000000), blurRadius: 25,
+                            offset: Offset(0, 12)),
+                          BoxShadow(color: Color(0x39FFCE74), blurRadius: 20),
+                        ],
                       ),
                       child: Column(children: [
-                        const Icon(Icons.auto_awesome, color: Color(0xFFFFD76E), size: 36),
-                        const SizedBox(height: 8),
-                        const FittedBox(child: Text('ŞEHİR HİKÂYELERİ',
-                          style: TextStyle(color: Color(0xFFFFE4A0),
-                          fontSize: 30, fontFamily: 'serif',
-                          fontWeight: FontWeight.w900, letterSpacing: 1.7,
-                          shadows: [Shadow(color: Colors.black, blurRadius: 8)]))),
-                        const SizedBox(height: 12),
-                        const Text("TÜRKİYE'Yİ KEŞFET  •  KELİMELERLE TANI",
+                        const Row(mainAxisSize: MainAxisSize.min, children: [
+                          Icon(Icons.auto_awesome, color: gold, size: 19),
+                          SizedBox(width: 9),
+                          Text('KELİME ÇEMBERİ', style: TextStyle(
+                            color: Color(0xFFECC784), fontSize: 11,
+                            letterSpacing: 2.5, fontWeight: FontWeight.w800)),
+                          SizedBox(width: 9),
+                          Icon(Icons.auto_awesome, color: gold, size: 19),
+                        ]),
+                        const SizedBox(height: 13),
+                        FittedBox(fit: BoxFit.scaleDown, child: Text(
+                          'ŞEHİR HİKÂYELERİ',
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Color(0xFFFFE8B2),
-                            fontSize: 10.5, letterSpacing: 1.2)),
+                          style: TextStyle(
+                            color: const Color(0xFFFFE8AA),
+                            fontSize: narrow ? 27 : 31,
+                            fontFamily: 'serif',
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                            shadows: const [Shadow(
+                              color: Color(0xF504070A), blurRadius: 9,
+                              offset: Offset(0, 3))],
+                          ),
+                        )),
+                        const SizedBox(height: 13),
+                        const Row(children: [
+                          Expanded(child: Divider(color: Color(0x7FFFDA91),
+                            thickness: .8)),
+                          Padding(padding: EdgeInsets.symmetric(horizontal: 10),
+                            child: Icon(Icons.diamond_outlined,
+                              color: gold, size: 14)),
+                          Expanded(child: Divider(color: Color(0x7FFFDA91),
+                            thickness: .8)),
+                        ]),
+                        const SizedBox(height: 11),
+                        const Text('TÜRKİYE’Yİ KEŞFET  •  KELİMELERLE TANI',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Color(0xFFF8DCA8),
+                            fontSize: 10.8, letterSpacing: 1.0,
+                            fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 9),
+                        const Text('81 ŞEHİR   ✦   243 BÖLÜM   ✦   BİR MACERA',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Color(0xFFF6EDDC),
+                            fontSize: 10.2, letterSpacing: .6)),
                       ]),
                     ),
                   )),
-                SizedBox(height: area.maxHeight * .14),
-                FadeTransition(opacity: _appear,
-                  child: Column(children: [
-                    _WelcomeAction(label: 'OYUNA BAŞLA',
+                  SizedBox(height: actionSpace),
+                  FadeTransition(opacity: _appear, child: Column(children: [
+                    _V317HomeButton(label: 'OYUNA BAŞLA',
                       icon: Icons.play_arrow_rounded, primary: true,
-                      onPressed: widget.onChooseCity),
+                      onTap: widget.onChooseCity),
                     const SizedBox(height: 10),
-                    _WelcomeAction(label: 'ŞEHİR SEÇ',
-                      icon: Icons.map_rounded, onPressed: widget.onChooseCity),
+                    _V317HomeButton(label: 'ŞEHİR SEÇ',
+                      icon: Icons.map_rounded, onTap: widget.onChooseCity),
                     const SizedBox(height: 10),
-                    _WelcomeAction(label: 'BÖLÜM SEÇ',
-                      icon: Icons.grid_view_rounded, onPressed: widget.onChooseChapter),
+                    _V317HomeButton(label: 'BÖLÜM SEÇ',
+                      icon: Icons.grid_view_rounded, onTap: widget.onChooseChapter),
                     const SizedBox(height: 10),
-                    _WelcomeAction(label: 'KALDIĞIM YERDEN DEVAM ET',
+                    _V317HomeButton(label: 'KALDIĞIM YERDEN DEVAM ET',
                       icon: Icons.subdirectory_arrow_right_rounded,
-                      onPressed: widget.onContinue),
+                      onTap: widget.onContinue),
                     const SizedBox(height: 10),
-                    _WelcomeAction(label: 'MACERA MERKEZİ · GÜNLÜK ÖDÜLLER',
-                      icon: Icons.auto_awesome_rounded, onPressed: widget.onAdventure),
-                    const SizedBox(height: 10),
-                    Text('Kaydedilen bölüm: ${widget.currentCity}  ${widget.currentStage}/3',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: Color(0xFFFFE2A1),
-                        shadows: [Shadow(color: Colors.black, blurRadius: 3)])),
+                    _V317HomeButton(label: 'MACERA MERKEZİ · GÜNLÜK ÖDÜLLER',
+                      icon: Icons.auto_awesome_rounded,
+                      onTap: widget.onAdventure),
+                    const SizedBox(height: 19),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 18, vertical: 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(22),
+                        color: const Color(0xD4091D34),
+                        border: Border.all(color: const Color(0x7DE6BF77)),
+                      ),
+                      child: Text(
+                        'Kaldığın yer  ·  ${widget.currentCity}  ${widget.currentStage}/3',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Color(0xFFFFE4B0),
+                            fontWeight: FontWeight.w600, fontSize: 12.5),
+                      ),
+                    ),
                     const SizedBox(height: 8),
-                    TextButton.icon(onPressed: widget.onExit,
-                      icon: const Icon(Icons.exit_to_app_rounded),
+                    TextButton.icon(
+                      onPressed: widget.onExit,
+                      icon: const Icon(Icons.logout_rounded, size: 18),
                       label: const Text('Çıkış'),
-                      style: TextButton.styleFrom(foregroundColor: Colors.white)),
+                      style: TextButton.styleFrom(
+                          foregroundColor: const Color(0xFFFBEEDD)),
+                    ),
                   ])),
-              ]),
+                ]),
+              ),
             ),
-          ));
+          );
         })),
       ]),
     );
   }
+}
+
+class _V317HomeButton extends StatelessWidget {
+  const _V317HomeButton({required this.label, required this.icon,
+      required this.onTap, this.primary = false});
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+  final bool primary;
+
+  @override
+  Widget build(BuildContext context) => Material(
+    color: Colors.transparent,
+    child: InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(22),
+      child: Ink(
+        width: double.infinity,
+        height: primary ? 59 : 55,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(22),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft, end: Alignment.bottomRight,
+            colors: primary
+              ? const [Color(0xFF36E985), Color(0xFF099D55),
+                  Color(0xFF006E41)]
+              : const [Color(0xFF194779), Color(0xF50C2B52),
+                  Color(0xFF071C36)],
+          ),
+          border: Border.all(color: const Color(0xFFFFD57D), width: 1.7),
+          boxShadow: const [
+            BoxShadow(color: Color(0xB2030B15), blurRadius: 12,
+                offset: Offset(0, 5)),
+            BoxShadow(color: Color(0x2DFFE1A3), blurRadius: 9),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Icon(icon, color: Colors.white,
+              size: primary ? 25 : 22),
+            const SizedBox(width: 10),
+            Flexible(child: FittedBox(fit: BoxFit.scaleDown, child: Text(
+              label,
+              maxLines: 1,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white,
+                fontWeight: FontWeight.w900,
+                fontSize: primary ? 18 : 15,
+                letterSpacing: .45),
+            ))),
+          ]),
+        ),
+      ),
+    ),
+  );
 }
 
 class _WelcomeRound extends StatelessWidget {
