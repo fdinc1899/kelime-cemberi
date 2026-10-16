@@ -20,6 +20,7 @@ part 'src/data/province_puzzles.dart';
 part 'src/features/adventure_features.dart';
 part 'src/features/v29_experience.dart';
 part 'src/features/v31_world.dart';
+part 'src/features/v321_arcade.dart';
 part 'src/features/v316_expedition.dart';
 part 'src/screens/game_screen.dart';
 part 'src/screens/premium_page.dart';
