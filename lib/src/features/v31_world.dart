@@ -667,6 +667,7 @@ class _V31WorldCenterState extends State<V31WorldCenter> {
       V323Challenges(prefs: widget.prefs, onReward: widget.onReward),
       V324MuseumZen(prefs: widget.prefs, completed: widget.completed),];
     return Column(children: [
+      const V327ModeTip(mode: 'v31'),
       SizedBox(height: 54, child: ListView.builder(scrollDirection: Axis.horizontal,
         itemCount: titles.length, itemBuilder: (context, i) => Padding(
           padding: const EdgeInsets.all(4), child: ChoiceChip(

@@ -246,6 +246,17 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
     _openLevel(_level);
     if (mounted) setState(() => _readyToPlay = true);
     _startMusic();
+    _v327FirstRunCheck(prefs);
+  }
+
+  // V327_TUTORIAL: first launch only; never edits gameplay progress or coins.
+  Future<void> _v327FirstRunCheck(SharedPreferences prefs) async {
+    if (_completedLevels.isNotEmpty || _unlocked != 0 ||
+        prefs.getBool('v327_intro_seen') == true) return;
+    await prefs.setBool('v327_intro_seen', true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) V327TutorialScreen.open(context);
+    });
   }
 
   void _openLevel(int index) {
@@ -821,6 +832,12 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
               Navigator.pop(menuContext);
               WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) _showStatistics(); });
             }),
+            _premiumMenuItem(Icons.help_outline_rounded, 'Nasıl Oynanır?', () {
+              Navigator.pop(menuContext);
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) V327TutorialScreen.open(context);
+              });
+            }),
             _premiumMenuItem(Icons.settings_rounded, 'Ayarlar', () {
               Navigator.pop(menuContext);
               WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) _showSettings(); });
@@ -884,6 +901,9 @@ class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateM
           change(() => _vibrationOn = v); _prefs?.setBool('vibration_enabled_v5', v);
           if (v) HapticFeedback.selectionClick();
         }),
+        _premiumMenuItem(Icons.school_outlined, 'Nasıl Oynanır?', () {
+          V327TutorialScreen.open(context);
+        }, detail: 'Etkileşimli 5 adım'),
         _premiumMenuItem(Icons.palette_outlined, 'Tema', () {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:
             Text('Premium gece teması etkin')));

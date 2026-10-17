@@ -340,6 +340,7 @@ class _V324MuseumZenState extends State<V324MuseumZen> {
     ];
     final views = <Widget>[_museumView(), _zenView(), _themesView()];
     return Column(children: [
+      const V327ModeTip(mode: 'museum'),
       SizedBox(height: 54, child: ListView.builder(
         scrollDirection: Axis.horizontal, itemCount: sections.length,
         itemBuilder: (context, i) => Padding(

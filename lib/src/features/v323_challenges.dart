@@ -447,6 +447,7 @@ class _V323ChallengesState extends State<V323Challenges>
   );
 
   Widget _v326Build(BuildContext context) => Column(children: [
+    const V327ModeTip(mode: 'challenges'),
     Padding(padding: const EdgeInsets.fromLTRB(6, 6, 6, 1), child: Row(children: [
       _menu('SÜRELİ', Icons.timer, 0),
       _menu('DÜELLO', Icons.sports_martial_arts, 1),

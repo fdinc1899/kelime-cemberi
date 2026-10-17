@@ -456,6 +456,7 @@ class _V29AdventureDashboardState extends State<V29AdventureDashboard> {
         onRestore: widget.onRestoreProgress),
     ];
     return Column(children: [
+      const V327ModeTip(mode: 'adventure'),
       SizedBox(height: 55, child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: titles.length, padding: EdgeInsets.symmetric(horizontal: 8),

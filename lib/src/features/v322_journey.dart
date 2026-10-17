@@ -348,6 +348,7 @@ class _V322JourneyState extends State<V322Journey> {
   );
 
   Widget _v326Build(BuildContext context) => Column(children: [
+    const V327ModeTip(mode: 'journey'),
     Padding(padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
       child: Row(children: [
         Expanded(child: _menu('DEDEKTİF', Icons.search, 0)),

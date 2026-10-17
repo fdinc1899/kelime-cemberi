@@ -262,6 +262,7 @@ class _V321ArcadeState extends State<V321Arcade> {
       Icons.emoji_events];
     final count = _finished.length + _bossFinished.length;
     return ListView(children: [
+      const V327ModeTip(mode: 'arcade'),
       _panel('V32.1 · YENİ OYUN MODLARI', Column(children: [
         _label('81 şehir × 4 yeni görev = 324 isteğe bağlı meydan okuma.'),
         const SizedBox(height: 10),
